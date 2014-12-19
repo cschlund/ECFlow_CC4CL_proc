@@ -7,7 +7,9 @@ F90=ftn
 libfile=lib.ecmwf.cray
 include $(libfile)
 
-. config_paths.file
+cfgfile=config_paths.file
+include $(cfgfile)
+
 lcommon=-lorac_common
 lpre=-lpreproc
 lmain=-lorac
