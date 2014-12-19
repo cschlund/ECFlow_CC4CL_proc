@@ -41,13 +41,17 @@ please create your suite using "--testrun"
     this is the source code for ecflow required on local machine
 
     start ecflow server
-        ecflow_start -p 3500 -d $HOME/ecflow_logs
+        ecflow_start.sh -p 3500 -d $HOME/ecflow_logs
 
     stop ecflow server, if you do not need it anymore!
-        ecflow_stop -p 3500
+        ecflow_stop.sh -p 3500
 
     edit config.sh
         adapt all variables and paths!
+
+    check if ecflow server is running
+        source config.sh
+        ecflow_client --ping
 
     edit suite config file
         edit config_suite.py
