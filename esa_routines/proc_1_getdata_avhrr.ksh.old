@@ -1,0 +1,119 @@
+#!/bin/ksh
+#
+# proc_1_get_data_avhrr.ksh
+#
+#***
+#
+# ######################################################################################################
+#
+# NAME
+#       proc_1_get_data_avhrr.ksh
+#
+# PURPOSE
+#       Extract AVHRR data from ECFS
+#       gets one month of data
+#
+# USES
+#
+#
+#
+# HISTORY
+#       2012-05-11  A.Kniffka DWD KU22
+#           created
+#       2012-06-12  M.JERG DWD KU22
+#           modified to only extract AVHRR
+#       2012-06-20 S.Stapelberg DWD KU22
+#           untar data to $datadir rm tar if succesful
+#           only one while loop left now for unix seconds -- not working at ECMWF!!!
+#       2012-06-21 S.Stapelberg
+#           different unixseconds approach works now at ECMWF
+#           needs extra function ymdhms2unix.ksh
+#	2012-07-11 S.Stapelberg
+#	    added STARTDAY and STOPDAY to configfile 
+#           gets now data of a single day ; if wanted
+# 2014-04-08 MJ migration to cca/sf7
+#
+# ######################################################################################################
+#-----------------------------------------------------------------------------
+get_avhrr()
+#
+# get AVHRR files from ECFS
+#
+# ARG1: year, e.g. 2007
+# ARG2: month + day, e.g. 0824
+#
+#-----------------------------------------------------------------------------
+#
+{
+ YEAR=${1}
+ MONDAY=${2}
+ datadir=${3}/
+
+    els ec:/sf6/gacrepr1/pps_v1/$YEAR/$MONDAY
+    bla=${?}
+    #just in case there are some files, retrieve them
+    if [ $bla -eq 0 ]
+	then
+        echo "GET_AVHRR: Get Data for " ${YEAR}${MONDAY}"."
+	ecp ec:/sf6/gacrepr1/pps_v1/$YEAR/$MONDAY/pps_avhrr_${YEAR}${MONDAY}.tar    $datadir
+	ret1=${?}
+	ecp ec:/sf6/gacrepr1/pps_v1/$YEAR/$MONDAY/sunsatangles_${YEAR}${MONDAY}.tar $datadir
+	ret2=${?}	
+	ecp ec:/sf6/gacrepr1/pps_v1/$YEAR/$MONDAY/physiography_${YEAR}${MONDAY}.tar $datadir
+	ret3=${?}
+    fi
+
+    #was retrieval succesful? if not, return 1
+    numfi=`ls -l $datadir/*${YEAR}${MONDAY}.tar | wc -l`
+    if [ $numfi -ne 3 ]  || [ $ret1 -ne 0  ] || [ $ret2 -ne 0  ] || [ $ret3 -ne 0  ]
+	then
+	echo "ERROR: GET_AVHRR FAILED: Not all files were retrieved for " ${YEAR}${MONDAY}"." ${numfi} ${ret1} ${ret2} ${ret3}
+	return 1
+    fi
+
+    #----sstapelb 19062012 untar files in datadir----------------------------------------------------------
+    cd $datadir
+    #tar files will be removed if untar was successful
+    tar xf pps_avhrr_${YEAR}${MONDAY}.tar    && rm -f pps_avhrr_${YEAR}${MONDAY}.tar
+    tar xf sunsatangles_${YEAR}${MONDAY}.tar && rm -f sunsatangles_${YEAR}${MONDAY}.tar
+    tar xf physiography_${YEAR}${MONDAY}.tar && rm -f physiography_${YEAR}${MONDAY}.tar
+    #------------------------------------------------------------------------------------------------------
+
+}
+#-----------------------------------------------------------------------------
+############################
+#
+#          Main
+#
+############################
+
+set -xv
+
+#source path configfile 
+. $1
+
+#source proc 1 configfile
+. $2
+
+# new approach with unixseconds sstapelb 20.06.2012
+
+#-this should work in Reading too-----sstapelb--21-06-2012-------------------------------------
+unix_start=`${ESA_ROUT}/ymdhms2unix.ksh $STARTYEAR $STARTMONTH $STARTDAY`
+if [ $STOPDAY -eq 0 ] ; then 
+STOPDAY=`cal $STOPMONTH $STOPYEAR | tr -s " " "\n" | tail -1` # nr days of month
+fi
+unix_stop=`${ESA_ROUT}/ymdhms2unix.ksh $STOPYEAR $STOPMONTH $STOPDAY`
+unix_counter=$unix_start
+while [ $unix_counter -le $unix_stop ]
+  do
+    YEAR=`perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');'`
+    MONS=`perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');'`
+    DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'`
+    DATADIRA=${INPUTDIR}/AVHRR/${platform}/${YEAR}/${MONS}/${DAYS}
+    mkdir -p $DATADIRA
+    get_avhrr $YEAR ${MONS}${DAYS} $DATADIRA
+    retc=${?}
+    (( unix_counter += 86400 )) # go to next day
+done
+#----------------------------------------------------------------------------------------------
+
