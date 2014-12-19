@@ -1,0 +1,16 @@
+%include <pbs_serial.h>
+%include <head.h>
+%include <export.h>
+
+export ATP_ENABLED=0
+ulimit -c unlimited
+ulimit -s unlimited
+
+echo "I am task %TASK% in family %FAMILY% responsible for archiving L3 data"
+%include <randomsleep.h>
+
+# -- execute ksh script
+#%RENAME_LOCAL_L3_KSH% %CFG_PATHS_FILE%
+#%ARCHIVE_L3_KSH% %CFG_PATHS_FILE%
+
+%include <tail.h>

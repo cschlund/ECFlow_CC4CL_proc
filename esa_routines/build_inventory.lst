@@ -1,0 +1,344 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S u m m a r y   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compilation
+-----------
+File     : /perm/ms/de/sf7/cschlund/ecflow_cc4cl_proc/src/build_inventory.F90
+Compiled : 12/01/14  12:52:19
+Compiler : Version 8.2.7
+Ftnlx    : Version 8242 (libcif 82030)
+Target   : x86-64
+Command  : ftn_driver.exe -hcpu=ivybridge -hdynamic -hnetwork=aries -c -Oomp
+           -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread3
+           -hmpi1 -hflex_mp=tolerant -rom -ef -em -DWRAPPER -DDEBUG
+           -I/perm/us/usc/hdfeos/include -I./
+           -I/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_pe
+           rformance_parallel-dwd/include
+           -J/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_pe
+           rformance_parallel-dwd/mod
+           -I/perm/ms/de/sf7/esa_cci_c_proc/software/epr/epr_api-2.2/src
+           -I/opt/cray/cce/8.2.7/craylibs/x86-64/include
+           -I/opt/cray/rca/1.0.0-2.0502.49765.5.41.ari/include
+           -I/opt/cray/alps/5.2.0-2.0502.8594.12.4.ari/include
+           -I/opt/cray/xpmem/0.1-2.0502.50559.4.2.ari/include
+           -I/opt/cray/gni-headers/3.0-1.0502.8554.6.6.ari/include
+           -I/opt/cray/dmapp/7.0.1-1.0502.8638.9.93.ari/include
+           -I/opt/cray/pmi/5.0.3-1.0000.9981.128.2.ari/include
+           -I/opt/cray/ugni/5.0-1.0502.8670.4.22.ari/include
+           -I/opt/cray/udreg/2.3.2-1.0502.8413.2.9.ari/include
+           -I/opt/cray/krca/1.0.0-2.0502.50273.6.28.ari/include
+           -I/opt/cray-hss-devel/7.1.0/include
+           -I/opt/cray/wlm_detect/1.0-1.0502.48996.3.2.ari/include
+           -I/opt/cray/hdf5/1.8.12/CRAY/81/include
+           -I/opt/cray/netcdf/4.3.1/CRAY/81/include
+           -I/opt/cray/mpt/6.3.1/gni/mpich2-cray/81/include
+           -I/opt/cray/libsci/12.2.0/CRAY/81/sandybridge/include
+           -I/usr/local/apps/hdf/4.2.10/CRAY/82/include
+           -I/usr/local/apps/grib_api/1.12.3/CRAY/82/include64
+           -I/usr/local/apps/jasper/1.900.1//include
+           -I/opt/cray/rca/1.0.0-2.0502.49765.5.41.ari/include
+           -I/opt/cray/alps/5.2.0-2.0502.8594.12.4.ari/include
+           -I/opt/cray/xpmem/0.1-2.0502.50559.4.2.ari/include
+           -I/opt/cray/gni-headers/3.0-1.0502.8554.6.6.ari/include
+           -I/opt/cray/dmapp/7.0.1-1.0502.8638.9.93.ari/include
+           -I/opt/cray/pmi/5.0.3-1.0000.9981.128.2.ari/include
+           -I/opt/cray/ugni/5.0-1.0502.8670.4.22.ari/include
+           -I/opt/cray/udreg/2.3.2-1.0502.8413.2.9.ari/include
+           -I/opt/cray/wlm_detect/1.0-1.0502.48996.3.2.ari/include
+           -I/opt/cray/krca/1.0.0-2.0502.50273.6.28.ari/include
+           -I/opt/cray-hss-devel/7.1.0/include build_inventory.F90
+
+ftnlx report
+------------
+Source   : /perm/ms/de/sf7/cschlund/ecflow_cc4cl_proc/src/build_inventory.F90
+Date     : 12/01/2014  12:52:22
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          O p t i o n s   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Options :  -O cache3,fp3,scalar3,thread3,vector3,modinline,ipa3,aggress
+           -O autoprefetch,noautothread,fusion2,nomsgs,negmsgs,nooverindex
+           -O pattern,shortcircuit2,unroll2,nozeroinc
+           -h mpi1,noadd_paren,align_arrays,caf,nocontiguous,nofp_trap
+           -h nofunc_trace,nomessage,noomp_analyze,noomp_trace,nopat_trace
+           -h safe_addr
+           -h omp,noomp_acc,noacc
+           -h flex_mp=tolerant
+           -h cpu=x86-64,ivybridge,aries
+           -s default32
+           -eh
+           -d acdgjnopvBDEIPQRSZ0
+           -e mqswACFT
+           -J perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_pe
+           rformance_parallel-dwd/mod 
+           -f free
+           -m3
+           -S /lus/TMP/JTMP/44/sf7.27694.cca-login2.20141201T102035/pe_15794/bui
+           ld_inventory_1.s
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+     %%%    L o o p m a r k   L e g e n d    %%%
+
+     Primary Loop Type        Modifiers
+     ------- ---- ----        ---------
+     A - Pattern matched      a - atomic memory operation
+                              b - blocked
+     C - Collapsed            c - conditional and/or computed
+     D - Deleted               
+     E - Cloned                
+     F - Flat - No calls      f - fused
+     G - Accelerated          g - partitioned
+     I - Inlined              i - interchanged
+     M - Multithreaded        m - partitioned
+                              n - non-blocking remote transfer
+                              p - partial
+                              r - unrolled
+                              s - shortloop
+     V - Vectorized           w - unwound
+
+     + - More messages listed at end of listing
+     ------------------------------------------
+
+
+    1.     subroutine build_inventory(log_dir,out_dir,jid,&
+    2.          & instrument,platform,month,year,&
+    3.          & inventory_file_pre,inventory_file_liq,inventory_file_ice,inventory_file_post,mytask,ntasks)
+    4.     
+    5.       implicit none
+    6.     
+    7.       integer :: ntasks,mytask
+    8.     
+    9.       character(len=512) :: jid,log_dir,out_dir
+   10.       character(len=15) :: instrument,platform  
+   11.       character(len=4) :: year
+   12.       character(len=2) :: month
+   13.     
+   14.       character(len=256) :: inventory_file_pre,inventory_file_liq,inventory_file_ice,inventory_file_post
+   15.       character(len=1536) :: command_line
+   16.     
+   17.       integer :: estat,cstat
+   18.       character(len=1024) :: cmsg
+   19.     
+   20.       !if(ntasks .lt. 4) then
+   21.     
+   22.       !set up inventory file names
+   23.       write(*,*) 'INV: define files'
+   24.       inventory_file_pre=trim(adjustl(log_dir))//&
+   25.            & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
+   26.            & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
+   27.            & trim(adjustl(jid))//'.pre.lst'
+   28.       write(*,*) 'pre',trim(adjustl(inventory_file_pre))
+   29.     
+   30.       inventory_file_liq=trim(adjustl(log_dir))//&
+   31.            & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
+   32.            & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
+   33.            & trim(adjustl(jid))//'.liq.lst'
+   34.       write(*,*) 'liq',trim(adjustl(inventory_file_liq))
+   35.     
+   36.       inventory_file_ice=trim(adjustl(log_dir))//&
+   37.            & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
+   38.            & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
+   39.            & trim(adjustl(jid))//'.ice.lst'
+   40.       write(*,*) 'ice',trim(adjustl(inventory_file_ice)) 
+   41.     
+   42.       inventory_file_post=trim(adjustl(log_dir))//&
+   43.            & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
+   44.            & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
+   45.            & trim(adjustl(jid))//'.post.lst'
+   46.       write(*,*) 'post',trim(adjustl(inventory_file_post)) 
+   47.     
+   48.       !erase any existing files
+   49.       command_line='rm -rf '//trim(adjustl(inventory_file_pre))
+   50.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   51.       write(*,*) trim(adjustl(command_line))
+   52.       command_line='rm -rf '//trim(adjustl(inventory_file_liq))
+   53.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   54.       write(*,*) trim(adjustl(command_line))
+   55.       command_line='rm -rf '//trim(adjustl(inventory_file_ice))
+   56.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   57.       write(*,*) trim(adjustl(command_line))
+   58.       command_line='rm -rf '//trim(adjustl(inventory_file_post))
+   59.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   60.       write(*,*) trim(adjustl(command_line))
+   61.     
+   62.       !determine number of files and write into inventory
+   63.       command_line='find '//trim(adjustl(out_dir))//'/*' //trim(adjustl(jid))// '/ -mindepth 1 -maxdepth 1 -type d | wc -l >> '//trim(adjustl(inventory_file_pre))
+   64.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   65.       write(*,*) trim(adjustl(command_line))
+   66.       command_line='find '//trim(adjustl(out_dir))//'/*' //trim(adjustl(jid))// '/ -mindepth 1 -maxdepth 1 -type d | wc -l >> '//trim(adjustl(inventory_file_liq))
+   67.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   68.       write(*,*) trim(adjustl(command_line))
+   69.       command_line='find '//trim(adjustl(out_dir))//'/*' //trim(adjustl(jid))// '/ -mindepth 1 -maxdepth 1 -type d | wc -l >> '//trim(adjustl(inventory_file_ice))
+   70.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   71.       write(*,*) trim(adjustl(command_line))
+   72.       command_line='find '//trim(adjustl(out_dir))//'/*' //trim(adjustl(jid))// '/ -mindepth 1 -maxdepth 1 -type d | wc -l >> '//trim(adjustl(inventory_file_post))
+   73.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   74.       write(*,*) trim(adjustl(command_line))
+   75.     
+   76.       !fill inventory files
+   77.       command_line='find '//trim(adjustl(out_dir))//'/*' //trim(adjustl(jid))// '/*/preproc_driver_*.dat -maxdepth 3 -type f | sort >> '&
+   78.            & //trim(adjustl(inventory_file_pre))
+   79.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   80.       write(*,*) trim(adjustl(command_line))
+   81.       command_line='find '//trim(adjustl(out_dir))//'/*' //trim(adjustl(jid))// '/*/mainproc_driver_*WAT.dat -maxdepth 3 -type f | sort >> '&
+   82.            & //trim(adjustl(inventory_file_liq))
+   83.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   84.       write(*,*) trim(adjustl(command_line))
+   85.       command_line='find '//trim(adjustl(out_dir))//'/*' //trim(adjustl(jid))// '/*/mainproc_driver_*ICE.dat -maxdepth 3 -type f | sort >> '&
+   86.            & //trim(adjustl(inventory_file_ice))
+   87.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   88.       write(*,*) trim(adjustl(command_line))
+   89.       command_line='find '//trim(adjustl(out_dir))//'/*' //trim(adjustl(jid))// '/*/postproc_driver_*.dat -maxdepth 3 -type f | sort >> '&
+   90.            & //trim(adjustl(inventory_file_post))
+   91.  +    call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+   92.       write(*,*) trim(adjustl(command_line))
+   93.     
+   94.       !else
+   95.     
+   96.       !set up inventory file names
+   97.       !write(*,*) 'INV: define files mytask',mytask
+   98.       !inventory_file_pre=trim(adjustl(log_dir))//&
+   99.     !!$          & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
+  100.     !!$          & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
+  101.     !!$             & trim(adjustl(jid))//'.pre.lst'
+  102.     !!$     write(*,*) 'pre',trim(adjustl(inventory_file_pre))
+  103.     !!$
+  104.     !!$     inventory_file_liq=trim(adjustl(log_dir))//&
+  105.     !!$          & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
+  106.     !!$          & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
+  107.     !!$          & trim(adjustl(jid))//'.liq.lst'
+  108.     !!$     write(*,*) 'liq',trim(adjustl(inventory_file_liq))
+  109.     !!$
+  110.     !!$     inventory_file_ice=trim(adjustl(log_dir))//&
+  111.     !!$          & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
+  112.     !!$          & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
+  113.     !!$          & trim(adjustl(jid))//'.ice.lst'
+  114.     !!$     write(*,*) 'ice',trim(adjustl(inventory_file_ice)) 
+  115.     !!$
+  116.     !!$     inventory_file_post=trim(adjustl(log_dir))//&
+  117.     !!$          & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
+  118.     !!$          & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
+  119.     !!$          & trim(adjustl(jid))//'.post.lst'
+  120.     !!$     write(*,*) 'post',trim(adjustl(inventory_file_post)) 
+  121.     !!$     
+  122.     !!$
+  123.     !!$     if(mytask .eq. 0 ) then
+  124.     !!$        
+  125.     !!$        !erase any existing files
+  126.     !!$        command_line='rm -rf '//trim(adjustl(inventory_file_pre))
+  127.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  128.     !!$        write(*,*) trim(adjustl(command_line))
+  129.     !!$
+  130.     !!$        !determine number of files and write into inventory
+  131.     !!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 2 -type d -wholename "*'//trim(adjustl(jid))//'/*" | wc -l >> '//trim(adjustl(inventory_file_pre))
+  132.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  133.     !!$        write(*,*) trim(adjustl(command_line))
+  134.     !!$
+  135.     !!$        !fill inventory files
+  136.     !!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 3 -type f -wholename "*'//trim(adjustl(jid))//'/*/preproc_driver_*.dat" | sort >> '&
+  137.     !!$             & //trim(adjustl(inventory_file_pre))
+  138.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  139.     !!$        write(*,*) trim(adjustl(command_line))
+  140.     !!$             
+  141.     !!$     elseif(mytask .eq. 1) then
+  142.     !!$
+  143.     !!$        command_line='rm -rf '//trim(adjustl(inventory_file_liq))
+  144.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  145.     !!$        write(*,*) trim(adjustl(command_line))
+  146.     !!$        
+  147.     !!$
+  148.     !!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 2 -type d -wholename "*'//trim(adjustl(jid))//'/*" | wc -l >> '//trim(adjustl(inventory_file_liq))
+  149.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  150.     !!$        write(*,*) trim(adjustl(command_line))
+  151.     !!$        
+  152.     !!$        
+  153.     !!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 3 -type f -wholename "*'//trim(adjustl(jid))//'/*/mainproc_driver_*WAT.dat" | sort >> '&
+  154.     !!$             & //trim(adjustl(inventory_file_liq))
+  155.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  156.     !!$        write(*,*) trim(adjustl(command_line))
+  157.     !!$        
+  158.     !!$     elseif(mytask .eq. 2) then
+  159.     !!$        
+  160.     !!$        command_line='rm -rf '//trim(adjustl(inventory_file_ice))
+  161.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  162.     !!$        write(*,*) trim(adjustl(command_line))
+  163.     !!$        
+  164.     !!$        
+  165.     !!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 2 -type d -wholename "*'//trim(adjustl(jid))//'/*" | wc -l >> '//trim(adjustl(inventory_file_ice))
+  166.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  167.     !!$        write(*,*) trim(adjustl(command_line))
+  168.     !!$        
+  169.     !!$        
+  170.     !!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 3 -type f -wholename "*'//trim(adjustl(jid))//'/*/mainproc_driver_*ICE.dat" | sort >> '&
+  171.     !!$             & //trim(adjustl(inventory_file_ice))
+  172.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  173.     !!$        write(*,*) trim(adjustl(command_line))
+  174.     !!$        
+  175.     !!$        
+  176.     !!$     elseif(mytask .eq. 3) then
+  177.     !!$        
+  178.     !!$        command_line='rm -rf '//trim(adjustl(inventory_file_post))
+  179.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  180.     !!$        write(*,*) trim(adjustl(command_line))
+  181.     !!$        
+  182.     !!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 2 -type d -wholename "*'//trim(adjustl(jid))//'/*" | wc -l >> '//trim(adjustl(inventory_file_post))
+  183.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  184.     !!$        write(*,*) trim(adjustl(command_line))
+  185.     !!$        
+  186.     !!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 3 -type f -wholename "*'//trim(adjustl(jid))//'/*/postproc_driver_*.dat" | sort >> '&
+  187.     !!$             & //trim(adjustl(inventory_file_post))
+  188.     !!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  189.     !!$        write(*,*) trim(adjustl(command_line))
+  190.     !!$        
+  191.     !!$     endif
+  192.     !!$
+  193.     !!$  endif
+  194.     end subroutine build_inventory
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 50 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 53 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 56 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 59 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 64 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 67 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 70 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 73 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 79 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 83 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 87 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = build_inventory.F90, Line = 91 
+  "_EXECUTE_COMMAND_LINE" (called from "build_inventory") was not inlined because the compiler was unable to locate the routine.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,1230 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S u m m a r y   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compilation
+-----------
+File     : /perm/ms/de/sf7/cschlund/ecflow_cc4cl_proc/src/mpi_wrapper.F90
+Compiled : 12/01/14  12:52:00
+Compiler : Version 8.2.7
+Ftnlx    : Version 8242 (libcif 82030)
+Target   : x86-64
+Command  : ftn_driver.exe -hcpu=ivybridge -hdynamic -hnetwork=aries -c -Oomp
+           -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread3
+           -hmpi1 -hflex_mp=tolerant -rom -ef -em -DWRAPPER -DDEBUG
+           -I/perm/us/usc/hdfeos/include -I./
+           -I/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_pe
+           rformance_parallel-dwd/include
+           -J/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_pe
+           rformance_parallel-dwd/mod
+           -I/perm/ms/de/sf7/esa_cci_c_proc/software/epr/epr_api-2.2/src
+           -I/opt/cray/cce/8.2.7/craylibs/x86-64/include
+           -I/opt/cray/rca/1.0.0-2.0502.49765.5.41.ari/include
+           -I/opt/cray/alps/5.2.0-2.0502.8594.12.4.ari/include
+           -I/opt/cray/xpmem/0.1-2.0502.50559.4.2.ari/include
+           -I/opt/cray/gni-headers/3.0-1.0502.8554.6.6.ari/include
+           -I/opt/cray/dmapp/7.0.1-1.0502.8638.9.93.ari/include
+           -I/opt/cray/pmi/5.0.3-1.0000.9981.128.2.ari/include
+           -I/opt/cray/ugni/5.0-1.0502.8670.4.22.ari/include
+           -I/opt/cray/udreg/2.3.2-1.0502.8413.2.9.ari/include
+           -I/opt/cray/krca/1.0.0-2.0502.50273.6.28.ari/include
+           -I/opt/cray-hss-devel/7.1.0/include
+           -I/opt/cray/wlm_detect/1.0-1.0502.48996.3.2.ari/include
+           -I/opt/cray/hdf5/1.8.12/CRAY/81/include
+           -I/opt/cray/netcdf/4.3.1/CRAY/81/include
+           -I/opt/cray/mpt/6.3.1/gni/mpich2-cray/81/include
+           -I/opt/cray/libsci/12.2.0/CRAY/81/sandybridge/include
+           -I/usr/local/apps/hdf/4.2.10/CRAY/82/include
+           -I/usr/local/apps/grib_api/1.12.3/CRAY/82/include64
+           -I/usr/local/apps/jasper/1.900.1//include
+           -I/opt/cray/rca/1.0.0-2.0502.49765.5.41.ari/include
+           -I/opt/cray/alps/5.2.0-2.0502.8594.12.4.ari/include
+           -I/opt/cray/xpmem/0.1-2.0502.50559.4.2.ari/include
+           -I/opt/cray/gni-headers/3.0-1.0502.8554.6.6.ari/include
+           -I/opt/cray/dmapp/7.0.1-1.0502.8638.9.93.ari/include
+           -I/opt/cray/pmi/5.0.3-1.0000.9981.128.2.ari/include
+           -I/opt/cray/ugni/5.0-1.0502.8670.4.22.ari/include
+           -I/opt/cray/udreg/2.3.2-1.0502.8413.2.9.ari/include
+           -I/opt/cray/wlm_detect/1.0-1.0502.48996.3.2.ari/include
+           -I/opt/cray/krca/1.0.0-2.0502.50273.6.28.ari/include
+           -I/opt/cray-hss-devel/7.1.0/include mpi_wrapper.F90
+
+ftnlx report
+------------
+Source   : /perm/ms/de/sf7/cschlund/ecflow_cc4cl_proc/src/mpi_wrapper.F90
+Date     : 12/01/2014  12:52:06
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          O p t i o n s   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Options :  -O cache3,fp3,scalar3,thread3,vector3,modinline,ipa3,aggress
+           -O autoprefetch,noautothread,fusion2,nomsgs,negmsgs,nooverindex
+           -O pattern,shortcircuit2,unroll2,nozeroinc
+           -h mpi1,noadd_paren,align_arrays,caf,nocontiguous,nofp_trap
+           -h nofunc_trace,nomessage,noomp_analyze,noomp_trace,nopat_trace
+           -h safe_addr
+           -h omp,noomp_acc,noacc
+           -h flex_mp=tolerant
+           -h cpu=x86-64,ivybridge,aries
+           -s default32
+           -eh
+           -d acdgjnopvBDEIPQRSZ0
+           -e mqswACFT
+           -J perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_pe
+           rformance_parallel-dwd/mod 
+           -f free
+           -m3
+           -S /lus/TMP/JTMP/44/sf7.27694.cca-login2.20141201T102035/pe_11467/mpi
+           _wrapper_1.s
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+     %%%    L o o p m a r k   L e g e n d    %%%
+
+     Primary Loop Type        Modifiers
+     ------- ---- ----        ---------
+     A - Pattern matched      a - atomic memory operation
+                              b - blocked
+     C - Collapsed            c - conditional and/or computed
+     D - Deleted               
+     E - Cloned                
+     F - Flat - No calls      f - fused
+     G - Accelerated          g - partitioned
+     I - Inlined              i - interchanged
+     M - Multithreaded        m - partitioned
+                              n - non-blocking remote transfer
+                              p - partial
+                              r - unrolled
+                              s - shortloop
+     V - Vectorized           w - unwound
+
+     + - More messages listed at end of listing
+     ------------------------------------------
+
+
+    1.              program mpi_wrapper
+    2.              
+    3.                !todo:
+    4.                !read in more command line arguments: chunksize,mode of operation (static etc) DONE
+    5.                !ueberhole find fuer pfade damit es keinen mess-up gibt, checke gemeinsame
+    6.                ! strings und fange ab DONE
+    7.                !lenke output aus script in loffile um TO BE DONE
+    8.                !output oaus wrapper code in monthly logfile DONE
+    9.                !1024 bzw. 2048 als variable POSTPONED
+   10.                !ziehe aenderungen auf static nach POSTPONED
+   11.                !loesche files von erfolgreichem schritt weg wenn naechster schritt
+   12.                ! erfolgreich. wie macht man das am besten? DONE
+   13.                !schreibe logfile fuer jede cpu bzw. jeden chunk TO BE DONE
+   14.                !chunking dynamisch setzen je nachdem wieviele tasks und files und je nach
+   15.                ! instrument PARTLY DONE
+   16.                !gibt es memory leaks in den teilprogrammen? TO BE INVESTIGATED: NO EVIDENCE
+   17.                !starte code mit vorhandenem inventory TO BE DONE
+   18.                !Parallelisiere laufen der scripts DONE
+   19.                !Andere Abarbeitung des Inventory-Teils DONE
+   20.                !Mehr logging TO BE DONE
+   21.                !seltsamer output weg machen DONE
+   22.                !kommentare TO BE DONE
+   23.                !smooth exit by eigentlicher rechenschelife einbauen DONE needs testing
+   24.                !move final results to filename as before in script TO BW DONE F
+   25.                !only write neccessary fields;O1
+   26.              
+   27.                Use mpi
+   28.              
+   29.                implicit none
+   30.              
+   31.                integer :: ierror,rc, ntasks,mytask,chunk,ifree,icycle,itask,aitask&
+   32.                     &,bitcounter,stime,i,j,iexit,icpu
+   33.              
+   34.                integer :: nfiles_pre,nfiles_liq,nfiles_ice,nfiles_post,nfiles,ifile&
+   35.                     &,nelements,lower_bound,upper_bound,tag0,tag1,tag2,tag3,tag4,&
+   36.                     & status(mpi_status_size)
+   37.              
+   38.                real(kind=4) :: rchunk,rnumber
+   39.              
+   40.                integer, allocatable, dimension(:) :: free,ccounter
+   41.              
+   42.                integer, parameter :: shortest_string=256
+   43.                integer, parameter :: short_string=1024
+   44.                integer, parameter :: long_string=2048
+   45.              
+   46.                integer :: rc_pre,rc_liq,rc_ice,rc_post
+   47.              
+   48.                integer :: nfiles_conf
+   49.                character(len=1024), allocatable, dimension(:) :: file_inventory_conf
+   50.                character*1024 :: filepath_conf
+   51.              
+   52.                character(len=1024), allocatable, dimension(:) :: file_inventory_pre
+   53.                character*1024 :: filepath1024
+   54.              
+   55.                character(len=2048), allocatable, dimension(:) ::  file_inventory_liq&
+   56.                     &,file_inventory_ice,file_inventory_post
+   57.                character*2048 :: filepath2048
+   58.              
+   59.                character(len=10) :: cmytask
+   60.              
+   61.                logical :: lstatic,lidle
+   62.              
+   63.                integer :: nx,ny
+   64.              
+   65.                integer :: nargs,cpu_counter,valmax,maxcpuval
+   66.              
+   67.                character(len=256) :: inventory_file_pre,inventory_file_liq&
+   68.                     &,inventory_file_ice,inventory_file_post
+   69.                character(len=256) :: inventory_file_config,config_paths,config_attributes
+   70.                character(len=1024) :: dummyfile1024
+   71.                character(len=2048) :: dummyfile2048
+   72.              
+   73.                character(len=15) :: instrument,wrapper_mode,platform
+   74.                character(len=4) :: year
+   75.                character(len=2) :: month
+   76.                character(len=512) :: jid,log_dir,out_dir
+   77.                character(len=1024) :: logfile,ilogfile
+   78.                character(len=256) :: to_upper
+   79.              
+   80.                ! Openmp variables
+   81.                integer                                :: nompthreads
+   82.                integer                                           :: omp_get_max_threads
+   83.                integer                                           :: omp_get_num_threads
+   84.              
+   85.                !Initialize MPI
+   86.  +             call MPI_INIT(ierror)
+   87.  +             call MPI_COMM_SIZE(MPI_COMM_WORLD,ntasks,ierror)
+   88.  +             call MPI_COMM_RANK(MPI_COMM_WORLD,mytask,ierror)
+   89.              
+   90.              
+   91.                !use master to read in command-line arguments from starting script
+   92.                if(mytask .eq. 0 ) then
+   93.              
+   94.                   cpu_counter=0
+   95.              
+   96.                   ! get number of arguments
+   97.  +                nargs = COMMAND_ARGUMENT_COUNT()
+   98.                   ! if more than one argument passed, all inputs on command line
+   99.                   if(nargs .eq. 11) then
+  100.              
+  101.  +                   CALL GET_COMMAND_ARGUMENT(1,inventory_file_config)
+  102.  +                   CALL GET_COMMAND_ARGUMENT(2,instrument)
+  103.  +                   CALL GET_COMMAND_ARGUMENT(3,platform)
+  104.  +                   CALL GET_COMMAND_ARGUMENT(4,month)
+  105.  +                   CALL GET_COMMAND_ARGUMENT(5,year)
+  106.  +                   CALL GET_COMMAND_ARGUMENT(6,wrapper_mode)
+  107.  +                   CALL GET_COMMAND_ARGUMENT(7,jid)
+  108.  +                   CALL GET_COMMAND_ARGUMENT(8,log_dir)
+  109.  +                   CALL GET_COMMAND_ARGUMENT(9,out_dir)
+  110.  +                   CALL GET_COMMAND_ARGUMENT(10,config_paths)
+  111.  +                   CALL GET_COMMAND_ARGUMENT(11,config_attributes)
+  112.              
+  113.                   endif
+  114.              
+  115.                   config_paths=trim(adjustl(config_paths))
+  116.                   !write(*,*) 'cp',trim(adjustl(config_paths))
+  117.                   config_attributes=trim(adjustl(config_attributes))
+  118.                   !write(*,*) 'ca', trim(adjustl(config_attributes))
+  119.              
+  120.              
+  121.              
+  122.                   !open file for stdout   
+  123.                   logfile=trim(adjustl(trim(adjustl(log_dir))//'/'//'proc_2_logfile_'&
+  124.                        &//trim(adjustl(jid))//'.log'))
+  125.              
+  126.  +                open(11,file=trim(adjustl(logfile)),status='replace')
+  127.              
+  128.                   !set threadnumber to default=single-threaded
+  129.                   nompthreads=1
+  130.              
+  131.                   ! Check how many threads are available?
+  132.              #ifdef _OPENMP
+  133.  +                nompthreads=omp_get_max_threads()
+  134.              #endif
+  135.              
+  136.                   write(11,*) '#############################################################'
+  137.                   write(11,*) '#############################################################'
+  138.                   write(11,*) "STARTING PARALLEL PROCESSING"
+  139.                   write(11,*)  '-------------------------------------------------------------'
+  140.                   write(11,*)  '-------------------------------------------------------------'
+  141.                   write(11,*) 'CHAIN running on: ', nompthreads, 'threads'
+  142.                   write(11,*) 'NO HYPERTHREADING IF NOT EXPLICITLY TURNED-ON!!!'
+  143.                   write(11,*) 'Number of tasks assigned:', ntasks
+  144.                   write(11,*) 'A total of ', nompthreads*ntasks,' CPUs is in use'
+  145.              
+  146.                   !set mode of operation (maintain only dynamic)
+  147.                   lstatic=.false.
+  148.                   if(trim(adjustl(wrapper_mode)) .eq. 'stat') lstatic=.true.
+  149.                   if(trim(adjustl(wrapper_mode)) .eq. 'dyn') lstatic=.false.
+  150.                   write(11,*)  'WRAPPER IN MODE ', trim(adjustl(wrapper_mode))
+  151.                   lidle=.false.
+  152.              
+  153.  +                open(25,file=trim(adjustl(inventory_file_config)),status='old')
+  154.                   read(25,*) nfiles_conf
+  155.              
+  156.              
+  157.                endif
+  158.              
+  159.                !bcast instrument and platform etc.
+  160.  +             call mpi_bcast(jid,512,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  161.  +             call mpi_bcast(log_dir,512,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  162.  +             call mpi_bcast(instrument,15,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  163.  +             call mpi_bcast(platform,15,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  164.  +             call mpi_bcast(year,4,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  165.  +             call mpi_bcast(month,2,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  166.              
+  167.                !bcast paths to cpus
+  168.  +             call mpi_bcast(config_paths,256,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  169.  +             call mpi_bcast(config_attributes,256,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  170.              
+  171.                !master bcasts "nfiles_conf" to all cpus
+  172.  +             call mpi_bcast(nfiles_conf,1,MPI_INT,0,MPI_COMM_WORLD,ierror)
+  173.  +             call mpi_barrier(MPI_COMM_WORLD,ierror)
+  174.              
+  175.                !allocate inventory on all cpus
+  176.                allocate(file_inventory_conf(nfiles_conf))
+  177.              
+  178.                !master reads now the config inventory file
+  179.                if(mytask .eq. 0 ) then
+  180.              
+  181.  + 1-------<      do ifile=1,nfiles_conf
+  182.    1         
+  183.    1                 read(25,100) filepath1024
+  184.    1                 file_inventory_conf(ifile)=trim(adjustl(filepath1024))
+  185.    1                 write(11,*) 'master',mytask,ifile,nfiles_conf&
+  186.    1                      &,trim(adjustl(file_inventory_conf(ifile)))
+  187.    1         
+  188.    1------->      enddo
+  189.              
+  190.  +                close(25)
+  191.              
+  192.                   !#ifdef
+  193.  +                call flush(11)
+  194.              
+  195.                endif
+  196.              
+  197.                !bcast config files to cpus
+  198.  +             call mpi_bcast(file_inventory_conf,nfiles_conf*1024,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  199.  +             call mpi_barrier(MPI_COMM_WORLD,ierror)
+  200.                !set chunk to 1(assume we always have ncpus>>ndays)
+  201.                chunk=1
+  202.              
+  203.                !set icycle: counts iterations of outer loop
+  204.                icycle=0
+  205.                allocate(free(0:ntasks-1))
+  206.                allocate(ccounter(0:ntasks-1))
+  207.              
+  208.    fA-----<>   free=1
+  209.    f------<>   ccounter=0
+  210.                upper_bound=-1
+  211.                itask=0
+  212.              
+  213.                !this is crucial as it determines the increment of work
+  214.                bitcounter=0
+  215.                !set exit flag for endless loop
+  216.                iexit=0
+  217.              
+  218.                !master cpu only controls others, does nothing else, too bad
+  219.  + 1-------<   do
+  220.    1         
+  221.    1              !if i am worker and i am free, tell master
+  222.    1              if( mytask .ne. 0 .and. free(mytask) .eq. 1)  then
+  223.    1                 tag3=3
+  224.    1                 ifree=1
+  225.    1                 call mpi_send(ifree,1,mpi_integer,0,tag3,mpi_comm_world,ierror)
+  226.    1                 !write(*,*) 'free signal sent',mytask,iexit
+  227.    1              endif
+  228.    1         
+  229.    1              !master monitors workers
+  230.    1              if(mytask .eq. 0) then
+  231.    1         
+  232.    1                 !if there is still work to do, wait for workers to report all is done
+  233.    1                 tag3=3
+  234.    1                 call mpi_recv(ifree,1,mpi_integer,mpi_any_source,tag3,mpi_comm_world,status,ierror)
+  235.    1                 itask=status(mpi_source)
+  236.    1                 write(11,*) 'config work done from cpu',itask
+  237.    1         
+  238.    1                 free(itask)=1
+  239.    1         
+  240.    1                 !if all files are processed, send to all workers the abort signal
+  241.    1                 if(upper_bound .eq. nfiles_conf) then
+  242.    1 Vr4--<>            if(sum(free(0:ntasks-1)) .eq. ntasks ) then
+  243.    1                       write(11,*) 'config work distribution was',ccounter,'sum'&
+  244.    1                            &,sum(ccounter)*chunk,'nfiles',nfiles_conf,ntasks,icycle
+  245.    1                       !sent exit signal to worker
+  246.    1                       tag0=0
+  247.    1                       iexit=1
+  248.  + 1 2-----<               do icpu=1,ntasks-1
+  249.    1 2                        aitask=icpu
+  250.    1 2                        call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
+  251.    1 2                        write(11,*) 'iexit signal sent (close)',mytask,aitask,iexit
+  252.    1 2----->               enddo
+  253.    1                       exit
+  254.    1                    else
+  255.    1                       cycle
+  256.    1                    endif
+  257.    1                 else
+  258.    1                    !if worker is free give it work
+  259.    1                    if(ifree .eq. 1 ) then
+  260.    1                       free(itask)=0
+  261.    1         
+  262.    1                       !determine new work load based on previously done work
+  263.    1                       lower_bound=(chunk*bitcounter)+1
+  264.    1                       upper_bound=min((bitcounter+1)*chunk,nfiles_conf)
+  265.    1                       aitask=itask
+  266.    1         
+  267.    1                       !sent continue signal to worker
+  268.    1                       tag0=0
+  269.    1                       iexit=0
+  270.    1                       call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
+  271.    1                       write(11,*) 'iexit signal sent (free)',mytask,aitask,iexit
+  272.    1         
+  273.    1                       !sent work assigment to worker
+  274.    1                       tag1=1
+  275.    1                       call mpi_send(lower_bound,1,mpi_integer,aitask,tag1,mpi_comm_world,ierror)
+  276.    1         
+  277.    1                       tag2=2
+  278.    1                       call mpi_send(upper_bound,1,mpi_integer,aitask,tag2,mpi_comm_world,ierror)
+  279.    1         
+  280.    1                       !P write(*,*) 'work assigned to cpu',aitask,lower_bound,upper_bound
+  281.    1                       ccounter(aitask)=ccounter(aitask)+1
+  282.    1                       write(11,*) 'config work assigned to cpu',aitask,lower_bound,upper_bound
+  283.    1                       !write(*,*) 'free', free
+  284.    1         
+  285.    1         
+  286.    1                       icycle=icycle+1
+  287.    1         
+  288.    1                       bitcounter=bitcounter+1
+  289.    1         
+  290.    1                    endif
+  291.    1         
+  292.    1                 endif
+  293.    1         
+  294.    1              endif
+  295.    1         
+  296.    1              !if i am worker
+  297.    1              if( mytask .ne. 0) then
+  298.    1         
+  299.    1                 !receive signal from master
+  300.    1                 tag0=0
+  301.    1                 call mpi_recv(iexit,1,mpi_integer,0,tag0,mpi_comm_world,status,ierror)
+  302.    1                 !write(*,*) 'iexit signal received',mytask,iexit
+  303.    1         
+  304.    1                 !if signal "go"
+  305.    1                 if(iexit .eq. 0 ) then
+  306.    1         
+  307.    1                    !receive work load from master
+  308.    1                    tag1=1
+  309.    1                    call mpi_recv(lower_bound,1,mpi_integer,0,tag1,mpi_comm_world,status,ierror)
+  310.    1                    free(mytask)=0
+  311.    1                    tag2=2
+  312.    1                    call mpi_recv(upper_bound,1,mpi_integer,0,tag2,mpi_comm_world,status,ierror)
+  313.    1         
+  314.    1                    !write(*,*) 'slave',mytask,nfiles!,trim(adjustl(file_inventory_pre))
+  315.    1         
+  316.    1                    !do some work 
+  317.  + 1 2-----<            do ifile=lower_bound,upper_bound
+  318.    1 2       
+  319.    1 2                     filepath1024=trim(adjustl(file_inventory_conf(ifile)))
+  320.  + 1 2                     call prepare_daily(filepath1024,config_paths,config_attributes,mytask)
+  321.    1 2       
+  322.    1 2----->            enddo
+  323.    1         
+  324.    1                    !report work is done, sent at next call of loop
+  325.    1                    free(mytask)=1
+  326.    1         
+  327.    1                    !if signal "stop" jump out of loop
+  328.    1                 elseif(iexit .eq. 1 ) then
+  329.    1                    exit     
+  330.    1                 endif
+  331.    1         
+  332.    1              endif
+  333.    1         
+  334.    1------->   enddo
+  335.              
+  336.                deallocate(free)
+  337.                deallocate(ccounter)
+  338.              
+  339.              
+  340.              
+  341.                !write(*,*) 'task,exit',mytask,iexit
+  342.                !wait till all workers are done
+  343.  +             call mpi_barrier(MPI_COMM_WORLD,ierror)
+  344.              
+  345.                !master builds inventory files
+  346.                if(mytask .eq. 0) then 
+  347.                   write(11,*) 'building inventory',mytask
+  348.  +                call flush(11)
+  349.                endif
+  350.              
+  351.                !if(ntasks .lt. 4) then
+  352.                if(mytask .eq. 0 ) then
+  353.  +                call build_inventory(log_dir,out_dir,jid,&
+  354.                        & instrument,platform,month,year,&
+  355.                        & inventory_file_pre,inventory_file_liq,inventory_file_ice,inventory_file_post,mytask,ntasks)
+  356.                endif
+  357.                !use first four cpus to build inventories
+  358.                !elseif(ntasks .ge. 4) then
+  359.              !!$     if(mytask .ge. 0 .and. mytask .le. 3) then
+  360.              !!$        call build_inventory(log_dir,out_dir,jid,&
+  361.              !!$             & instrument,platform,month,year,&
+  362.              !!$             & inventory_file_pre,inventory_file_liq,inventory_file_ice,inventory_file_post,mytask,ntasks)
+  363.              !!$     endif
+  364.              !!$  endif
+  365.                !everybody wait till master is done
+  366.  +             call mpi_barrier(MPI_COMM_WORLD,ierror)
+  367.              
+  368.              
+  369.                !master reads inventory in again
+  370.                if(mytask .eq. 0 ) then
+  371.              
+  372.  +                open(15,file=trim(adjustl(inventory_file_pre)),status='old')
+  373.  +                open(16,file=trim(adjustl(inventory_file_liq)),status='old')
+  374.  +                open(17,file=trim(adjustl(inventory_file_ice)),status='old')
+  375.  +                open(18,file=trim(adjustl(inventory_file_post)),status='old')
+  376.              
+  377.                   read(15,*) nfiles_pre
+  378.                   read(16,*) nfiles_liq
+  379.                   read(17,*) nfiles_ice
+  380.                   read(18,*) nfiles_post
+  381.              
+  382.                   !check file number is correct otherwise abort job
+  383.                   if(nfiles_pre .eq. nfiles_liq .and. nfiles_liq .eq. nfiles_ice .and. nfiles_ice .eq. nfiles_post) then
+  384.              
+  385.                      nfiles=nfiles_pre
+  386.              
+  387.                   else
+  388.              
+  389.                      write(11,*) 'FAILED: # of files not equal:',nfiles_pre,nfiles_liq,nfiles_ice,nfiles_post
+  390.  +                   close(11)
+  391.  +                   call mpi_abort(mpi_comm_world,rc,ierror)
+  392.                      stop
+  393.              
+  394.                   endif
+  395.              
+  396.                   !set default chunk sizes
+  397.                   chunk=1
+  398.                   !set chunk according to processed instrument
+  399.                   if(trim(adjustl(instrument)) .eq. 'MODIS' .or. trim(adjustl(instrument)) .eq. 'modis') chunk=1
+  400.                   if(trim(adjustl(instrument)) .eq. 'AVHRR' .or. trim(adjustl(instrument)) .eq. 'avhrr') chunk=1
+  401.              
+  402.                   !if more work assignable than existing reduce assignable work
+  403.                   if((ntasks-1)*chunk .gt. nfiles) then
+  404.                      chunk=int(nfiles/float(ntasks))
+  405.                   endif
+  406.                   !if more CPUs available than files
+  407.                   if((ntasks-1) .gt. nfiles) then
+  408.                      !call OMP_SET_NUM_THREADS(num_threads) !could shovel those abundant cpus into threads?
+  409.                      write(11,*) 'PROCESSING FAILED!!!! TOO MANY CPUS'
+  410.  +                   call flush(11)
+  411.  +                   close(11)
+  412.  +                   call mpi_abort(mpi_comm_world,rc,ierror)
+  413.                   endif
+  414.                   chunk=max(chunk,1)
+  415.                   write(11,*) 'Chunk set statically to: ',chunk
+  416.              
+  417.                endif
+  418.              
+  419.              
+  420.                !master bcasts "nfiles" to all cpus
+  421.  +             call mpi_bcast(nfiles,1,MPI_INT,0,MPI_COMM_WORLD,ierror)
+  422.  +             call mpi_barrier(MPI_COMM_WORLD,ierror)
+  423.              
+  424.              
+  425.                !allocate inventory on all cpus
+  426.                allocate(file_inventory_pre(nfiles))
+  427.                !file_inventory_pre=''
+  428.              
+  429.                allocate(file_inventory_liq(nfiles))
+  430.                !file_inventory_liq=''
+  431.              
+  432.                allocate(file_inventory_ice(nfiles))
+  433.                !file_inventory_ice=''
+  434.              
+  435.                allocate(file_inventory_post(nfiles))
+  436.                !file_inventory_post=''
+  437.              
+  438.              
+  439.                !master reads now the inventory files
+  440.                if(mytask .eq. 0 ) then
+  441.              
+  442.  + 1-------<      do ifile=1,nfiles
+  443.    1         
+  444.    1                 read(15,100) filepath1024
+  445.    1                 file_inventory_pre(ifile)=trim(adjustl(filepath1024))
+  446.    1                 write(11,*) 'master',mytask,ifile,nfiles,trim(adjustl(file_inventory_pre(ifile)))
+  447.    1         
+  448.    1                 read(16,200) filepath2048
+  449.    1                 file_inventory_liq(ifile)=trim(adjustl(filepath2048))
+  450.    1         
+  451.    1                 read(17,200) filepath2048
+  452.    1                 file_inventory_ice(ifile)=trim(adjustl(filepath2048))
+  453.    1         
+  454.    1                 read(18,200) filepath2048
+  455.    1         
+  456.    1                 file_inventory_post(ifile)=trim(adjustl(filepath2048))
+  457.    1         
+  458.    1------->      enddo
+  459.              
+  460.  +                close(15)
+  461.  +                close(16)
+  462.  +                close(17)
+  463.  +                close(18)
+  464.              
+  465.                   nelements=size(file_inventory_pre)
+  466.                   write(11,*) nelements,'elements to process'   
+  467.  +                call flush(11)
+  468.              
+  469.                endif
+  470.              
+  471.                !use this if static work distribution on the available cpus is desired not maintained at the moment)
+  472.                if(lstatic) then
+  473.              
+  474.                   !master bcasts "file_inventory" to all cpus
+  475.  +                call mpi_bcast(file_inventory_pre,nfiles*1024,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  476.  +                call mpi_bcast(file_inventory_liq,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  477.  +                call mpi_bcast(file_inventory_ice,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  478.  +                call mpi_bcast(file_inventory_post,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  479.  +                call mpi_barrier(MPI_COMM_WORLD,ierror)
+  480.              
+  481.              100  format(a1024)
+  482.              200  format(a2048)
+  483.              
+  484.                   !now compute how many files go to each cpu
+  485.                   rchunk=nfiles/float(ntasks)
+  486.              
+  487.                   !that way a couple of cpus remain idle, too bad
+  488.                   if(lidle) then
+  489.              
+  490.                      chunk=ceiling(rchunk)
+  491.                      chunk=min(chunk,1)
+  492.                      lower_bound=(chunk*mytask)+1
+  493.                      upper_bound=min((mytask+1)*chunk,nfiles)     
+  494.              
+  495.                      !that way the last cpu has to go through more files than the others, too bad
+  496.                   else
+  497.              
+  498.                      chunk=floor(rchunk)
+  499.                      chunk=min(chunk,1)
+  500.                      lower_bound=(chunk*mytask)+1
+  501.                      upper_bound=min((mytask+1)*chunk,nfiles)
+  502.                      if(mytask .eq. ntasks)  upper_bound=max((mytask+1)*chunk,nfiles)
+  503.              
+  504.                   endif
+  505.              
+  506.                   !now each cpu has its work in terms of a loop chunk assigned
+  507.                   !start looping now
+  508.                   !do some work 
+  509.    D-------<      do ifile=lower_bound,upper_bound
+  510.    D         
+  511.    D                 !        write(11,*) 'RUNNING PREPROC'
+  512.    D                 !        write(11,*) chunk,mytask,ifile,trim(adjustl(file_inventory_pre(ifile)))
+  513.    D                 !        call preprocessing(mytask,ntasks,lower_bound,upper_bound,adjustl(file_inventory_pre(ifile)))
+  514.    D         
+  515.    D                 !        write(11,*) 'RUNNING PROC',chunk,mytask,ifile,lower_bound,upper_bound,trim(adjustl(file_inventory_liq(ifile)))
+  516.    D                 !        dummyfile2048=adjustl(file_inventory_liq(ifile))
+  517.    D                 !write(11,*) 'dummyfile',trim(adjustl(dummyfile2048))
+  518.    D                 !        call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048)
+  519.    D                 !              
+  520.    D                 !        call post_process_level2
+  521.    D         
+  522.    D         
+  523.    D------->      enddo
+  524.              
+  525.                   !use this if dynamic work assignment is desired
+  526.                else
+  527.              
+  528.                   !chunk has been set above as default, e.g. chunk=10
+  529.              
+  530.                   !bcast inventories to all cpus (could just sent path to be processed)
+  531.  +                call mpi_bcast(file_inventory_pre,nfiles*1024,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  532.  +                call mpi_bcast(file_inventory_liq,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  533.  +                call mpi_bcast(file_inventory_ice,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  534.  +                call mpi_bcast(file_inventory_post,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  535.  +                call mpi_barrier(MPI_COMM_WORLD,ierror)
+  536.              
+  537.              #ifdef DEBUG
+  538.                   if(mytask .ne. 0 ) then 
+  539.                      Write( cmytask, '(i10)' ) mytask
+  540.                      ilogfile=trim(adjustl(trim(adjustl(log_dir))//'/'//'proc_2_logfile_'//trim(adjustl(jid))//&
+  541.                           & '_CPU_'//trim(adjustl(cmytask))//'.log'))
+  542.  +                   open(300+mytask,file=trim(adjustl(ilogfile)),status='replace')
+  543.                   endif
+  544.              #endif
+  545.              
+  546.              
+  547.                   !set icylce: counts how many times outer loop has been run through
+  548.                   icycle=0
+  549.                   allocate(free(0:ntasks-1))
+  550.                   allocate(ccounter(0:ntasks-1))
+  551.              
+  552.    fA-----<>      free=1
+  553.    f------<>      ccounter=0
+  554.                   upper_bound=-1
+  555.                   !lower_bound=1
+  556.                   !upper_bound=lower_bound+chunk-1
+  557.                   itask=0
+  558.                   maxcpuval=1
+  559.              
+  560.                   !this is crucial as it determines the increment of work
+  561.                   bitcounter=0
+  562.              
+  563.                   !set exit flag for endless loop
+  564.                   iexit=0
+  565.              
+  566.                   !master cpu only controls others, does nothing else, too bad
+  567.  + 1-------<      do
+  568.    1         
+  569.    1                 !if i am worker and i am free, tell master
+  570.    1                 if( mytask .ne. 0 .and. free(mytask) .eq. 1 )  then
+  571.    1                    tag3=3
+  572.    1                    ifree=1
+  573.    1                    call mpi_send(ifree,1,mpi_integer,0,tag3,mpi_comm_world,ierror)
+  574.    1                 endif
+  575.    1         
+  576.    1                 !master monitors workers
+  577.    1                 if(mytask .eq. 0 ) then
+  578.    1         
+  579.    1                    !if there is still work to do, wait for workers to report all is done
+  580.    1                    tag3=3
+  581.    1                    call mpi_recv(ifree,1,mpi_integer,mpi_any_source,tag3,mpi_comm_world,status,ierror)
+  582.    1                    itask=status(mpi_source)
+  583.    1         
+  584.    1                    !reset chunk dynamically
+  585.    1                    !           valmax=maxval(ccounter(1:ntasks-1))
+  586.    1                    !           if(valmax .gt. maxcpuval) then
+  587.    1                    !              maxcpuval=valmax
+  588.    1                    !              chunk=min(int(0.25*(nfiles-upper_bound)/float((ntasks-1))),chunk)
+  589.    1                    !              chunk=max(chunk,1)
+  590.    1                    !              write(11,*) 'Chunk set dynamically to: ',chunk
+  591.    1                    !           endif
+  592.    1         
+  593.    1         !!$           valmin=minval(ccounter(1:ntasks-1))
+  594.    1         !!$           if(valmin .gt. mincpuval) then
+  595.    1         !!$              mincpuval=valmin
+  596.    1         !!$              chunk=max(int(0.25*(nfiles-upper_bound)/float((ntasks-1))),1)
+  597.    1         !!$              chunk=max(chunk,1)
+  598.    1         !!$           endif
+  599.    1         
+  600.    1         
+  601.    1                    free(itask)=1
+  602.    1         
+  603.    1                    !if all files are processed, send to all workers the abort signal
+  604.    1                    if(upper_bound .eq. nfiles) then
+  605.    1         
+  606.    1                       cpu_counter=cpu_counter+1
+  607.    1                       write(11,*) 'Closing, work done from cpu',itask,cpu_counter/float((ntasks-1))*100.0,cpu_counter,ntasks-1,ntasks-1-cpu_counter
+  608.  + 1                       call flush(11)
+  609.    1         
+  610.    1 Vr4--<>               if(sum(free(0:ntasks-1)) .eq. ntasks ) then
+  611.    1                          write(11,*) 'work distribution was',ccounter,'sum',sum(ccounter)*chunk,'nfiles',nfiles,ntasks,icycle
+  612.    1         
+  613.    1                          !sent exit signal to worker
+  614.    1                          tag0=0
+  615.    1                          iexit=1
+  616.  + 1 2-----<                  do icpu=1,ntasks-1
+  617.    1 2                           aitask=icpu
+  618.    1 2                           call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
+  619.    1 2                           write(11,*) 'iexit signal sent (close)',mytask,aitask,iexit            
+  620.    1 2                           !call mpi_abort(mpi_comm_world,rc,ierror)
+  621.    1 2----->                  enddo
+  622.    1                          exit
+  623.    1                       else
+  624.    1                          cycle
+  625.    1                       endif
+  626.    1                    else
+  627.    1         
+  628.    1                       !P           write(*,*) 'work done from cpu',itask,ccounter(itask)
+  629.    1                       write(11,*) 'Running, work done from cpu',itask
+  630.  + 1                       call flush(11)
+  631.    1         
+  632.    1                       !if worker is free give it work
+  633.    1                       if(ifree .eq. 1 ) then
+  634.    1                          free(itask)=0
+  635.    1         
+  636.    1                          !determine new work load based on previously done work
+  637.    1                          lower_bound=(chunk*bitcounter)+1
+  638.    1                          upper_bound=min((bitcounter+1)*chunk,nfiles)
+  639.    1         
+  640.    1                          !MJ TEST lower_bound=upper_bound+1
+  641.    1                          !MJ TEST upper_bound=min(lower_bound+chunk-1,nfiles)
+  642.    1         
+  643.    1         
+  644.    1                          aitask=itask
+  645.    1         
+  646.    1                          !sent continue signal to worker
+  647.    1                          tag0=0
+  648.    1                          iexit=0
+  649.    1                          call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
+  650.    1                          write(11,*) 'iexit signal sent (free)',mytask,aitask,iexit
+  651.    1         
+  652.    1                          !sent work assigment to worker
+  653.    1                          tag1=1
+  654.    1                          call mpi_send(lower_bound,1,mpi_integer,aitask,tag1,mpi_comm_world,ierror)
+  655.    1         
+  656.    1                          tag2=2
+  657.    1                          call mpi_send(upper_bound,1,mpi_integer,aitask,tag2,mpi_comm_world,ierror)
+  658.    1         
+  659.    1                          !P write(*,*) 'work assigned to cpu',aitask,lower_bound,upper_bound
+  660.    1                          ccounter(aitask)=ccounter(aitask)+1
+  661.    1                          write(11,*) 'work assigned to cpu',aitask,lower_bound,upper_bound
+  662.    1                          !write(*,*) 'free', free
+  663.    1         
+  664.    1         
+  665.    1                          icycle=icycle+1
+  666.    1         
+  667.    1                          bitcounter=bitcounter+1
+  668.    1         
+  669.    1                       endif
+  670.    1         
+  671.    1                    endif
+  672.    1         
+  673.    1                 endif
+  674.    1         
+  675.    1                 !if i am worker
+  676.    1                 if(mytask .ne. 0) then
+  677.    1         
+  678.    1                    !receive signal from master
+  679.    1                    tag0=0
+  680.    1                    call mpi_recv(iexit,1,mpi_integer,0,tag0,mpi_comm_world,status,ierror)
+  681.    1                    !write(*,*) 'iexit signal received',mytask,iexit
+  682.    1         
+  683.    1                    !if signal "go"           
+  684.    1                    if(iexit .eq. 0 ) then
+  685.    1         
+  686.    1                       !receive work load from master
+  687.    1                       tag1=1
+  688.    1                       call mpi_recv(lower_bound,1,mpi_integer,0,tag1,mpi_comm_world,status,ierror)
+  689.    1                       free(mytask)=0
+  690.    1                       tag2=2
+  691.    1                       call mpi_recv(upper_bound,1,mpi_integer,0,tag2,mpi_comm_world,status,ierror)
+  692.    1         
+  693.    1         #ifdef DEBUG
+  694.    1                       write(300+mytask,*) 'Worker ',mytask,'processing: ',lower_bound,upper_bound
+  695.    1         #endif
+  696.    1         
+  697.    1                       !do some work 
+  698.  + 1 2-----<               do ifile=lower_bound,upper_bound
+  699.    1 2       
+  700.    1 2                        !set some return codes
+  701.    1 2                        rc_pre=1
+  702.    1 2                        rc_liq=1
+  703.    1 2                        rc_ice=1 
+  704.    1 2                        rc_post=1
+  705.    1 2       
+  706.    1 2                        !run preprocessing
+  707.    1 2                        dummyfile1024=adjustl(file_inventory_pre(ifile))
+  708.    1 2       #ifdef DEBUG
+  709.    1 2                        write(300+mytask,*) 'Worker ',mytask,'processing: ',ifile,trim(adjustl(dummyfile1024))
+  710.    1 2       #endif
+  711.    1 2       
+  712.  + 1 2                        call preprocessing(mytask,ntasks,lower_bound,upper_bound,dummyfile1024,rc_pre)
+  713.    1 2       
+  714.    1 2                        !run main for water
+  715.    1 2                        dummyfile2048=adjustl(file_inventory_liq(ifile))
+  716.  + 1 2                        call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_liq)
+  717.    1 2       
+  718.    1 2                        !run main for ice
+  719.    1 2                        dummyfile2048=adjustl(file_inventory_ice(ifile))
+  720.  + 1 2                        call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_ice)
+  721.    1 2       
+  722.    1 2                        !run postprocessing
+  723.    1 2                        dummyfile1024=adjustl(file_inventory_post(ifile))
+  724.  + 1 2                        call post_process_level2(mytask,ntasks,lower_bound,upper_bound,dummyfile1024,rc_post)
+  725.    1 2       
+  726.    1 2       
+  727.    1 2                        rc_pre=0
+  728.    1 2                        rc_liq=0
+  729.    1 2                        rc_ice=0
+  730.    1 2                        rc_post=0
+  731.    1 2       
+  732.    1 2                        !cleanup and rename if everything worked well
+  733.    1 2                        if(rc_pre .eq. 0 .and.&
+  734.    1 2                             & rc_ice .eq. 0 .and.&
+  735.    1 2                             & rc_liq .eq. 0 .and.&
+  736.    1 2                             & rc_post .eq. 0) then
+  737.    1 2                           dummyfile1024=adjustl(file_inventory_pre(ifile))
+  738.    1 2                           !call clean_up_pre(dummyfile1024)
+  739.    1 2                           dummyfile2048=adjustl(file_inventory_liq(ifile))
+  740.    1 2                           !call clean_up_main(dummyfile2048)
+  741.    1 2                           dummyfile1024=adjustl(file_inventory_post(ifile))
+  742.    1 2                           write(*,*) "Calling move_post"
+  743.  + 1 2                           call move_post(dummyfile1024,instrument,platform,year,month)
+  744.    1 2                        endif
+  745.    1 2       
+  746.    1 2       #ifdef DEBUG
+  747.  + 1 2                        call flush(300+mytask)
+  748.    1 2       #endif
+  749.    1 2       
+  750.    1 2----->               enddo
+  751.    1                       !report work is done, sent at next call of loop
+  752.    1                       free(mytask)=1
+  753.    1         
+  754.    1                       !if signal "stop" jump out of loop
+  755.    1                    elseif(iexit .eq. 1 ) then
+  756.    1                       exit     
+  757.    1                    endif
+  758.    1         
+  759.    1                 endif
+  760.    1         
+  761.    1------->      enddo
+  762.              
+  763.                   deallocate(free)
+  764.                   deallocate(ccounter)
+  765.              
+  766.                endif
+  767.              
+  768.  +             call mpi_barrier(MPI_COMM_WORLD,ierror)  
+  769.              
+  770.                !close processing
+  771.                if(mytask .eq. 0) then
+  772.                   write(11,*)
+  773.                   write(11,*) '##################################################'
+  774.                   write(11,*) '##################################################'
+  775.                   write(11,*) 'Closing down processing,exit',mytask,iexit
+  776.                   write(11,*) '##################################################'
+  777.                   write(11,*) '##################################################'
+  778.  +                call flush(11)
+  779.  +                close(11)
+  780.                elseif(mytask .ne. 0 ) then 
+  781.              #ifdef DEBUG
+  782.  +                call flush(300+mytask)
+  783.  +                close(300+mytask)
+  784.              #endif
+  785.                endif
+  786.              
+  787.  +             call mpi_barrier(MPI_COMM_WORLD,ierror)
+  788.              
+  789.  +             call MPI_FINALIZE(ierror)
+  790.              
+  791.              end program mpi_wrapper
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 86 
+  "mpi_init" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 87 
+  "mpi_comm_size" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 88 
+  "mpi_comm_rank" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 97 
+  "_COMMAND_ARGUMENT_COUNT_4" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 101 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 102 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 103 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 104 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 105 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 106 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 107 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 108 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 109 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 110 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 111 
+  "_GET_COMMAND_ARGUMENT" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 126 
+  "_OPEN" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 133 
+  "omp_get_max_threads_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 153 
+  "_OPEN" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 160 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 161 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 162 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 163 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 164 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 165 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 168 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 169 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 172 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 173 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-6286 ftn: VECTOR File = mpi_wrapper.F90, Line = 181 
+  A loop starting at line 181 was not vectorized because it contains input/output operations at line 183.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 190 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 193 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 198 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 199 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-6230 ftn: VECTOR File = mpi_wrapper.F90, Line = 208 
+  A loop starting at line 208 was replaced with multiple library calls.
+
+ftn-6004 ftn: SCALAR File = mpi_wrapper.F90, Line = 209 
+  A loop starting at line 209 was fused with the loop starting at line 208.
+
+ftn-6286 ftn: VECTOR File = mpi_wrapper.F90, Line = 219 
+  A loop starting at line 219 was not vectorized because it contains input/output operations at line 236.
+
+ftn-6005 ftn: SCALAR File = mpi_wrapper.F90, Line = 242 
+  A loop starting at line 242 was unrolled 4 times.
+
+ftn-6204 ftn: VECTOR File = mpi_wrapper.F90, Line = 242 
+  A loop starting at line 242 was vectorized.
+
+ftn-6286 ftn: VECTOR File = mpi_wrapper.F90, Line = 248 
+  A loop starting at line 248 was not vectorized because it contains input/output operations at line 251.
+
+ftn-6262 ftn: VECTOR File = mpi_wrapper.F90, Line = 317 
+  A loop starting at line 317 was not vectorized because it contains a call to a subroutine or function on line 319.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 320 
+  "prepare_daily" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 343 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 348 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 353 
+  "build_inventory" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 366 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 372 
+  "_OPEN" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 373 
+  "_OPEN" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 374 
+  "_OPEN" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 375 
+  "_OPEN" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 390 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 391 
+  "mpi_abort" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 410 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 411 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 412 
+  "mpi_abort" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 421 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 422 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-6286 ftn: VECTOR File = mpi_wrapper.F90, Line = 442 
+  A loop starting at line 442 was not vectorized because it contains input/output operations at line 444.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 460 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 461 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 462 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 463 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 467 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 475 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 476 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 477 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 478 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 479 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-6002 ftn: SCALAR File = mpi_wrapper.F90, Line = 509 
+  A loop starting at line 509 was eliminated by optimization.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 531 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 532 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 533 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 534 
+  "mpi_bcast" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 535 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 542 
+  "_OPEN" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-6230 ftn: VECTOR File = mpi_wrapper.F90, Line = 552 
+  A loop starting at line 552 was replaced with multiple library calls.
+
+ftn-6004 ftn: SCALAR File = mpi_wrapper.F90, Line = 553 
+  A loop starting at line 553 was fused with the loop starting at line 552.
+
+ftn-6286 ftn: VECTOR File = mpi_wrapper.F90, Line = 567 
+  A loop starting at line 567 was not vectorized because it contains input/output operations at line 629.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 608 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-6005 ftn: SCALAR File = mpi_wrapper.F90, Line = 610 
+  A loop starting at line 610 was unrolled 4 times.
+
+ftn-6204 ftn: VECTOR File = mpi_wrapper.F90, Line = 610 
+  A loop starting at line 610 was vectorized.
+
+ftn-6286 ftn: VECTOR File = mpi_wrapper.F90, Line = 616 
+  A loop starting at line 616 was not vectorized because it contains input/output operations at line 619.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 630 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-6262 ftn: VECTOR File = mpi_wrapper.F90, Line = 698 
+  A loop starting at line 698 was not vectorized because it contains a call to a subroutine or function on line 707.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 712 
+  "preprocessing" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 716 
+  "ecp" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 720 
+  "ecp" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 724 
+  "post_process_level2" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 743 
+  "move_post" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 747 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 768 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 778 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 779 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 782 
+  "flush_" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 783 
+  "_CLOSE" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 787 
+  "mpi_barrier" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3021 ftn: IPA File = mpi_wrapper.F90, Line = 789 
+  "mpi_finalize" (called from "mpi_wrapper") was not inlined because the compiler was unable to locate the routine.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  792.              
+  793.              !===================================================================
+  794.              
+  795.              Pure Function to_upper (str) Result (string)
+  796.              
+  797.                !   ==============================
+  798.                !   Changes a string to upper case
+  799.                !   ==============================
+  800.              
+  801.                Implicit None
+  802.              
+  803.                Character(*), Intent(In) :: str
+  804.                Character(LEN(str))      :: string
+  805.              
+  806.                Integer :: ic, i
+  807.              
+  808.                Character(26), Parameter :: cap = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  809.                Character(26), Parameter :: low = 'abcdefghijklmnopqrstuvwxyz'
+  810.              
+  811.                !   Capitalize each letter if it is lowecase
+  812.                string = str
+  813.  + 1-------<   do i = 1, LEN_TRIM(str)
+  814.    1              ic = INDEX(low, str(i:i))
+  815.    1              if (ic > 0) string(i:i) = cap(ic:ic)
+  816.    1------->   end do
+  817.              
+  818.              End Function to_upper
+
+ftn-6263 ftn: VECTOR File = mpi_wrapper.F90, Line = 813 
+  A loop starting at line 813 was not vectorized because it contains a reference to a non-vector intrinsic on line 814.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

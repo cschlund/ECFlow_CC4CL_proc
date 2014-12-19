@@ -1,0 +1,199 @@
+subroutine clean_up_pre(string)
+
+  implicit none
+
+  character(len=1024) :: string
+  character(len=256) :: dir
+  character(len=1280) :: directory
+
+  character(len=1536) :: command_line
+
+  integer :: cut_off
+  integer :: estat,cstat
+
+  character(len=1024) :: cmsg
+
+  dir='pre_proc'
+  
+  !get path to preprocessing results from path to driver file
+  cut_off=index(trim(adjustl(string)),'/',BACK=.true.)
+
+  directory=trim(adjustl(string(1:cut_off)))//trim(adjustl(dir))
+  
+
+  command_line="rm -rf "//trim(adjustl(directory))
+  call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  !  write(11,*) 'Removal of',trim(adjustl(directory)),estat,cstat,cmsg
+
+end subroutine clean_up_pre
+
+
+
+
+
+subroutine clean_up_main(string)
+
+  implicit none
+
+  character(len=2048) :: string
+  character(len=256) :: dir
+  character(len=2304) :: directory
+
+  character(len=2560) :: command_line
+
+  integer :: cut_off
+  integer :: estat,cstat
+
+  character(len=1024) :: cmsg
+
+  dir='main'
+  
+  !get path to preprocessing results from path to driver file
+  cut_off=index(trim(adjustl(string)),'/',BACK=.true.)
+
+  directory=trim(adjustl(string(1:cut_off)))//trim(adjustl(dir))
+  
+
+  command_line="rm -rf "//trim(adjustl(directory))
+  call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+  !  write(11,*) 'Removal of',trim(adjustl(directory)),estat,cstat,cmsg
+
+end subroutine clean_up_main
+
+ 
+ 
+subroutine move_post(string,instrument,platform,year,month)
+
+  character(len=1024) :: string
+  character(len=15)   :: instrument,platform
+  character(len=1024) :: finalprimary, finalsecondary, sourceprimary
+  character(len=4)    :: year
+  character(len=5)    :: month,day,hour,min
+  character(len=16)   :: prefix_dummy
+  character(len=4)    :: suffix_dummy
+  character(len=11)   :: suffix_source
+  character(len=3)    :: suffix_target
+  integer             :: cut_off,cut_off_head,cut_off_tail
+  character(len=256)  :: dri_file
+  character(len=6)    :: yyyymm
+  character(len=2560) :: command_line
+  character(len=2304) :: directory
+  character(len=256)  :: dir
+  integer :: estat,cstat,i,ic
+  character(len=1024) :: cmsg
+  character(len=256) :: to_upper
+
+  dir='post'
+  prefix_dummy='postproc_driver_'
+  suffix_dummy='.dat'
+  suffix_source='.primary.nc'
+  suffix_target='.nc'
+
+  write(*,*) "in move_post"
+
+  if(trim(adjustl(instrument)) .eq. 'AVHRR' .or. trim(adjustl(instrument)) .eq. 'avhrr') then
+
+     cut_off = index(trim(adjustl(string)),'/',BACK=.true.)
+     directory = trim(adjustl(string(1:cut_off)))
+     write(*,*) cut_off,trim(directory)
+
+     cut_off=index(trim(adjustl(string)),'/',BACK=.true.)
+     dri_file=trim(adjustl(string(cut_off+1:len_trim(string))))
+     write(*,*) cut_off,trim(adjustl(dri_file))
+
+     yyyymm=trim(adjustl(year))//trim(adjustl(month))
+     write(*,*) yyyymm
+
+     cut_off_head=verify(trim(adjustl(dri_file)),prefix_dummy)
+     write(*,*) cut_off_head
+     cut_off_tail=index(trim(adjustl(dri_file)),suffix_dummy)
+     write(*,*) cut_off_tail
+     sourceprimary = trim(adjustl(dri_file(cut_off_head:cut_off_tail-1))) // suffix_source
+     write(*,*) trim(sourceprimary)
+
+     cut_off=index(trim(adjustl(dri_file)),yyyymm)
+     write(*,*) 'co',cut_off
+
+     day=trim(adjustl(dri_file(cut_off+6:cut_off+7)))
+     write(*,*) 'day',day
+
+     hour=trim(adjustl(dri_file(cut_off+9:cut_off+10)))
+     write(*,*) 'hour',hour
+
+     min=trim(adjustl(dri_file(cut_off+11:cut_off+12)))
+     write(*,*) 'min',min
+
+     platform = to_upper(platform)
+
+     !command_line = "ls *" //  trim(adjustl(suffix_source)) " > delete.txt"
+     !call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+     !open()
+
+     ! TO DO: import file version
+     finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // '-fv1.0' // trim(suffix_target)
+
+     command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
+     !command_line="mv -f "//trim(adjustl(dri_file)) // " " // finalprimary
+     call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+
+  endif
+  !finalprimary
+
+
+  !finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv1.0.nc
+
+  !/scratch/ms/de/sf7/esa_cci_c_proc/output/20080601_AVHRR_noaa18_proc2process_ID9621691_US1402576159/noaa18_20080601_2111_99999_satproj_00000_12208_avhrr/postproc_
+  !driver_noaa18_20080601_2111_99999_satproj_00000_12208_avhrr.dat
+  !finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv1.0.nc
+
+  if (trim(adjustl(instrument)) .eq. 'MODIS' .or. trim(adjustl(instrument)) .eq. 'modis') then
+
+     ! dummy = MYD021KM.A2008153.0745.006.2012068172824.bspscs_000500694484.primary.nc
+     ! finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv1.0.nc
+
+     cut_off = index(trim(adjustl(string)),'/',BACK=.true.)
+     directory = trim(adjustl(string(1:cut_off)))
+     write(*,*) cut_off,trim(directory)
+
+     cut_off=index(trim(adjustl(string)),'/',BACK=.true.)
+     dri_file=trim(adjustl(string(cut_off+1:len_trim(string))))
+     write(*,*) cut_off,trim(adjustl(dri_file))
+
+     yyyymm=trim(adjustl(year))//trim(adjustl(month))
+     write(*,*) yyyymm
+
+     cut_off_head=verify(trim(adjustl(dri_file)),prefix_dummy)
+     write(*,*) cut_off_head
+     cut_off_tail=index(trim(adjustl(dri_file)),suffix_dummy)
+     write(*,*) cut_off_tail
+     sourceprimary = trim(adjustl(dri_file(cut_off_head:cut_off_tail-1))) // suffix_source
+     write(*,*) trim(sourceprimary)
+
+     cut_off=index(trim(adjustl(dri_file)),yyyymm)
+     write(*,*) 'co',cut_off
+
+     day=trim(adjustl(dri_file(cut_off+6:cut_off+7)))
+     write(*,*) 'day',day
+
+     hour=trim(adjustl(dri_file(cut_off+9:cut_off+10)))
+     write(*,*) 'hour',hour
+
+     min=trim(adjustl(dri_file(cut_off+11:cut_off+12)))
+     write(*,*) 'min',min
+
+     !command_line = "ls *" //  trim(adjustl(suffix_source)) " > delete.txt"                                                                                          
+     !call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)                                                     
+     !open()                                                                                                                                                          
+
+     finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // & 
+          '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // & 
+          trim(platform) // '-fv1.0' // trim(suffix_target)
+
+     command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
+     !command_line="mv -f "//trim(adjustl(dri_file)) // " " // finalprimary                                                                                           
+     call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+
+  endif
+
+end subroutine move_post
+

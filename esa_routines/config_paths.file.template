@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+#
+# Config file for ESA Cloud CCI ORAC processing
+
+
+# ---------------------------------------------------------------
+# modify TYPE and BASE
+# ---------------------------------------------------------------
+
+# local & remote
+TYPE="test"
+BASE="ms/de/sf7/cschlund"
+# remote machine!
+MAIN="/perm/ms/de/sf7/esa_cci_c_proc"
+#MAIN="/perm/${BASE}/sissi_orac"
+
+# ---------------------------------------------------------------
+# do not change unless you know what you are doing ;-)
+# ---------------------------------------------------------------
+
+# MAIN CC4CL source code
+LIB_common=${MAIN}/orac_repository/trunk/common
+LIB_pre=${MAIN}/orac_repository/trunk/pre_processing
+LIB_main=${MAIN}/orac_repository/trunk/src
+LIB_post=${MAIN}/orac_repository/post_processing
+
+# base paths
+REPOSITORY="ECFlow_CC4CL_proc"
+PERM_BASE="/perm/${BASE}/${TYPE}/${REPOSITORY}"
+SCRATCH_BASE="/scratch/${BASE}/${TYPE}/${REPOSITORY}"
+
+# real source code
+ESA_PERM=/perm/ms/de/sf7/esa_cci_c_proc
+ESA_SCRATCH=/scratch/ms/de/sf7/esa_cci_c_proc
+USGS_PATH=$ESA_PERM/aux/usgs_type_dem
+ORAC_PATH=$ESA_PERM/orac_repository
+
+# input and output
+ESA_ROUT=$PERM_BASE/esa_routines
+LOGDIR=$SCRATCH_BASE/logs
+INPUTDIR=$SCRATCH_BASE/input
+OUTPUTDIR=$SCRATCH_BASE/output
+
+# ---------------------------------------------------------------
+# new python/bash tools, C. Schlundt 2014 (Nov, Dec.)
+# ---------------------------------------------------------------
+create_cfg_files=$ESA_ROUT/create_config_files.py
+pick_aux_datafile=$ESA_ROUT/pick_aux_dir.py
+get_number_of_slaves=$ESA_ROUT/count_orbit_files.sh
+cleanup_scratch=$ESA_ROUT/cleanup_scratch.py
+
+# ---------------------------------------------------------------
+# this is where the volatile aux data is in the ecfs 
+# and what the names of the sub-directories are
+# ---------------------------------------------------------------
+toplevel_aux=ec:/sf4/orac_aux
+albedo_ecfs=MCD43C3_MODIS_Albedo
+BRDF_ecfs=MCD43C1_MODIS_BRDF
+emissivity_ecfs=UWisc_Emissivity
+ice_snow_ecfs=NISE_Snow_Ice
+USGS_file="$USGS_PATH/Aux_file_CM_SAF_AVHRR_GAC_ori_0.05deg.nc"
+
+# ---------------------------------------------------------------
+# this is where the aux files are going on $TEMP
+# ---------------------------------------------------------------
+temp_aux=$SCRATCH_BASE/input/aux
+albedo_temp=albedo_dir
+brdf_temp=BRDF_dir
+emissivity_temp=emissivity_dir
+ice_snow_temp=ice_snow_dir
+
+# ---------------------------------------------------------------
+# permanent aux files
+# ---------------------------------------------------------------
+perm_aux=$ESA_PERM/aux
+
+# ---------------------------------------------------------------
+# Scratchdir for archiving
+# ---------------------------------------------------------------
+SCRATCHDIR=$SCRATCH_BASE/scratch
+
+# ---------------------------------------------------------------
+# MODIS top level directory in ecfs
+# ---------------------------------------------------------------
+modis_top=ec:/sf4/modis_coll6
+
+# ---------------------------------------------------------------
+# directory where uuid generator sits:
+# ---------------------------------------------------------------
+#uuid_path='/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/ossp_uuid-1.6.2/bin/uuid -v 4'
+uuid_path="${ESA_PERM}/tools_bins/ossp_uuid-1.6.2/bin/uuid -v 4"
+
+# ---------------------------------------------------------------
+# Level3 related
+# ---------------------------------------------------------------
+l3execpath=$ORAC_PATH/level3
+# l3 config file
+LOCAL_L2TOL3CONFIGPATH=$ORAC_PATH/level3
+LOCAL_L2TOL3CONFIGFILE=l2tol3config.dat
+# l2 input path
+l2inputpath=$OUTPUTDIR
+# l3 output path
+l3outputpath=$OUTPUTDIR/level3
+
+# ---------------------------------------------------------------
+# ecfs_ls
+# ---------------------------------------------------------------
+#l2_ecfs=cloud_cci_data/l2
+l2_ecfs=/sf4/scratch
+#l2_ecfs=/sf7/scratch
+
+# era_inter comparison files
+era_comp=/scratch/ms/de/sf7/esa_cci_c_proc/era_interim
+
+# free path
+free_path=/usr/bin
+

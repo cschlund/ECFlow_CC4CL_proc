@@ -1,0 +1,21 @@
+%include <pbs_serial_mars.h>
+%include <head.h>
+%include <export.h>
+
+export ATP_ENABLED=0
+ulimit -c unlimited
+ulimit -s unlimited
+
+echo "I am task %TASK% in family %FAMILY% responsible for downloading era interim data"
+
+# -- write config file
+python %MAKE_CFG_FILE% \
+    -cf %CFG_P1_MARS% \
+    -sy %START_YEAR% -ey %END_YEAR% \
+    -sm %START_MONTH% -em %END_MONTH% \
+    getaux -get era
+
+# -- execute ksh script
+#%GET_MARS_KSH% %CFG_PATHS_FILE% %CFG_P1_MARS%
+
+%include <tail.h>

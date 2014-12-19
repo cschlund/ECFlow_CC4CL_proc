@@ -1,0 +1,31 @@
+%include <pbs_serial_l2tol3.h>
+%include <head.h>
+%include <export.h>
+
+export ATP_ENABLED=1
+ulimit -c unlimited
+ulimit -s unlimited
+
+echo "I am task %TASK% in family %FAMILY% responsible for L3c processing, i. e. monthly averages (L3a)"
+
+# -- working directory: write core file here
+cd %ESA_ROUTINE%
+
+# -- create job id number
+primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
+id=`date +%%s`
+sleep 3
+jid=ID${primary_id}_US${id}
+
+# -- write config file for l3a
+python %MAKE_CFG_FILE% \
+    -cf %CFG_L3C_FILE% \
+    -sy %START_YEAR% -ey %END_YEAR% \
+    -sm %START_MONTH% -em %END_MONTH% \
+    l2tol3 -sat %SATELLITE% -ins %SENSOR% \
+    -inp %ESA_OUTPUTDIR% -typ l3a
+
+# -- execute ksh script
+%RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% %CFG_L3C_FILE%
+
+%include <tail.h>
