@@ -89,8 +89,8 @@ ld_lib_path  = "/perm/ms/de/sf7/esa_cci_c_proc/software/"\
 
 # -- server settings @ ecgate
 ecflow_submit     = os.path.join( pycmsaf_bin, "ecf_submit.py" )
-ecf_files_dir     = os.path.join( perm_base, "tasks" )
-ecf_include_dir   = os.path.join( perm_base, "include" )
+ecf_files_dir     = os.path.join( perm_base, "ecflow_suite/tasks" )
+ecf_include_dir   = os.path.join( perm_base, "ecflow_suite/include" )
 ecf_home_dir      = os.path.join( scratch_base, "generated" )
 ecf_out_dir       = os.path.join( scratch_base, "log" )
 remote_log_dir    = os.path.join( scratch_base, "log" )
