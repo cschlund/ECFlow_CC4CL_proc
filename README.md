@@ -56,14 +56,25 @@ please create your suite using "--testrun"
     edit suite config file
         edit config_suite.py
 
+    go to include/
+        modify templates if necessary, i.e. email, wall clock time, memory, etc.; safe them without .template ending
+
+    got to tasks/
+        modify ecflow scripts; save them without .template ending;
+
+        recommendation: 
+            before you activate the real jobs in the scripts, 
+            run ecflow with "randomsleep" job only, testing if your settings are OK.
+            If everything worked out, then deactivate the randomsleep call and 
+            activate the code below, which is deactivated by default.
+
     clear directories if necessary
         ./cleanup_local.sh
         ./cleanup_remote.sh
 
     generate suite definition
-        ./create_suite.py -h
         ./create_suite.py --sdate 20080101 --edate 20081231
-
+        ./create_suite.py --sdate 20080101 --edate 20081231 --satellite noaa18 --testrun
 
     load suite
         ./load.sh
