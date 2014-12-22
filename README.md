@@ -57,7 +57,9 @@ please create your suite using "--testrun"
         edit config_suite.py
 
     go to include/
-        modify templates if necessary, i.e. email, wall clock time, memory, etc.; safe them without .template ending
+        modify templates if necessary, 
+        i.e. email, wall clock time, memory, etc.; 
+        safe them without .template ending
 
     got to tasks/
         modify ecflow scripts; save them without .template ending;
