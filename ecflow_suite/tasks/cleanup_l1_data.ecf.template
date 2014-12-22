@@ -1,0 +1,12 @@
+%include <pbs_serial.h>
+%include <head.h>
+%include <export.h>
+
+echo "I am task %TASK% in family %FAMILY% responsible for cleanup Level 1 data"
+%include <randomsleep.h>
+
+#python %CLEANUP_SCRATCH%  --inpdir %ESA_INPUTDIR% \
+#    --year %START_YEAR% --month %START_MONTH% \
+#    clear_l1 --satellite %SATELLITE% --instrument %SENSOR%
+
+%include <tail.h>
