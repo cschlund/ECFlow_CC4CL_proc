@@ -70,6 +70,7 @@ get_modis_ksh  = os.path.join( esa_routine, "proc_1_getdata_modis.ksh" )
 get_mars_ksh   = os.path.join( esa_routine, "proc_1_getdata_mars.ksh" )
 get_aux_ksh    = os.path.join( esa_routine, "proc_1_getdata_aux.ksh" )
 proc2_orac_ksh = os.path.join( esa_routine, "proc_2_process.ksh" )
+single_day_ksh = os.path.join( esa_routine, "process_single_day.ksh")
 run_l2tol3_ksh = os.path.join( esa_routine, "proc_3_l2tol3_script.ksh" )
 # diese sollte man besser ersetzen durch ein neues python tool!
 # siehe avhrrgac proc

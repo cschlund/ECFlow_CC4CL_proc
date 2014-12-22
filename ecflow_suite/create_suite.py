@@ -118,6 +118,7 @@ def set_vars(suite):
     suite.add_variable("GET_MARS_KSH", get_mars_ksh)
     suite.add_variable("GET_AUX_KSH", get_aux_ksh)
     suite.add_variable("PROC2_ORAC_KSH", proc2_orac_ksh)
+    suite.add_variable("SINGLE_DAY_KSH", single_day_ksh)
     suite.add_variable("RUN_L2TOL3_KSH", run_l2tol3_ksh)
     suite.add_variable("RENAME_LOCAL_L3_KSH", rename_l3_ksh)
     suite.add_variable("ARCHIVE_L3_KSH", archive_l3_ksh)

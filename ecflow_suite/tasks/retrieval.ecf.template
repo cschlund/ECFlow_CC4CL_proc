@@ -143,7 +143,8 @@ echo "I am task %TASK% in family %FAMILY% responsible for proc2 (ORAC)"
 #        ${instrument} ${platform} \
 #        ${ACTMONTHS} ${ACTYEAR} \
 #        ${wrapper_mode} ${jid} ${logs_monthly} \
-#        ${OUTPUTDIR} %CFG_PATHS_FILE% %CFG_ATTRI_FILE% 
+#        ${OUTPUTDIR} %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
+#        %SINGLE_DAY_KSH%
 #
 #    
 #    echo " *** FINISHED: retrieval for %SATELLITE%/%SENSOR% "\

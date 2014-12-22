@@ -67,6 +67,7 @@ program mpi_wrapper
   character(len=256) :: inventory_file_pre,inventory_file_liq&
        &,inventory_file_ice,inventory_file_post
   character(len=256) :: inventory_file_config,config_paths,config_attributes
+  character(len=256) :: single_day_ksh
   character(len=1024) :: dummyfile1024
   character(len=2048) :: dummyfile2048
 
@@ -96,7 +97,7 @@ program mpi_wrapper
      ! get number of arguments
      nargs = COMMAND_ARGUMENT_COUNT()
      ! if more than one argument passed, all inputs on command line
-     if(nargs .eq. 11) then
+     if(nargs .eq. 12) then
 
         CALL GET_COMMAND_ARGUMENT(1,inventory_file_config)
         CALL GET_COMMAND_ARGUMENT(2,instrument)
@@ -109,6 +110,7 @@ program mpi_wrapper
         CALL GET_COMMAND_ARGUMENT(9,out_dir)
         CALL GET_COMMAND_ARGUMENT(10,config_paths)
         CALL GET_COMMAND_ARGUMENT(11,config_attributes)
+        CALL GET_COMMAND_ARGUMENT(12,single_day_ksh)
 
      endif
 
@@ -116,6 +118,8 @@ program mpi_wrapper
      !write(*,*) 'cp',trim(adjustl(config_paths))
      config_attributes=trim(adjustl(config_attributes))
      !write(*,*) 'ca', trim(adjustl(config_attributes))
+     single_day_ksh=trim(adjustl(single_day_ksh))
+     write(*,*) 'single_day_ksh in mpi_wrapper.F90: ', trim(adjustl(single_day_ksh))
 
 
 
@@ -167,6 +171,7 @@ program mpi_wrapper
   !bcast paths to cpus
   call mpi_bcast(config_paths,256,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
   call mpi_bcast(config_attributes,256,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  call mpi_bcast(single_day_ksh,256,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
 
   !master bcasts "nfiles_conf" to all cpus
   call mpi_bcast(nfiles_conf,1,MPI_INT,0,MPI_COMM_WORLD,ierror)
@@ -317,7 +322,7 @@ program mpi_wrapper
            do ifile=lower_bound,upper_bound
 
               filepath1024=trim(adjustl(file_inventory_conf(ifile)))
-              call prepare_daily(filepath1024,config_paths,config_attributes,mytask)
+              call prepare_daily(filepath1024,single_day_ksh,config_paths,config_attributes,mytask)
 
            enddo
 
