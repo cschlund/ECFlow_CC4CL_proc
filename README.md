@@ -61,22 +61,24 @@ please create your suite using "--testrun"
         i.e. email, wall clock time, memory, etc.; 
         safe them without .template ending
 
-    got to tasks/
-        modify ecflow scripts; save them without .template ending;
-
-        recommendation: 
-            before you activate the real jobs in the scripts, 
-            run ecflow with "randomsleep" job only, testing if your settings are OK.
-            If everything worked out, then deactivate the randomsleep call and 
-            activate the code below, which is deactivated by default.
-
     clear directories if necessary
         ./cleanup_local.sh
         ./cleanup_remote.sh
 
     generate suite definition
-        ./create_suite.py --sdate 20080101 --edate 20081231
-        ./create_suite.py --sdate 20080101 --edate 20081231 --satellite noaa18 --testrun
+
+        recommendation: 
+            before you run the "real" jobs (CC4CL), 
+            please test ECFlow_CC4CL_proc using the option "--dummy",
+            in order to check if your settings are OK.
+
+            ./create_suite.py --sdate 20080101 --edate 20081231 --satellite noaa18 --dummy
+
+        if everything worked out, then you can try to run a 11x11 pixel box:
+            ./create_suite.py --sdate 20080101 --edate 20081231 --satellite noaa18 --testrun
+
+        if everything worked out, then you can do the hard work:
+            ./create_suite.py --sdate 20080101 --edate 20081231 --satellite noaa18
 
     load suite
         ./load.sh
