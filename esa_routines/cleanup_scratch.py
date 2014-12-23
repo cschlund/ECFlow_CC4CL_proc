@@ -94,7 +94,7 @@ def clear_l2(args):
         for ad in alldirs:
             if datestr in ad \
                     and args.instrument.upper() in ad \
-                    and platform in ad and 'retrieval'in ad:
+                    and platform in ad and 'retrieval' in ad:
                         getdirs.append( ad )
 
         # sort list
@@ -131,6 +131,76 @@ def clear_l3(args):
     '''
     Remove L3 results if archiving was successful.
     '''
+
+    # find platform
+    if args.satellite.upper() == "TERRA" or \
+            args.satellite.upper() == "MOD":
+        platform="TERRA"
+
+    elif args.satellite.upper() == "AQUA" or \
+            args.satellite.upper() == "MYD":
+        platform="AQUA"
+
+    elif args.satellite.upper().startswith("NOAA"):
+        platform=args.satellite.upper()
+
+    elif args.satellite.upper().startswith("METOP"):
+        platform=args.satellite.upper()
+
+    else:
+        print " ! Wrong satellite name !\n"
+        exit(0)
+
+
+    # find sensor
+    if platform == "MOD" or platform == "MYD":
+        sensor = "MODIS"
+    else:
+        sensor = "AVHRR"
+
+
+    # date string
+    datestr = str(args.year)+str('%02d' % args.month)
+
+    # get dirs list containing all subdirs of given path
+    alldirs = os.listdir( args.inpdir )
+
+    if len(alldirs) > 0:
+
+        # get dirs list matching the arguments
+        getdirs = list()
+        for ad in alldirs:
+            if datestr in ad \
+                    and sensor in ad \
+                    and 'ORAC' in ad \
+                    and platform in ad:
+                        getdirs.append( ad )
+
+        # sort list
+        getdirs.sort()
+
+        # get last element from list, should be last job
+        lastdir = getdirs.pop()
+
+        # get ID number from the last job
+        id = get_id( lastdir )
+
+        ## remove all subdirs matching the id number
+        #for dir in getdirs:
+        #    if id in dir:
+        #        delete_dir( dir )
+
+        # pattern
+        pattern = datestr+'*'+sensor+'_ORAC*'+platform+'*'+id
+
+        # remove all dirs matching pattern
+        print (''' *** Delete: \'%s\' '''
+               '''because L2toL3 was successful!''' % pattern )
+
+    else:
+
+        print (" --- Nothing to delete in %s for %s %s %s" 
+                % (args.inpdir, sensor, platform, datestr))
 
 # -------------------------------------------------------------------
 def clear_aux(args):
