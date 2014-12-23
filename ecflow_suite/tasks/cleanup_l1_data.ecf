@@ -6,7 +6,7 @@ echo "I am task %TASK% in family %FAMILY% responsible for cleanup Level 1 data"
 
 if [ %DUMMYRUN% == 1 ]; then 
 
-    %include <randomsleep.h>
+    %%include <randomsleep.h>
 
 else
 
