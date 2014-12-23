@@ -14,11 +14,6 @@ from pycmsaf.utilities import date_from_year_doy
 from pycmsaf.ssh_client import SSHClient
 
 # ----------------------------------------------------------------
-def feedbackloop():
-    """
-    List of satellites and months for feedbackloop.
-    """
-# ----------------------------------------------------------------
 def get_modis_list():
     """
     MODIS data list
@@ -93,6 +88,7 @@ def set_vars(suite):
     suite.add_variable("CLEANUP_SCRATCH", cleanup_scratch)
     suite.add_variable("LD_LIB_PATH", ld_lib_path)
     suite.add_variable("TESTRUN", testcase)
+    suite.add_variable("DUMMYRUN", dummycase)
 
     # some processing directories
     suite.add_variable("ESA_ROUTINE", esa_routine)
@@ -432,9 +428,13 @@ if __name__ == '__main__':
             terra, aqua''')
     parser.add_argument('--testrun',
             help='Run a subset of pixels', action="store_true")
+    parser.add_argument('--dummy',
+            help='Dummy run, i.e. randomsleep only', action="store_true")
     
     args = parser.parse_args()
 
+    if args.dummy:
+        dummycase = 1
 
     if args.testrun == True:
         testcase = 1
