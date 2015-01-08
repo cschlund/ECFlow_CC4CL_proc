@@ -23,6 +23,12 @@ You have to clone this repository twice:
     2) remote machine, eg.g cca: /path/to/repo
 
 
+If you want to process only a single day (or a few days) for a month and
+satellite, then you have to modify in ./esa_routines/ the python tool
+"create_config_files.py" and set 'sday' and 'eday' as you wish,
+instead of 1 and 0 (i.e. whole month is being processed).
+
+
 If you want to run only a small pixel box instead of the whole orbit, 
 please create your suite using "--testrun"
 
@@ -63,7 +69,6 @@ please create your suite using "--testrun"
 
     clear directories if necessary
         ./cleanup_local.sh
-        ./cleanup_remote.sh
 
     generate suite definition
 
