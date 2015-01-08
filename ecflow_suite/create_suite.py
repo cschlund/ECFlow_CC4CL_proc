@@ -433,8 +433,10 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
-    if args.dummy:
+    if args.dummy == True:
         dummycase = 1
+    else:
+        dummycase = 0
 
     if args.testrun == True:
         testcase = 1
