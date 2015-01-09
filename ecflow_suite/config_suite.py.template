@@ -21,7 +21,7 @@ type = "test"
 mysuite = type+"_cc4cl_proc" 
 
 # ECFS path: final level3 data
-ecfs_l3_path = "ec:/sf7/ESA_Cloud_cci_data/L3"
+ecfs_l3_dir = "ec:/sf7/ESA_Cloud_cci_data/L3"
 
 # serial and parallel threads
 serial_threads_number = 1
