@@ -21,8 +21,8 @@ def copy_into_ecfs(dat, fil):
     p1 = subprocess.Popen(["emkdir", "-p", ecfs_target],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p1.communicate()
-    print stdout
     if p1.returncode > 0:
+        print stdout
         print stderr
 
     # -- copy file into ECFS dir
@@ -30,8 +30,8 @@ def copy_into_ecfs(dat, fil):
     p2 = subprocess.Popen(["ecp", "-o", fil, ecfs_target],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p2.communicate()
-    print stdout
     if p2.returncode > 0:
+        print stdout
         print stderr
 
     # -- change mode of file in ECFS
@@ -40,8 +40,8 @@ def copy_into_ecfs(dat, fil):
     p3 = subprocess.Popen(["echmod", "555", ecfs_target+"/"+filebase],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p3.communicate()
-    print stdout
     if p3.returncode > 0:
+        print stdout
         print stderr
 
     # -- delete file in $SCRATCH
@@ -131,24 +131,34 @@ def create_l3u_tarball( inpdir, idnumber, tempdir, l3_tarfile ):
         for f in files:
 
             if f.endswith(".nc"):
+                # copy file
                 source = os.path.join( daily, f )
                 target = os.path.join( daily_tempdir, f )
                 ncbase = os.path.splitext(f)[0]
-                #print (" * Copy \'%s\' to \'%s\'" % (source,target))
                 shutil.copy2( source, target )
+                
+                # add to list
                 daily_tar_files.append( target )
 
-            if f.endswith(".tmp"):
-                basename    = os.path.splitext(f)[0]
-                newsuffix   = ".tar.gz"
-                source_file = os.path.join( daily, f)
-                target_file = os.path.join( daily_tempdir, basename+newsuffix )
-                daily_tar_files.append( target_file )
 
-                #print (" * Create \'%s\'" % target_file)
-                tar = tarfile.open( target_file,"w:gz" )
-                tar.add( source_file, arcname=f )
-                tar.close()
+            if f.endswith(".tmp"):
+                fname, fext = os.path.splitext(f)
+                last_folder = daily_tempdir.split("/")[-1]
+                try:
+                    pattern = re.search( '(.+?)_global',
+                              last_folder ).group(1)+'_l2files'
+                except:
+                    pattern = last_folder+'_l2files'
+
+                # copy file
+                l2_tmp = pattern + fext
+                source = os.path.join( daily, f )
+                target = os.path.join( daily_tempdir, l2_tmp )
+                shutil.copy2( source, target )
+
+                # add to list
+                daily_tar_files.append( target )
+
 
         # create daily tarfile
         daily_l3_tarfile = os.path.join(tempdir, ncbase+".tar.bz2")
@@ -202,25 +212,35 @@ def create_l3c_tarball( inpdir, idnumber, tempdir, l3_tarfile ):
     # -- list all files
     files = os.listdir( l3cdir )
     for f in files:
+
         if f.endswith(".nc"):
+            # copy file
             source = os.path.join( l3cdir, f)
             target = os.path.join( tempdir, f)
-
-            #print (" * Copy \'%s\' to \'%s\'" % (source,target))
             shutil.copy2( source, target )
+
+            # add to list
             tar_files.append( target )
 
-        if f.endswith(".tmp"):
-            basename    = os.path.splitext(f)[0]
-            newsuffix   = ".tar.gz"
-            source_file = os.path.join( l3cdir, f )
-            target_file = os.path.join( tempdir, basename+newsuffix )
-            tar_files.append( target_file )
 
-            #print (" * Create \'%s\'" % target_file)
-            tar = tarfile.open(target_file,"w:gz")
-            tar.add(source_file, arcname=f)
-            tar.close()
+        if f.endswith(".tmp"):
+            fname, fext = os.path.splitext(f)
+            last_folder = l3cdir.split("/")[-1]
+            try:
+                pattern = re.search( '(.+?)_global',
+                          last_folder ).group(1)+'_l2files'
+            except:
+                pattern = last_folder+'_l2files'
+
+            # copy file
+            l2_tmp = pattern + fext
+            source = os.path.join( l3cdir, f )
+            target = os.path.join( tempdir, l2_tmp )
+            shutil.copy2( source, target )
+
+            # add to list
+            tar_files.append( target )
+
 
     # -- create final tarfile to be copied into ECFS
     #print (" * Create \'%s\'" % l3_tarfile)

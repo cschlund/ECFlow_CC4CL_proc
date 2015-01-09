@@ -60,33 +60,8 @@ if __name__ == '__main__':
     # -- list everything in input directory
     alldirs = os.listdir( args.inpdir )
 
-    
-    # *** (1) L3U archiving ***
 
-    # -- find latest job via ID-US number
-    if len(alldirs) > 0:
-        getdirs = list()
-        # collect right subfolders
-        for ad in alldirs:
-            if datestring in ad \
-                    and args.instrument.upper() in ad \
-                    and args.satellite.upper() in ad \
-                    and 'daily_samples' in ad:
-                        getdirs.append( ad )
-        # sort list
-        getdirs.sort()
-        # get last element from list, should be last job
-        lastdir = getdirs.pop()
-        # get ID number from the last job
-        idnumber = get_id( lastdir )
-        # archive data
-        tar_l3_results( "L3U", args.inpdir, datestring, 
-                        sensor, platform, idnumber)
-    else:
-        print (" ! Check your input directory, maybe it is empty ? \n")
-
-
-    # *** (2) L3C archiving ***
+    # *** L3C archiving ***
 
     # -- find latest job via ID-US number
     if len(alldirs) > 0:
@@ -106,6 +81,31 @@ if __name__ == '__main__':
         idnumber = get_id( lastdir )
         # archive data
         tar_l3_results( "L3C", args.inpdir, datestring, 
+                        sensor, platform, idnumber)
+    else:
+        print (" ! Check your input directory, maybe it is empty ? \n")
+
+    
+    # *** L3U archiving ***
+
+    # -- find latest job via ID-US number
+    if len(alldirs) > 0:
+        getdirs = list()
+        # collect right subfolders
+        for ad in alldirs:
+            if datestring in ad \
+                    and args.instrument.upper() in ad \
+                    and args.satellite.upper() in ad \
+                    and 'daily_samples' in ad:
+                        getdirs.append( ad )
+        # sort list
+        getdirs.sort()
+        # get last element from list, should be last job
+        lastdir = getdirs.pop()
+        # get ID number from the last job
+        idnumber = get_id( lastdir )
+        # archive data
+        tar_l3_results( "L3U", args.inpdir, datestring, 
                         sensor, platform, idnumber)
     else:
         print (" ! Check your input directory, maybe it is empty ? \n")
