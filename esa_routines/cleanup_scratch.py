@@ -51,7 +51,7 @@ def clear_l1(args):
 
         print (" *** Delete: \'%s\' since retrieval was successful!" 
                 % ipath)
-        #delete_dir( ipath )
+        delete_dir( ipath )
 
     else:
 
@@ -106,10 +106,10 @@ def clear_l2(args):
         # get ID number from the last job
         id = get_id( lastdir )
 
-        ## remove all subdirs matching the id number
-        #for dir in getdirs:
-        #    if id in dir:
-        #        delete_dir( dir )
+        # remove all subdirs matching the id number
+        for dir in getdirs:
+            if id in dir:
+                delete_dir( dir )
 
         # pattern
         pattern = datestr+'*'+args.instrument.upper()+'_'+\
@@ -185,10 +185,10 @@ def clear_l3(args):
         # get ID number from the last job
         id = get_id( lastdir )
 
-        ## remove all subdirs matching the id number
-        #for dir in getdirs:
-        #    if id in dir:
-        #        delete_dir( dir )
+        # remove all subdirs matching the id number
+        for dir in getdirs:
+            if id in dir:
+                delete_dir( dir )
 
         # pattern
         pattern = datestr+'*'+sensor+'_ORAC*'+platform+'*'+id
@@ -226,7 +226,7 @@ def clear_aux(args):
 
             print (" *** Delete: \'%s\' since month was successful!" 
                     % ispath)
-            #delete_dir( ispath )
+            delete_dir( ispath )
 
         else:
 
