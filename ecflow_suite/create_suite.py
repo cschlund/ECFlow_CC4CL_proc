@@ -86,6 +86,7 @@ def set_vars(suite):
     suite.add_variable("MAKE_CFG_FILE", make_cfg_files)
     suite.add_variable("COUNT_ORBIT_FILES", count_orbit_files)
     suite.add_variable("CLEANUP_SCRATCH", cleanup_scratch)
+    suite.add_variable("ARCHIVE_L3_DATA", archive_l3_data)
     suite.add_variable("LD_LIB_PATH", ld_lib_path)
     suite.add_variable("TESTRUN", testcase)
     suite.add_variable("DUMMYRUN", dummycase)

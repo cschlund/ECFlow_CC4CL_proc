@@ -14,10 +14,10 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    echo "to be done"
-    # -- execute ksh script
-    #%RENAME_LOCAL_L3_KSH% %CFG_PATHS_FILE%
-    #%ARCHIVE_L3_KSH% %CFG_PATHS_FILE%
+    python %ARCHIVE_L3_DATA% --inpdir %ESA_LEVEL3DIR% \
+        --satellite %SATELLITE% --instrument %SENSOR% \
+        --year %START_YEAR% --month %START_MONTH%
+
 fi
 
 %include <tail.h>
