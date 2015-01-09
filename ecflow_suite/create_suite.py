@@ -153,31 +153,30 @@ def add_aux_tasks(family):
 def add_tasks(family, prefamily):
     get_sat_data    = add_task(family, 'get_sat_data')
     retrieval       = add_task(family, 'retrieval')
-    cleanup_l1_data = add_task(family, 'cleanup_l1_data')
     make_l3u_data   = add_task(family, 'make_l3u_daily_composites')
     make_l3c_data   = add_task(family, 'make_l3c_monthly_averages')
+    cleanup_l1_data = add_task(family, 'cleanup_l1_data')
     cleanup_l2_data = add_task(family, 'cleanup_l2_data')
     archive_l3_data = add_task(family, 'archive_l3_data')
     cleanup_l3_data = add_task(family, 'cleanup_l3_data')
 
     add_trigger(get_sat_data, prefamily)
     add_trigger(retrieval, get_sat_data)
-    add_trigger(cleanup_l1_data, retrieval)
-
-    add_trigger(make_l3u_data, cleanup_l1_data)
-    add_trigger(make_l3c_data, cleanup_l1_data)
-
+    add_trigger(make_l3u_data, retrieval)
+    add_trigger(make_l3c_data, retrieval)
+    add_trigger_expr(cleanup_l1_data, 
+                     make_l3u_data, make_l3c_data)
     add_trigger_expr(cleanup_l2_data, 
                      make_l3u_data, make_l3c_data)
-
-    add_trigger(archive_l3_data, cleanup_l2_data)
+    add_trigger_expr(archive_l3_data, 
+                     cleanup_l1_data, cleanup_l2_data)
     add_trigger(cleanup_l3_data, archive_l3_data)
 
     return dict(get_sat_data=get_sat_data,
                 retrieval=retrieval,
-                cleanup_l1_data=cleanup_l1_data,
                 make_l3u_data=make_l3u_data,
                 make_l3c_data=make_l3c_data,
+                cleanup_l1_data=cleanup_l1_data,
                 cleanup_l2_data=cleanup_l2_data,
                 archive_l3_data=archive_l3_data,
                 cleanup_l3_data=cleanup_l3_data
