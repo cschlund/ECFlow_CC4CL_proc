@@ -7,14 +7,13 @@ import subprocess
 
 
 # -------------------------------------------------------------------
-def copy_into_ecfs(dat, fil):
+def copy_into_ecfs(dat, fil, ecfspath):
     """
     Copy tarfile into ECFS archive
     """
 
     # -- get the right path for ECFS
-    ecfs_l3_dir = "ec:/sf7/ESA_Cloud_cci_data/L3"
-    ecfs_target = os.path.join(ecfs_l3_dir, dat)
+    ecfs_target = os.path.join(ecfspath, dat)
 
     # -- make dir in ECFS
     #print (" * emkdir -p %s" % ecfs_target)
@@ -51,7 +50,7 @@ def copy_into_ecfs(dat, fil):
 
 # -------------------------------------------------------------------
 def tar_l3_results(ptype, inpdir, datestring, 
-        sensor, platform, idnumber):
+        sensor, platform, idnumber, ecfsdir):
     """
     Creates L3 tarfile, either L3U or L3C.
     """
@@ -85,7 +84,7 @@ def tar_l3_results(ptype, inpdir, datestring,
 
     # -- copy tarfile into ECFS
     print (" * Copy2ECFS \'%s\'" % l3_tarfile)
-    copy_into_ecfs( datestring, l3_tarfile )
+    copy_into_ecfs( datestring, l3_tarfile, ecfsdir )
 
     # -- delete tempdir
     print (" * Delete \'%s\'" % tempdir)

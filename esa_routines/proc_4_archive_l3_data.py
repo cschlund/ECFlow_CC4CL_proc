@@ -24,6 +24,8 @@ if __name__ == '__main__':
     
     parser.add_argument('--inpdir', type=str, required=True, 
             help='String, e.g. /path/to/output/level3')
+    parser.add_argument('--ecfsdir', type=str, required=True, 
+            help='String, e.g. /ecfs/path/to/L3/data')
     parser.add_argument('--instrument', type=str, required=True, 
             help='String, e.g. AVHRR')
     parser.add_argument('--satellite', type=str,required=True, 
@@ -81,7 +83,7 @@ if __name__ == '__main__':
         idnumber = get_id( lastdir )
         # archive data
         tar_l3_results( "L3C", args.inpdir, datestring, 
-                        sensor, platform, idnumber)
+                        sensor, platform, idnumber, args.ecfsdir)
     else:
         print (" ! Check your input directory, maybe it is empty ? \n")
 
@@ -106,7 +108,7 @@ if __name__ == '__main__':
         idnumber = get_id( lastdir )
         # archive data
         tar_l3_results( "L3U", args.inpdir, datestring, 
-                        sensor, platform, idnumber)
+                        sensor, platform, idnumber, args.ecfsdir)
     else:
         print (" ! Check your input directory, maybe it is empty ? \n")
 

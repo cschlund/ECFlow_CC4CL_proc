@@ -20,6 +20,9 @@ type = "test"
 # suite name
 mysuite = type+"_cc4cl_proc" 
 
+# ECFS path: final level3 data
+ecfs_l3_path = "ec:/sf7/ESA_Cloud_cci_data/L3"
+
 # serial and parallel threads
 serial_threads_number = 1
 parallel_threads_number = 2
@@ -73,10 +76,6 @@ get_aux_ksh    = os.path.join( esa_routine, "proc_1_getdata_aux.ksh" )
 proc2_orac_ksh = os.path.join( esa_routine, "proc_2_process.ksh" )
 single_day_ksh = os.path.join( esa_routine, "process_single_day.ksh")
 run_l2tol3_ksh = os.path.join( esa_routine, "proc_3_l2tol3_script.ksh" )
-# diese sollte man besser ersetzen durch ein neues python tool!
-# siehe avhrrgac proc
-rename_l3_ksh  = os.path.join( esa_routine, "rename_local_l3.ksh" )
-archive_l3_ksh = os.path.join( esa_routine, "archive_L3.ksh" )
 
 # exe scripts
 wrapper_exe    = os.path.join( esa_routine, "mpi_wrapper.x")

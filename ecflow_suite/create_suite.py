@@ -87,6 +87,7 @@ def set_vars(suite):
     suite.add_variable("COUNT_ORBIT_FILES", count_orbit_files)
     suite.add_variable("CLEANUP_SCRATCH", cleanup_scratch)
     suite.add_variable("ARCHIVE_L3_DATA", archive_l3_data)
+    suite.add_variable("ECFS_L3_DIR", ecfs_l3_dir)
     suite.add_variable("LD_LIB_PATH", ld_lib_path)
     suite.add_variable("TESTRUN", testcase)
     suite.add_variable("DUMMYRUN", dummycase)
@@ -117,8 +118,6 @@ def set_vars(suite):
     suite.add_variable("PROC2_ORAC_KSH", proc2_orac_ksh)
     suite.add_variable("SINGLE_DAY_KSH", single_day_ksh)
     suite.add_variable("RUN_L2TOL3_KSH", run_l2tol3_ksh)
-    suite.add_variable("RENAME_LOCAL_L3_KSH", rename_l3_ksh)
-    suite.add_variable("ARCHIVE_L3_KSH", archive_l3_ksh)
     suite.add_variable("WRAPPER_EXE", wrapper_exe)
 
 # ----------------------------------------------------------------

@@ -15,6 +15,7 @@ if [ %DUMMYRUN% == 1 ]; then
 else
 
     python %ARCHIVE_L3_DATA% --inpdir %ESA_LEVEL3DIR% \
+        --ecfsdir %ECFS_L3_DIR% \
         --satellite %SATELLITE% --instrument %SENSOR% \
         --year %START_YEAR% --month %START_MONTH%
 
