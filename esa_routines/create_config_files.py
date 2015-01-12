@@ -99,9 +99,12 @@ def getaux(args):
             f.write("ice_snow_type=NISE_SSMI*\n") 
             f.write("ice_snow_suffix=.tar\n")
             f.write("emissivity_type=global_emis_inf10_monthFilled_MYD11C3.A\n")
-            if args.start_year <= 2006 and args.end_year <= 2006:
+            if args.start_year >= 2003 and args.start_year <= 2006 and \
+                    args.end_year >= 2003 and args.end_year <= 2006:
+                # between 2003 and 2006 filename extension
                 f.write("emissivity_suffix=.nc.bz2\n")
             else:
+                # from 2007 onwards and for climatology filename
                 f.write("emissivity_suffix=.041.nc.bz2\n")
         f.close()
     except (IndexError, ValueError, RuntimeError,
