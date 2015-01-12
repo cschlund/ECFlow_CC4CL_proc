@@ -46,8 +46,14 @@ please create your suite using "--testrun"
 
     this is the source code for ecflow required on local machine
 
+    change to your home directory
+        cd $HOME
+    create a new directory for ecflow log
+        mkdir ecflow_logs_username
+    check which server is available
+        netstat -lnptu |less
     start ecflow server
-        ecflow_start.sh -p 3500 -d $HOME/ecflow_logs
+        ecflow_start.sh -p 3500 -d $HOME/ecflow_logs_username
 
     stop ecflow server, if you do not need it anymore!
         ecflow_stop.sh -p 3500
