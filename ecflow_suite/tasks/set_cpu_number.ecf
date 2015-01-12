@@ -21,7 +21,10 @@ else
     else
 
         val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% %CFG_P1_MODIS%`
+
         # for MODIS we must set a maximum!
+        maxval=2400
+        if [ "$val" -gt "$maxval" ]; then val=$maxval; fi
 
     fi
     
