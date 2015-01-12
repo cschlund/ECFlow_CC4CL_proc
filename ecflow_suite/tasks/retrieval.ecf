@@ -14,18 +14,6 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    # -- set new variable: EC_total_tasks = # of slaves + 1 for master
-    if [ %SENSOR% == "AVHRR" ]; then
-        val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% %CFG_P1_AVHRR%`
-    else
-        val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% %CFG_P1_MODIS%`
-    fi
-    
-    #val=1
-    new=$((val + 1))
-    ecflow_client --alter add variable 'EC_TOTAL_SLAVES' "$new" '/%SUITE%/%FAMILY%'
-
-
     # -- working directory: write core file here
     cd %ESA_ROUTINE%
     
