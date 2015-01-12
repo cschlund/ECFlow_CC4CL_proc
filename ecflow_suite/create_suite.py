@@ -152,6 +152,7 @@ def add_aux_tasks(family):
 # ----------------------------------------------------------------
 def add_tasks(family, prefamily):
     get_sat_data    = add_task(family, 'get_sat_data')
+    set_cpu_number  = add_task(family, 'set_cpu_number')
     retrieval       = add_task(family, 'retrieval')
     make_l3u_data   = add_task(family, 'make_l3u_daily_composites')
     make_l3c_data   = add_task(family, 'make_l3c_monthly_averages')
@@ -161,7 +162,8 @@ def add_tasks(family, prefamily):
     cleanup_l3_data = add_task(family, 'cleanup_l3_data')
 
     add_trigger(get_sat_data, prefamily)
-    add_trigger(retrieval, get_sat_data)
+    add_trigger(set_cpu_number, get_sat_data)
+    add_trigger(retrieval, set_cpu_number)
     add_trigger(make_l3u_data, retrieval)
     add_trigger(make_l3c_data, retrieval)
     add_trigger_expr(cleanup_l1_data, 
@@ -173,6 +175,7 @@ def add_tasks(family, prefamily):
     add_trigger(cleanup_l3_data, archive_l3_data)
 
     return dict(get_sat_data=get_sat_data,
+                set_cpu_number=set_cpu_number,
                 retrieval=retrieval,
                 make_l3u_data=make_l3u_data,
                 make_l3c_data=make_l3c_data,
