@@ -48,15 +48,19 @@ please create your suite using "--testrun"
 
     change to your home directory
         cd $HOME
+
     create a new directory for ecflow log
         mkdir ecflow_logs_username
-    check which server is available
+
+    check which server is available, i.e. which is NOT in the list
         netstat -lnptu |less
+        netstat -lnptu |grep 35816
+
     start ecflow server
-        ecflow_start.sh -p 3500 -d $HOME/ecflow_logs_username
+        ecflow_start.sh -p 35816 -d $HOME/ecflow_logs_username
 
     stop ecflow server, if you do not need it anymore!
-        ecflow_stop.sh -p 3500
+        ecflow_stop.sh -p 35816
 
     edit config.sh
         adapt all variables and paths!
