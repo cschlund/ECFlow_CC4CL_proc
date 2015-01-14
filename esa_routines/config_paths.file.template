@@ -14,6 +14,14 @@ BASE="ms/de/sf7/cschlund"
 MAIN="/perm/ms/de/sf7/esa_cci_c_proc"
 #MAIN="/perm/${BASE}/sissi_orac"
 
+# AVHRR GAC top level directory in ecfs
+# final pygac data
+#avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive
+# CMSAF feedback loop months: JAN+JUL 2008, APR 2002, JAN 1983
+#avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive/testdata
+# old pygac version (2008,2009,2010 only)
+avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive/pyGACv0.1.0
+
 # ---------------------------------------------------------------
 # do not change unless you know what you are doing ;-)
 # ---------------------------------------------------------------
@@ -103,15 +111,10 @@ l2inputpath=$OUTPUTDIR
 l3outputpath=$OUTPUTDIR/level3
 
 # ---------------------------------------------------------------
-# ecfs_ls
+# misc
 # ---------------------------------------------------------------
-#l2_ecfs=cloud_cci_data/l2
-l2_ecfs=/sf4/scratch
-#l2_ecfs=/sf7/scratch
-
 # era_inter comparison files
 era_comp=/scratch/ms/de/sf7/esa_cci_c_proc/era_interim
-
 # free path
 free_path=/usr/bin
 
