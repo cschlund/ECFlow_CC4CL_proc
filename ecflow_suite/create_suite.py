@@ -141,12 +141,14 @@ def add_cleanup_aux_task(family, prefamily):
     return dict(cleanup_aux_data=cleanup_aux_data)
 
 # ----------------------------------------------------------------
+def add_cfg_task(family):
+    write_cfg_files = add_task(family, 'write_config_files')
+    return(write_cfg_files)
+
+# ----------------------------------------------------------------
 def add_aux_tasks(family):
-    get_aux_data    = add_task(family, 'get_aux_data')
-    get_mars_data   = add_task(family, 'get_mars_data')
-
-    #add_trigger(get_mars_data, get_aux_data)
-
+    get_aux_data  = add_task(family, 'get_aux_data')
+    get_mars_data = add_task(family, 'get_mars_data')
     return dict(get_aux_data=get_aux_data,
                 get_mars_data=get_mars_data)
 
@@ -322,14 +324,22 @@ def build_suite():
 
 
         # ----------------------------------------------------
-        # add get aux/era family
+        # add write config files family
         # ----------------------------------------------------
-        fam_aux = add_fam(fam_month, "GET_AUX_DATA")
-        add_aux_tasks( fam_aux )
+        fam_cfg = add_fam( fam_month, "CREATE_CONFIGS" )
+        add_cfg_task( fam_cfg )
 
         # trigger for next month node
         if month_cnt > 0 :
-            add_trigger(fam_aux, fam_month_previous)
+            add_trigger( fam_cfg, fam_month_previous )
+
+
+        # ----------------------------------------------------
+        # add get aux/era family
+        # ----------------------------------------------------
+        fam_aux = add_fam( fam_month, "GET_AUX_DATA" )
+        add_aux_tasks( fam_aux )
+        add_trigger( fam_aux, fam_cfg )
 
 
         # ----------------------------------------------------
@@ -362,7 +372,7 @@ def build_suite():
         # ----------------------------------------------------
         # add cleanup aux/era family
         # ----------------------------------------------------
-        fam_cleanup_aux = add_fam(fam_month, "CLEANUP_AUX_DATA")
+        fam_cleanup_aux = add_fam( fam_month, "CLEANUP_AUX_DATA" )
         add_cleanup_aux_task( fam_cleanup_aux, fam_main )
 
         # remember fam_month

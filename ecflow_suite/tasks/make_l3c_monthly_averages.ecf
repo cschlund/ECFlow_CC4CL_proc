@@ -23,14 +23,6 @@ else
     sleep 3
     jid=ID${primary_id}_US${id}
     
-    # -- write config file for l3a
-    python %MAKE_CFG_FILE% \
-        -cf %CFG_L3C_FILE% \
-        -sy %START_YEAR% -ey %END_YEAR% \
-        -sm %START_MONTH% -em %END_MONTH% \
-        l2tol3 -sat %SATELLITE% -ins %SENSOR% \
-        -inp %ESA_OUTPUTDIR% -typ l3a
-    
     # -- execute ksh script
     %RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% %CFG_L3C_FILE%
 
