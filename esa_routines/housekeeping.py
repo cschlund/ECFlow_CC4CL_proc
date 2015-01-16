@@ -7,16 +7,35 @@ import subprocess
 
 
 # -------------------------------------------------------------------
-def copy_into_ecfs(dat, fil, ecfspath):
+def get_file_list(idir, iend):
+    """
+    Returns a list of files for a given directory and file
+    extension.
+    """
+    flist = list()
+    for root, dirs, files in os.walk(idir):
+        for file in files:
+            if file.endswith(iend):
+                flist.append( os.path.join(root,file) )
+
+    flist.sort()
+    return flist
+
+
+# -------------------------------------------------------------------
+def copy_into_ecfs(datestring, file_list, ecfspath):
     """
     Copy tarfile into ECFS archive
     """
 
+    # -- make ecpstring
+    ecpstring = " ".join(file_list)
+
     # -- get the right path for ECFS
-    ecfs_target = os.path.join(ecfspath, dat)
+    ecfs_target = os.path.join(ecfspath, datestring)
 
     # -- make dir in ECFS
-    #print (" * emkdir -p %s" % ecfs_target)
+    print (" * emkdir -p %s" % ecfs_target)
     p1 = subprocess.Popen(["emkdir", "-p", ecfs_target],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p1.communicate()
@@ -25,7 +44,7 @@ def copy_into_ecfs(dat, fil, ecfspath):
         print stderr
 
     # -- copy file into ECFS dir
-    #print (" * ecp -o %s %s" % (fil, ecfs_target))
+    print (" * ecp -o %s %s" % (fil, ecfs_target))
     p2 = subprocess.Popen(["ecp", "-o", fil, ecfs_target],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p2.communicate()
@@ -35,7 +54,7 @@ def copy_into_ecfs(dat, fil, ecfspath):
 
     # -- change mode of file in ECFS
     filebase = os.path.basename(fil)
-    #print (" * echmod 555 %s/%s" % (ecfs_target, filebase))
+    print (" * echmod 555 %s/%s" % (ecfs_target, filebase))
     p3 = subprocess.Popen(["echmod", "555", ecfs_target+"/"+filebase],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p3.communicate()
@@ -44,15 +63,15 @@ def copy_into_ecfs(dat, fil, ecfspath):
         print stderr
 
     # -- delete file in $SCRATCH
-    #print (" * delete %s " % fil)
+    print (" * delete %s " % fil)
     delete_file( fil )
 
 
 # -------------------------------------------------------------------
-def tar_l3_results(ptype, inpdir, datestring, 
-        sensor, platform, idnumber, ecfsdir):
+def tar_results(ptype, inpdir, datestring, sensor, platform, 
+        idnumber):
     """
-    Creates L3 tarfile, either L3U or L3C.
+    Creates L2, L3U or L3C tarfile.
     """
 
     # -- check type
@@ -60,35 +79,100 @@ def tar_l3_results(ptype, inpdir, datestring,
         typ = ptype.upper()
     elif ptype.upper() == "L3C":
         typ = ptype.upper()
+    elif ptype.upper() == "L2":
+        typ = ptype.upper()
     else:
-        print (" ! Wrong type name: either \'L3U\' or \'L3C\'")
+        print (" ! Wrong type name ! Options: L2, L3U, L3C")
         sys.exit(0)
 
-    # -- create L3 tarname
-    l3_tarname = create_l3_tarname( typ, datestring, 
-                                    sensor, platform ) 
+    # -- create tarname
+    tarname = create_tarname( typ, datestring, sensor, platform ) 
     
     # -- define temp. subfolder for tar creation
     tempdir = os.path.join( inpdir, "tmp_tardir_"+typ.lower() )
     create_dir( tempdir )
 
-    # -- final l3 tarfile to be copied into ECFS
-    l3_tarfile = os.path.join( tempdir, l3_tarname)
+    # -- final tarfile to be copied into ECFS
+    tarfile = os.path.join( tempdir, tarname)
 
     # -- get final tarball
-    print (" * Create \'%s\'" % l3_tarfile)
+    print (" * Create \'%s\'" % tarfile)
     if typ == "L3U":
-        create_l3u_tarball( inpdir, idnumber, tempdir, l3_tarfile )
+        create_l3u_tarball( inpdir, idnumber, tempdir, tarfile )
+    elif typ == "L3C":
+        create_l3c_tarball( inpdir, idnumber, tempdir, tarfile )
     else:
-        create_l3c_tarball( inpdir, idnumber, tempdir, l3_tarfile )
+        create_l2_tarball( inpdir, idnumber, tempdir, tarfile )
 
-    # -- copy tarfile into ECFS
-    print (" * Copy2ECFS \'%s\'" % l3_tarfile)
-    copy_into_ecfs( datestring, l3_tarfile, ecfsdir )
+    return ( tarfile, tempdir )
 
-    # -- delete tempdir
-    print (" * Delete \'%s\'" % tempdir)
-    delete_dir( tempdir )
+
+# -------------------------------------------------------------------
+def create_l2_tarball( inpdir, idnumber, tempdir, l2_tarfile ):
+    """
+    Create the final l2 tarball to be stored in ECFS.
+    """
+
+    # -- find l2 input directory via idnumber
+    dirs = os.listdir( inpdir )
+    daily_list = list()
+    if len(dirs) > 0:
+        for dir in dirs:
+            if idnumber in dir: 
+                daily_list.append(os.path.join(inpdir,dir))
+    else:
+        print (" * No input in %s matching %s " % 
+                (inpdir, idnumber))
+        sys.exit(0)
+
+    # -- final files to be tared
+    tar_files = list()
+
+    # -- sort daily list
+    daily_list.sort()
+
+    # -- make daily tarballs
+    for daily in daily_list:
+
+        # date and subdir of daily
+        idate_folder = daily.split("/")[-1]
+        idate = idate_folder.split("_")[0]
+
+        # list all orbitfiles
+        files = get_file_list(daily, "fv1.0.nc")
+
+        # create daily tarfilename
+        ncfile = files.pop()
+        ncbase = os.path.splitext( os.path.basename(ncfile) )[0]
+        nclist = ncbase.split("-")[1:]
+        ncstr  = "-".join(nclist)
+        tarbas = idate + '-' + ncstr
+        daily_l2_tarfile = os.path.join(tempdir, tarbas+".tar.bz2")
+
+        # create daily tarfile containing all orbits
+        #print (" * Create \'%s\'" % daily_l2_tarfile)
+        tar = tarfile.open( daily_l2_tarfile, "w:bz2" )
+        for tfile in files:
+            filedir = os.path.dirname(tfile)
+            filenam = os.path.basename(tfile)
+            tar.add( tfile, arcname=filenam )
+        tar.close()
+        sys.exit(0)
+
+        # collect daily tarfiles for final tarball
+        tar_files.append( daily_l2_tarfile )
+
+    # -- make monthly tarballs containing all daily tarballs
+    tar = tarfile.open( l2_tarfile, "w:gz" )
+    for tfile in tar_files:
+        filedir = os.path.dirname(tfile)
+        filenam = os.path.basename(tfile)
+        tar.add( tfile, arcname=filenam )
+    tar.close()
+
+    # -- delete daily tarballs
+    for tfile in tar_files:
+        delete_file( tfile )
 
 
 # -------------------------------------------------------------------
@@ -266,11 +350,12 @@ def split_platform_string( platform ):
 
 
 # -------------------------------------------------------------------
-def create_l3_tarname( ctype, datestring, sensor, platform ):
+def create_tarname( ctype, datestring, sensor, platform ):
     """
     Create tar filename.
-    Usage: create_l3_tarnme( "L3U", 200806, AVHRR, NOAA18 )
-           create_l3_tarnme( "L3C", 200806, AVHRR, NOAA18 )
+    Usage: create_tarname( "L3U", 200806, AVHRR, NOAA18 )
+           create_tarname( "L3C", 200806, AVHRR, NOAA18 )
+           create_tarname( "L2", 200806, AVHRR, NOAA18 )
     """
     esacci = "ESACCI"
     cloudp = "CLOUD-CLD_PRODUCTS"

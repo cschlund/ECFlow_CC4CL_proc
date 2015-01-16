@@ -86,8 +86,9 @@ def set_vars(suite):
     suite.add_variable("MAKE_CFG_FILE", make_cfg_files)
     suite.add_variable("COUNT_ORBIT_FILES", count_orbit_files)
     suite.add_variable("CLEANUP_SCRATCH", cleanup_scratch)
-    suite.add_variable("ARCHIVE_L3_DATA", archive_l3_data)
+    suite.add_variable("ARCHIVE_DATA", archive_data)
     suite.add_variable("ECFS_L3_DIR", ecfs_l3_dir)
+    suite.add_variable("ECFS_L2_DIR", ecfs_l2_dir)
     suite.add_variable("LD_LIB_PATH", ld_lib_path)
     suite.add_variable("TESTRUN", testcase)
     suite.add_variable("DUMMYRUN", dummycase)
@@ -154,34 +155,32 @@ def add_tasks(family, prefamily):
     get_sat_data    = add_task(family, 'get_sat_data')
     set_cpu_number  = add_task(family, 'set_cpu_number')
     retrieval       = add_task(family, 'retrieval')
+    cleanup_l1_data = add_task(family, 'cleanup_l1_data')
     make_l3u_data   = add_task(family, 'make_l3u_daily_composites')
     make_l3c_data   = add_task(family, 'make_l3c_monthly_averages')
-    cleanup_l1_data = add_task(family, 'cleanup_l1_data')
+    archive_data    = add_task(family, 'archive_data')
     cleanup_l2_data = add_task(family, 'cleanup_l2_data')
-    archive_l3_data = add_task(family, 'archive_l3_data')
     cleanup_l3_data = add_task(family, 'cleanup_l3_data')
 
     add_trigger(get_sat_data, prefamily)
     add_trigger(set_cpu_number, get_sat_data)
     add_trigger(retrieval, set_cpu_number)
-    add_trigger(make_l3u_data, retrieval)
-    add_trigger(make_l3c_data, retrieval)
-    add_trigger_expr(cleanup_l1_data, 
+    add_trigger(cleanup_l1_data, retrieval)
+    add_trigger(make_l3u_data, cleanup_l1_data)
+    add_trigger(make_l3c_data, cleanup_l1_data)
+    add_trigger_expr(archive_data, 
                      make_l3u_data, make_l3c_data)
-    add_trigger_expr(cleanup_l2_data, 
-                     make_l3u_data, make_l3c_data)
-    add_trigger_expr(archive_l3_data, 
-                     cleanup_l1_data, cleanup_l2_data)
-    add_trigger(cleanup_l3_data, archive_l3_data)
+    add_trigger(cleanup_l2_data, archive_data)
+    add_trigger(cleanup_l3_data, archive_data)
 
     return dict(get_sat_data=get_sat_data,
                 set_cpu_number=set_cpu_number,
                 retrieval=retrieval,
+                cleanup_l1_data=cleanup_l1_data,
                 make_l3u_data=make_l3u_data,
                 make_l3c_data=make_l3c_data,
-                cleanup_l1_data=cleanup_l1_data,
+                archive_data=archive_data,
                 cleanup_l2_data=cleanup_l2_data,
-                archive_l3_data=archive_l3_data,
                 cleanup_l3_data=cleanup_l3_data
                )
 

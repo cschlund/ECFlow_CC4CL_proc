@@ -50,12 +50,13 @@ INPUTDIR=$SCRATCH_BASE/input
 OUTPUTDIR=$SCRATCH_BASE/output
 
 # ---------------------------------------------------------------
-# new python/bash tools, C. Schlundt 2014 (Nov, Dec.)
+# new python/bash tools, C. Schlundt 2014/2015
 # ---------------------------------------------------------------
 create_cfg_files=$ESA_ROUT/create_config_files.py
 pick_aux_datafile=$ESA_ROUT/pick_aux_dir.py
 get_number_of_slaves=$ESA_ROUT/count_orbit_files.sh
 cleanup_scratch=$ESA_ROUT/cleanup_scratch.py
+archive_data=$ESA_ROUT/proc_4_archive_data.py
 
 # ---------------------------------------------------------------
 # this is where the volatile aux data is in the ecfs 
