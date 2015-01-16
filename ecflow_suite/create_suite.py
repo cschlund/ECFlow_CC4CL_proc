@@ -14,6 +14,10 @@ from pycmsaf.utilities import date_from_year_doy
 from pycmsaf.ssh_client import SSHClient
 
 # ----------------------------------------------------------------
+def str2upper(string_object): 
+    return string_object.upper()
+
+# ----------------------------------------------------------------
 def get_modis_list():
     """
     MODIS data list
@@ -427,16 +431,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=sys.argv[0]+'''
     creates the suite '''+mysuite+''' required by ecflow.''')
     
-    parser.add_argument('--sdate', type=str2date,
-            help='start date, e.g. 20090101', required=True)
-    parser.add_argument('--edate', type=str2date,
-            help='end date, e.g. 20091231',required=True)
-    parser.add_argument( '--satellite', type=str,
-            help='''satellite name, e.g. noaa15, metopa, 
-            terra, aqua''')
-    parser.add_argument('--testrun',
+    parser.add_argument('--sdate', type=str2date, required=True,
+            help='start date, e.g. 20090101')
+    parser.add_argument('--edate', type=str2date, required=True,
+            help='end date, e.g. 20091231')
+    parser.add_argument( '--satellite', type=str2upper, nargs='*', 
+            help='''satellite name, e.g. noaa15, metopa, terra, aqua''')
+    parser.add_argument('--testrun', 
             help='Run a subset of pixels', action="store_true")
-    parser.add_argument('--dummy',
+    parser.add_argument('--dummy', 
             help='Dummy run, i.e. randomsleep only', action="store_true")
     
     args = parser.parse_args()
