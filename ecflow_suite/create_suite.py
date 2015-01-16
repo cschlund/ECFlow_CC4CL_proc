@@ -141,19 +141,21 @@ def add_cleanup_aux_task(family, prefamily):
     return dict(cleanup_aux_data=cleanup_aux_data)
 
 # ----------------------------------------------------------------
-def add_cfg_task(family):
-    write_cfg_files = add_task(family, 'write_config_files')
-    return(write_cfg_files)
-
-# ----------------------------------------------------------------
 def add_aux_tasks(family):
+    wrt_aux_cfgs  = add_task(family, 'write_aux_cfg_files')
     get_aux_data  = add_task(family, 'get_aux_data')
     get_mars_data = add_task(family, 'get_mars_data')
-    return dict(get_aux_data=get_aux_data,
+
+    add_trigger(get_aux_data, wrt_aux_cfgs)
+    add_trigger(get_mars_data, wrt_aux_cfgs)
+
+    return dict(wrt_aux_cfgs=wrt_aux_cfgs,
+                get_aux_data=get_aux_data,
                 get_mars_data=get_mars_data)
 
 # ----------------------------------------------------------------
 def add_tasks(family, prefamily):
+    wrt_main_cfgs   = add_task(family, 'write_main_cfg_files')
     get_sat_data    = add_task(family, 'get_sat_data')
     set_cpu_number  = add_task(family, 'set_cpu_number')
     retrieval       = add_task(family, 'retrieval')
@@ -164,7 +166,8 @@ def add_tasks(family, prefamily):
     cleanup_l2_data = add_task(family, 'cleanup_l2_data')
     cleanup_l3_data = add_task(family, 'cleanup_l3_data')
 
-    add_trigger(get_sat_data, prefamily)
+    add_trigger(wrt_main_cfgs, prefamily)
+    add_trigger(get_sat_data, wrt_main_cfgs)
     add_trigger(set_cpu_number, get_sat_data)
     add_trigger(retrieval, set_cpu_number)
     add_trigger(cleanup_l1_data, retrieval)
@@ -175,7 +178,8 @@ def add_tasks(family, prefamily):
     add_trigger(cleanup_l2_data, archive_data)
     add_trigger(cleanup_l3_data, archive_data)
 
-    return dict(get_sat_data=get_sat_data,
+    return dict(wrt_main_cfgs=wrt_main_cfgs,
+                get_sat_data=get_sat_data,
                 set_cpu_number=set_cpu_number,
                 retrieval=retrieval,
                 cleanup_l1_data=cleanup_l1_data,
@@ -308,6 +312,7 @@ def build_suite():
 
     # loop over months for given date range
     for mm in rrule(MONTHLY, dtstart=args.sdate, until=args.edate): 
+
         year_string  = mm.strftime("%Y")
         month_string = mm.strftime("%m")
         
@@ -324,22 +329,14 @@ def build_suite():
 
 
         # ----------------------------------------------------
-        # add write config files family
-        # ----------------------------------------------------
-        fam_cfg = add_fam( fam_month, "CREATE_CONFIGS" )
-        add_cfg_task( fam_cfg )
-
-        # trigger for next month node
-        if month_cnt > 0 :
-            add_trigger( fam_cfg, fam_month_previous )
-
-
-        # ----------------------------------------------------
         # add get aux/era family
         # ----------------------------------------------------
         fam_aux = add_fam( fam_month, "GET_AUX_DATA" )
         add_aux_tasks( fam_aux )
-        add_trigger( fam_aux, fam_cfg )
+
+        # trigger for next month node
+        if month_cnt > 0 :
+            add_trigger( fam_aux, fam_month_previous )
 
 
         # ----------------------------------------------------
