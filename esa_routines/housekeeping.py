@@ -44,27 +44,28 @@ def copy_into_ecfs(datestring, file_list, ecfspath):
         print stderr
 
     # -- copy file into ECFS dir
-    print (" * ecp -o %s %s" % (fil, ecfs_target))
-    p2 = subprocess.Popen(["ecp", "-o", fil, ecfs_target],
+    print (" * ecp -o %s %s" % (ecpstring, ecfs_target))
+    p2 = subprocess.Popen(["ecp", "-o", ecpstring, ecfs_target],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p2.communicate()
     if p2.returncode > 0:
         print stdout
         print stderr
 
-    # -- change mode of file in ECFS
-    filebase = os.path.basename(fil)
-    print (" * echmod 555 %s/%s" % (ecfs_target, filebase))
-    p3 = subprocess.Popen(["echmod", "555", ecfs_target+"/"+filebase],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = p3.communicate()
-    if p3.returncode > 0:
-        print stdout
-        print stderr
+    # -- change mode of files in ECFS
+    for fil in file_list: 
+        filebase = os.path.basename(fil)
+        print (" * echmod 555 %s/%s" % (ecfs_target, filebase))
+        p3 = subprocess.Popen(["echmod", "555", ecfs_target+"/"+filebase],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = p3.communicate()
+        if p3.returncode > 0:
+            print stdout
+            print stderr
 
-    # -- delete file in $SCRATCH
-    print (" * delete %s " % fil)
-    delete_file( fil )
+        ## -- delete file in $SCRATCH
+        #print (" * delete %s " % fil)
+        #delete_file( fil )
 
 
 # -------------------------------------------------------------------
