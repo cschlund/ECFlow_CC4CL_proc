@@ -285,7 +285,7 @@ def build_suite():
 
     # Create list of available satellites
     if args.satellite:
-        sat_list = [args.satellite.upper()]
+        sat_list = args.satellite
     else:
         # connect to database and get_sats list
         db = AvhrrGacDatabase( dbfile=gacdb_file )
