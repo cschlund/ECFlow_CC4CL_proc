@@ -17,7 +17,6 @@ subroutine build_inventory(log_dir,out_dir,jid,&
   integer :: estat,cstat
   character(len=1024) :: cmsg
 
-  !if(ntasks .lt. 4) then
 
   !set up inventory file names
   write(*,*) 'INV: define files'
@@ -91,104 +90,4 @@ subroutine build_inventory(log_dir,out_dir,jid,&
   call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
   write(*,*) trim(adjustl(command_line))
 
-  !else
-
-  !set up inventory file names
-  !write(*,*) 'INV: define files mytask',mytask
-  !inventory_file_pre=trim(adjustl(log_dir))//&
-!!$          & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
-!!$          & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
-!!$             & trim(adjustl(jid))//'.pre.lst'
-!!$     write(*,*) 'pre',trim(adjustl(inventory_file_pre))
-!!$
-!!$     inventory_file_liq=trim(adjustl(log_dir))//&
-!!$          & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
-!!$          & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
-!!$          & trim(adjustl(jid))//'.liq.lst'
-!!$     write(*,*) 'liq',trim(adjustl(inventory_file_liq))
-!!$
-!!$     inventory_file_ice=trim(adjustl(log_dir))//&
-!!$          & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
-!!$          & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
-!!$          & trim(adjustl(jid))//'.ice.lst'
-!!$     write(*,*) 'ice',trim(adjustl(inventory_file_ice)) 
-!!$
-!!$     inventory_file_post=trim(adjustl(log_dir))//&
-!!$          & '/process_single_day_'//trim(adjustl(year))//trim(adjustl(month))//&
-!!$          & '_'//trim(adjustl(instrument))//'_'//trim(adjustl(platform))//'_'//&
-!!$          & trim(adjustl(jid))//'.post.lst'
-!!$     write(*,*) 'post',trim(adjustl(inventory_file_post)) 
-!!$     
-!!$
-!!$     if(mytask .eq. 0 ) then
-!!$        
-!!$        !erase any existing files
-!!$        command_line='rm -rf '//trim(adjustl(inventory_file_pre))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$
-!!$        !determine number of files and write into inventory
-!!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 2 -type d -wholename "*'//trim(adjustl(jid))//'/*" | wc -l >> '//trim(adjustl(inventory_file_pre))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$
-!!$        !fill inventory files
-!!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 3 -type f -wholename "*'//trim(adjustl(jid))//'/*/preproc_driver_*.dat" | sort >> '&
-!!$             & //trim(adjustl(inventory_file_pre))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$             
-!!$     elseif(mytask .eq. 1) then
-!!$
-!!$        command_line='rm -rf '//trim(adjustl(inventory_file_liq))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$
-!!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 2 -type d -wholename "*'//trim(adjustl(jid))//'/*" | wc -l >> '//trim(adjustl(inventory_file_liq))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$        
-!!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 3 -type f -wholename "*'//trim(adjustl(jid))//'/*/mainproc_driver_*WAT.dat" | sort >> '&
-!!$             & //trim(adjustl(inventory_file_liq))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$     elseif(mytask .eq. 2) then
-!!$        
-!!$        command_line='rm -rf '//trim(adjustl(inventory_file_ice))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$        
-!!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 2 -type d -wholename "*'//trim(adjustl(jid))//'/*" | wc -l >> '//trim(adjustl(inventory_file_ice))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$        
-!!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 3 -type f -wholename "*'//trim(adjustl(jid))//'/*/mainproc_driver_*ICE.dat" | sort >> '&
-!!$             & //trim(adjustl(inventory_file_ice))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$        
-!!$     elseif(mytask .eq. 3) then
-!!$        
-!!$        command_line='rm -rf '//trim(adjustl(inventory_file_post))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 2 -type d -wholename "*'//trim(adjustl(jid))//'/*" | wc -l >> '//trim(adjustl(inventory_file_post))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$        command_line='find '//trim(adjustl(out_dir))//'/ -maxdepth 3 -type f -wholename "*'//trim(adjustl(jid))//'/*/postproc_driver_*.dat" | sort >> '&
-!!$             & //trim(adjustl(inventory_file_post))
-!!$        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-!!$        write(*,*) trim(adjustl(command_line))
-!!$        
-!!$     endif
-!!$
-!!$  endif
 end subroutine build_inventory

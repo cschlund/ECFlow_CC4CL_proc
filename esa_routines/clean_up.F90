@@ -19,16 +19,11 @@ subroutine clean_up_pre(string)
   cut_off=index(trim(adjustl(string)),'/',BACK=.true.)
 
   directory=trim(adjustl(string(1:cut_off)))//trim(adjustl(dir))
-  
 
   command_line="rm -rf "//trim(adjustl(directory))
   call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-  !  write(11,*) 'Removal of',trim(adjustl(directory)),estat,cstat,cmsg
 
 end subroutine clean_up_pre
-
-
-
 
 
 subroutine clean_up_main(string)
@@ -52,11 +47,9 @@ subroutine clean_up_main(string)
   cut_off=index(trim(adjustl(string)),'/',BACK=.true.)
 
   directory=trim(adjustl(string(1:cut_off)))//trim(adjustl(dir))
-  
 
   command_line="rm -rf "//trim(adjustl(directory))
   call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-  !  write(11,*) 'Removal of',trim(adjustl(directory)),estat,cstat,cmsg
 
 end subroutine clean_up_main
 
@@ -125,31 +118,15 @@ subroutine move_post(string,instrument,platform,year,month)
 
      platform = to_upper(platform)
 
-     !command_line = "ls *" //  trim(adjustl(suffix_source)) " > delete.txt"
-     !call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
-     !open()
-
      ! TO DO: import file version
      finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // '-fv1.0' // trim(suffix_target)
 
      command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
-     !command_line="mv -f "//trim(adjustl(dri_file)) // " " // finalprimary
      call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
 
   endif
-  !finalprimary
-
-
-  !finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv1.0.nc
-
-  !/scratch/ms/de/sf7/esa_cci_c_proc/output/20080601_AVHRR_noaa18_proc2process_ID9621691_US1402576159/noaa18_20080601_2111_99999_satproj_00000_12208_avhrr/postproc_
-  !driver_noaa18_20080601_2111_99999_satproj_00000_12208_avhrr.dat
-  !finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv1.0.nc
 
   if (trim(adjustl(instrument)) .eq. 'MODIS' .or. trim(adjustl(instrument)) .eq. 'modis') then
-
-     ! dummy = MYD021KM.A2008153.0745.006.2012068172824.bspscs_000500694484.primary.nc
-     ! finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv1.0.nc
 
      cut_off = index(trim(adjustl(string)),'/',BACK=.true.)
      directory = trim(adjustl(string(1:cut_off)))
@@ -181,16 +158,11 @@ subroutine move_post(string,instrument,platform,year,month)
      min=trim(adjustl(dri_file(cut_off+11:cut_off+12)))
      write(*,*) 'min',min
 
-     !command_line = "ls *" //  trim(adjustl(suffix_source)) " > delete.txt"                                                                                          
-     !call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)                                                     
-     !open()                                                                                                                                                          
-
      finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // & 
           '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // & 
           trim(platform) // '-fv1.0' // trim(suffix_target)
 
      command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
-     !command_line="mv -f "//trim(adjustl(dri_file)) // " " // finalprimary                                                                                           
      call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
 
   endif

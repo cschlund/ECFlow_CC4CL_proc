@@ -5,32 +5,18 @@
 DATE=${1}
 DATADIR=${2}
 
-
 export MARS_MULTITARGET_STRICT_FORMAT=1
 
 TYPE=an
-#TYPE=fc
-
 STEP=00
-#STEP=12
-
-#for YEAR in 2008; do 
-#for MONTH in 03; do
-#for DAY in 20; do
-
-#DATE=${YEAR}${MONTH}${DAY}
-
-#for DATE in 20080320 20080613 20080620 20080921 20082012; do
 
 for TIME in 00 06 12 18; do
-#for TIME in 12; do
 
 FILENAME_GRIB='"'${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.grb'"'
 FILENAME_NETCDF='"'${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.nc'"'
 
 echo "GET_ERA_CCI: Retrieve gribfile " $FILENAME_GRIB
 
-#return 0
 
 [[ ${TIME} -eq 00 ]] && STIME=00:00:00
 [[ ${TIME} -eq 06 ]] && STIME=06:00:00
@@ -72,52 +58,37 @@ EOF
 
 rc=$?
                     
-if [ ${rc} -eq 0 ]
-then
-echo "The MARS ERA interim request for ${DATE} ran successfully at `date`!"
+if [ ${rc} -eq 0 ]; then 
+    echo "The MARS ERA interim request for ${DATE} ran successfully at `date`!"
 fi
 
-if [ ${rc} -ge 1 ]
-then
-echo "ERROR: The MARS ERA interim request for ${DATE} FAILED at `date`!"
-  exit 1
-fi
-
-#TIME
-done
-
-for TIME in 00 06 12 18; do
-#for TIME in 12; do
-
-FILENAME_GRIB=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.grb
-FILENAME_NETCDF=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.nc
-
-cdo -t ecmwf -f nc copy ${FILENAME_GRIB} ${FILENAME_NETCDF}
-
-rc=$?
-                    
-if [ ${rc} -eq 0 ]
-then
-echo "The MARS GRIB data converted successfully to NetCDF format for ${DATE}!"
-rm -f ${FILENAME_GRIB}
-fi
-
-if [ ${rc} -ge 1 ]
-then
-echo "ERROR: The MARS GRIB data conversion to NetCDF format FAILED for ${DATE}!"
-  exit 1
+if [ ${rc} -ge 1 ]; then 
+    echo "ERROR: The MARS ERA interim request for ${DATE} FAILED at `date`!" 
+    exit 1
 fi
 
 done
 
-#DATE
-#done
 
-#DAY
-#done
 
-#MONTH
-#done
+for TIME in 00 06 12 18; do 
 
-#YEAR
-#done
+    FILENAME_GRIB=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.grb
+    FILENAME_NETCDF=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.nc
+    
+    cdo -t ecmwf -f nc copy ${FILENAME_GRIB} ${FILENAME_NETCDF}
+    
+    rc=$?
+                        
+    if [ ${rc} -eq 0 ]; then 
+        echo "The MARS GRIB data converted successfully to NetCDF format for ${DATE}!" 
+        rm -f ${FILENAME_GRIB}
+    fi
+    
+    if [ ${rc} -ge 1 ]; then 
+        echo "ERROR: The MARS GRIB data conversion to NetCDF format FAILED for ${DATE}!" 
+        exit 1
+    fi
+
+done
+

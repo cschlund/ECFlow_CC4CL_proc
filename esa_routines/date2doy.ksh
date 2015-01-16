@@ -1,11 +1,8 @@
 #/bin/ksh
 #
-#
 # Calculate DOY from YYYYMMDD
 # 
-# 
 # INPUT: Date in form of YYYY MM DD, e.g. 2008 06 20
-#       
 #
 # OUTPUT:DOY
 #

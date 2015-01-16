@@ -1,5 +1,5 @@
-#these few lines write the driver file for
-#the main processing of the current granule/orbit
+# these few lines write the driver file for
+# the main processing of the current granule/orbit
 
 echo "'${l2_outp_pre}'
 '${preproc_base}'

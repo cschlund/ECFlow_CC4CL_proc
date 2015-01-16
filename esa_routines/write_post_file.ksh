@@ -1,5 +1,5 @@
-#these few lines write the driver file for
-#the post processing of the current granule/orbit
+# these few lines write the driver file for
+# the post processing of the current granule/orbit
 
 echo "'${wat_out_path}.primary.nc'
 '${ice_out_path}.primary.nc'

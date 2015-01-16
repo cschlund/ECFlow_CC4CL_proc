@@ -1,7 +1,5 @@
 #!/bin/ksh
 #
-# #############################################################
-#
 # NAME
 #       process_single_day.ksh
 #
@@ -22,9 +20,7 @@
 #       - OMP ENVIRONMENT VARIABLES
 #       2014-04-15 MJ migration to cca/sf7, Stage I
 #
-# #############################################################
 
-#set -xv
 set -x
 
 # -- source config path files
