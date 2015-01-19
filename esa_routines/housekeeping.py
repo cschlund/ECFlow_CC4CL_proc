@@ -28,25 +28,24 @@ def copy_into_ecfs(datestring, file_list, ecfspath):
     Copy tarfile into ECFS archive
     """
 
-    # -- make ecpstring
-    ecpstring = " ".join(file_list)
-
     # -- get the right path for ECFS
     ecfs_target = os.path.join(ecfspath, datestring)
 
     # -- make dir in ECFS
-    print (" * emkdir -p %s" % ecfs_target)
-    p1 = subprocess.Popen(["emkdir", "-p", ecfs_target],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    args = ['emkdir', '-p'] + [ecfs_target]
+    print (" * %s" % args)
+    p1 = subprocess.Popen(args, stdout=subprocess.PIPE, 
+                                stderr=subprocess.PIPE)
     stdout, stderr = p1.communicate()
     if p1.returncode > 0:
         print stdout
         print stderr
 
     # -- copy file into ECFS dir
-    print (" * ecp -o %s %s" % (ecpstring, ecfs_target))
-    p2 = subprocess.Popen(["ecp", "-o", ecpstring, ecfs_target],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    args = ['ecp', '-o'] + file_list + [ecfs_target]
+    print (" * %s" % args)
+    p2 = subprocess.Popen(args, stdout=subprocess.PIPE, 
+                                stderr=subprocess.PIPE)
     stdout, stderr = p2.communicate()
     if p2.returncode > 0:
         print stdout
@@ -55,17 +54,15 @@ def copy_into_ecfs(datestring, file_list, ecfspath):
     # -- change mode of files in ECFS
     for fil in file_list: 
         filebase = os.path.basename(fil)
-        print (" * echmod 555 %s/%s" % (ecfs_target, filebase))
-        p3 = subprocess.Popen(["echmod", "555", ecfs_target+"/"+filebase],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ecfsfile = os.path.join(ecfs_target, filebase)
+        args = ['echmod', '555'] + [ecfsfile]
+        print (" * %s" % args)
+        p3 = subprocess.Popen(args, stdout=subprocess.PIPE, 
+                                    stderr=subprocess.PIPE)
         stdout, stderr = p3.communicate()
         if p3.returncode > 0:
             print stdout
             print stderr
-
-        ## -- delete file in $SCRATCH
-        #print (" * delete %s " % fil)
-        #delete_file( fil )
 
 
 # -------------------------------------------------------------------
@@ -99,13 +96,16 @@ def tar_results(ptype, inpdir, datestring, sensor, platform,
     # -- get final tarball
     print (" * Create \'%s\'" % tarfile)
     if typ == "L3U":
-        create_l3u_tarball( inpdir, idnumber, tempdir, tarfile )
+        tarfile_list = create_l3u_tarball( inpdir, idnumber, 
+                                           tempdir, tarfile )
     elif typ == "L3C":
-        create_l3c_tarball( inpdir, idnumber, tempdir, tarfile )
+        tarfile_list = create_l3c_tarball( inpdir, idnumber, 
+                                           tempdir, tarfile )
     else:
-        create_l2_tarball( inpdir, idnumber, tempdir, tarfile )
+        tarfile_list = create_l2_tarball( inpdir, idnumber, 
+                                          tempdir, tarfile )
 
-    return ( tarfile, tempdir )
+    return ( tarfile_list, tempdir )
 
 
 # -------------------------------------------------------------------
@@ -126,8 +126,8 @@ def create_l2_tarball( inpdir, idnumber, tempdir, l2_tarfile ):
                 (inpdir, idnumber))
         sys.exit(0)
 
-    # -- final files to be tared
-    tar_files = list()
+    # -- final files to be stored in ECFS (daily .tar.gz)
+    tar_file_list = list()
 
     # -- sort daily list
     daily_list.sort()
@@ -148,33 +148,37 @@ def create_l2_tarball( inpdir, idnumber, tempdir, l2_tarfile ):
         nclist = ncbase.split("-")[1:]
         ncstr  = "-".join(nclist)
         tarbas = idate + '-' + ncstr
-        daily_l2_tarfile = os.path.join(tempdir, tarbas+".tar.bz2")
+        daily_l2_tarfile = os.path.join(tempdir, tarbas+".tar.gz")
 
         # create daily tarfile containing all orbits
         #print (" * Create \'%s\'" % daily_l2_tarfile)
-        tar = tarfile.open( daily_l2_tarfile, "w:bz2" )
+        tar = tarfile.open( daily_l2_tarfile, "w:gz" )
         for tfile in files:
             filedir = os.path.dirname(tfile)
             filenam = os.path.basename(tfile)
             tar.add( tfile, arcname=filenam )
         tar.close()
-        sys.exit(0)
 
         # collect daily tarfiles for final tarball
-        tar_files.append( daily_l2_tarfile )
+        tar_file_list.append( daily_l2_tarfile )
 
-    # -- make monthly tarballs containing all daily tarballs
-    tar = tarfile.open( l2_tarfile, "w:gz" )
-    for tfile in tar_files:
-        filedir = os.path.dirname(tfile)
-        filenam = os.path.basename(tfile)
-        tar.add( tfile, arcname=filenam )
-    tar.close()
+    # --------------------------------------------------------
+    # NOT POSSIBLE -> larger than 32 GB (limit)
+    # --------------------------------------------------------
+    ## -- make monthly tarballs containing all daily tarballs
+    #tar = tarfile.open( l2_tarfile, "w:gz" )
+    #for tfile in tar_file_list:
+    #    filedir = os.path.dirname(tfile)
+    #    filenam = os.path.basename(tfile)
+    #    tar.add( tfile, arcname=filenam )
+    #tar.close()
 
-    # -- delete daily tarballs
-    for tfile in tar_files:
-        delete_file( tfile )
+    ## -- delete daily tarballs
+    #for tfile in tar_file_list:
+    #    delete_file( tfile )
+    # --------------------------------------------------------
 
+    return tar_file_list
 
 # -------------------------------------------------------------------
 def create_l3u_tarball( inpdir, idnumber, tempdir, l3_tarfile ):
@@ -273,6 +277,8 @@ def create_l3u_tarball( inpdir, idnumber, tempdir, l3_tarfile ):
     for tfile in tar_files:
         delete_file( tfile )
 
+    return [l3_tarfile]
+
 
 # -------------------------------------------------------------------
 def create_l3c_tarball( inpdir, idnumber, tempdir, l3_tarfile ):
@@ -338,6 +344,8 @@ def create_l3c_tarball( inpdir, idnumber, tempdir, l3_tarfile ):
     # -- delete input files in temp
     for tfile in tar_files:
         delete_file(tfile)
+
+    return [l3_tarfile]
 
 
 # -------------------------------------------------------------------

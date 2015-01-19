@@ -56,10 +56,10 @@ def l2(args):
         idnumber = get_id( lastdir )
 
         #/archive data
-        (tarfile, tempdir) = tar_results( "L2", args.inpdir, 
+        (tlist, tempdir) = tar_results( "L2", args.inpdir, 
                 datestring, sensor, platform, idnumber)
 
-        tarfile_list.append(tarfile)
+        tarfile_list = tlist
 
     else:
         print (" ! Check your input directory, maybe it is empty ? \n")
@@ -68,7 +68,7 @@ def l2(args):
     print (" * Copy2ECFS: tarfile_list")
     copy_into_ecfs( datestring, tarfile_list, args.ecfsdir )
 
-    # delete tempdir
+    ## delete tempdir
     print (" * Delete \'%s\'" % tempdir)
     delete_dir( tempdir )
 
@@ -118,10 +118,8 @@ def l3(args):
         idnumber = get_id( lastdir )
 
         # archive data
-        (tarfile, tempdir_l3c) = tar_results( "L3C", args.inpdir, 
+        (tlist_l3c, tempdir_l3c) = tar_results( "L3C", args.inpdir, 
                 datestring, sensor, platform, idnumber)
-
-        tarfile_list.append(tarfile)
 
     else:
         print (" ! Check your input directory, maybe it is empty ? \n")
@@ -147,13 +145,14 @@ def l3(args):
         idnumber = get_id( lastdir )
 
         # archive data
-        (tarfile, tempdir_l3u) = tar_results( "L3U", args.inpdir, 
+        (tlist_l3u, tempdir_l3u) = tar_results( "L3U", args.inpdir, 
                 datestring, sensor, platform, idnumber)
-
-        tarfile_list.append(tarfile)
 
     else:
         print (" ! Check your input directory, maybe it is empty ? \n")
+
+    # list
+    tarfile_list = tlist_l3c + tlist_l3u
 
     # copy tarfile into ECFS
     print (" * Copy2ECFS: tarfile_list")
