@@ -241,6 +241,9 @@ def proc2(args):
         f.write("cchunk='F'\n")
         f.write("cfullpath='T'\n")
         f.write("cinclude_full_brdf='T'\n")
+        f.write("RTTOV_version='11'\n")
+        f.write("ECMWF_version='ERA-Interim'\n")
+        f.write("SVN_version='2875'\n")
         f.close()
     except (IndexError, ValueError, RuntimeError,
             Exception) as err:

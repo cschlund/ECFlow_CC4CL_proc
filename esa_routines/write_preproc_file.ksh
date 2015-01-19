@@ -45,5 +45,7 @@ echo "'${sensor}'
 '${cchunk}'
 '${cfullpath}'
 '${cfullbrdf}'
+'${rttov_version}'
+'${ecmwf_version}'
+'${svn_version}'
 #END">${preproc_driver}
-
