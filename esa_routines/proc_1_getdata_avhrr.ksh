@@ -25,6 +25,7 @@
 #           gets now data of a single day ; if wanted
 #   2014-04-08 MJ migration to cca/sf7
 #   2014-11-12 C. Schlundt: modified in order to get new AVHRR GAC L1C data
+#   2015-01-14 C. Schlundt: ahvrr_top added
 #
 # ##############################################################################
 
@@ -38,8 +39,7 @@ get_avhrr_data()
  YEAR=${1}
  MONTH=$(printf %02d ${2})
  SAT=`echo ${3} | awk '{ print toupper($0)}'`
-
- ecfs_dir="ec:/sf7/data/AVHRR_GAC_L1c_archive/pyGACv0.1.0"
+ ecfs_dir=${4}
 
  tar_prefix="AVHRR_GAC_L1C_"
  tar_suffix=".tar"
@@ -122,13 +122,13 @@ for year in `seq $STARTYEAR $STOPYEAR`
 do
     for month in `seq $STARTMONTH $STOPMONTH`
     do
-        get_avhrr_data $year $month $platform
+        get_avhrr_data $year $month $platform $avhrr_top
 
         if [ ${?} -ne 0 ]; then
-            print " --- FAILED: get_avhrr_data $year $month $platform"
+            print " --- FAILED: get_avhrr_data $year $month $platform $avhrr_top"
             return 1
         else
-            print " --- FINISHED: get_avhrr_data $year $month $platform"
+            print " --- FINISHED: get_avhrr_data $year $month $platform $avhrr_top"
         fi
     done
 done

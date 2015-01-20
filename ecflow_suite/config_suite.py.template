@@ -20,8 +20,9 @@ type = "test"
 # suite name
 mysuite = type+"_cc4cl_proc" 
 
-# ECFS path: final level3 data
+# ECFS path: final level3, level2 data
 ecfs_l3_dir = "ec:/sf7/ESA_Cloud_cci_data/L3"
+ecfs_l2_dir = "ec:/sf7/ESA_Cloud_cci_data/L2"
 
 # serial and parallel threads
 serial_threads_number = 1
@@ -55,7 +56,7 @@ esa_logdir    = os.path.join( scratch_base, "logs/processing" )
 make_cfg_files    = os.path.join( esa_routine, "create_config_files.py" )
 count_orbit_files = os.path.join( esa_routine, "count_orbit_files.sh" )
 cleanup_scratch   = os.path.join( esa_routine, "cleanup_scratch.py" )
-archive_l3_data   = os.path.join( esa_routine, "proc_4_archive_l3_data.py" )
+archive_data      = os.path.join( esa_routine, "proc_4_archive_data.py" )
 
 # config files
 cfg_paths_file = os.path.join( esa_routine, "config_paths.file" )

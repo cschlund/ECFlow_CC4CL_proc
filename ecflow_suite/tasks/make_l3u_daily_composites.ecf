@@ -23,14 +23,6 @@ else
     sleep 3
     jid=ID${primary_id}_US${id}
     
-    # -- write config file for l2b
-    python %MAKE_CFG_FILE% \
-        -cf %CFG_L3U_FILE% \
-        -sy %START_YEAR% -ey %END_YEAR% \
-        -sm %START_MONTH% -em %END_MONTH% \
-        l2tol3 -sat %SATELLITE% -ins %SENSOR% \
-        -inp %ESA_OUTPUTDIR% -typ l2b
-    
     # -- execute ksh script
     %RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% %CFG_L3U_FILE%
 

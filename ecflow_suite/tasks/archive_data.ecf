@@ -1,0 +1,25 @@
+%include <pbs_serial.h>
+%include <head.h>
+%include <export.h>
+
+echo "I am task %TASK% in family %FAMILY% responsible for archiving L3 data"
+
+if [ %DUMMYRUN% == 1 ]; then 
+
+    python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+
+else
+
+    # -- archive L3 data
+    python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
+        --year %START_YEAR% --month %START_MONTH% \
+        l3 --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR% \
+
+    ## -- archive L2 data
+    #python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
+    #    --year %START_YEAR% --month %START_MONTH% \
+    #    l2 --inpdir %ESA_OUTPUTDIR% --ecfsdir %ECFS_L2_DIR% \
+
+fi
+
+%include <tail.h>

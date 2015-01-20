@@ -17,26 +17,6 @@ else
     # -- working directory: write core file here
     cd %ESA_ROUTINE%
     
-    
-    # -- write config file
-    if [ %TESTRUN% == 1 ]; then
-    
-        python %MAKE_CFG_FILE% \
-            -cf %CFG_P2_ORAC% \
-            -sy %START_YEAR% -ey %END_YEAR% \
-            -sm %START_MONTH% -em %END_MONTH% \
-            proc2 -sat %SATELLITE% -ins %SENSOR% --testrun
-    
-    else
-    
-        python %MAKE_CFG_FILE% \
-            -cf %CFG_P2_ORAC% \
-            -sy %START_YEAR% -ey %END_YEAR% \
-            -sm %START_MONTH% -em %END_MONTH% \
-            proc2 -sat %SATELLITE% -ins %SENSOR%
-    
-    fi
-    
 
     # -- some more export statements
     OMP_STACKSIZE=256MB

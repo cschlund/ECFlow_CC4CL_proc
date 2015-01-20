@@ -14,6 +14,10 @@ from pycmsaf.utilities import date_from_year_doy
 from pycmsaf.ssh_client import SSHClient
 
 # ----------------------------------------------------------------
+def str2upper(string_object): 
+    return string_object.upper()
+
+# ----------------------------------------------------------------
 def get_modis_list():
     """
     MODIS data list
@@ -86,8 +90,9 @@ def set_vars(suite):
     suite.add_variable("MAKE_CFG_FILE", make_cfg_files)
     suite.add_variable("COUNT_ORBIT_FILES", count_orbit_files)
     suite.add_variable("CLEANUP_SCRATCH", cleanup_scratch)
-    suite.add_variable("ARCHIVE_L3_DATA", archive_l3_data)
+    suite.add_variable("ARCHIVE_DATA", archive_data)
     suite.add_variable("ECFS_L3_DIR", ecfs_l3_dir)
+    suite.add_variable("ECFS_L2_DIR", ecfs_l2_dir)
     suite.add_variable("LD_LIB_PATH", ld_lib_path)
     suite.add_variable("TESTRUN", testcase)
     suite.add_variable("DUMMYRUN", dummycase)
@@ -141,47 +146,51 @@ def add_cleanup_aux_task(family, prefamily):
 
 # ----------------------------------------------------------------
 def add_aux_tasks(family):
-    get_aux_data    = add_task(family, 'get_aux_data')
-    get_mars_data   = add_task(family, 'get_mars_data')
+    wrt_aux_cfgs  = add_task(family, 'write_aux_cfg_files')
+    get_aux_data  = add_task(family, 'get_aux_data')
+    get_mars_data = add_task(family, 'get_mars_data')
 
-    #add_trigger(get_mars_data, get_aux_data)
+    add_trigger(get_aux_data, wrt_aux_cfgs)
+    add_trigger(get_mars_data, wrt_aux_cfgs)
 
-    return dict(get_aux_data=get_aux_data,
+    return dict(wrt_aux_cfgs=wrt_aux_cfgs,
+                get_aux_data=get_aux_data,
                 get_mars_data=get_mars_data)
 
 # ----------------------------------------------------------------
 def add_tasks(family, prefamily):
+    wrt_main_cfgs   = add_task(family, 'write_main_cfg_files')
     get_sat_data    = add_task(family, 'get_sat_data')
     set_cpu_number  = add_task(family, 'set_cpu_number')
     retrieval       = add_task(family, 'retrieval')
+    cleanup_l1_data = add_task(family, 'cleanup_l1_data')
     make_l3u_data   = add_task(family, 'make_l3u_daily_composites')
     make_l3c_data   = add_task(family, 'make_l3c_monthly_averages')
-    cleanup_l1_data = add_task(family, 'cleanup_l1_data')
+    archive_data    = add_task(family, 'archive_data')
     cleanup_l2_data = add_task(family, 'cleanup_l2_data')
-    archive_l3_data = add_task(family, 'archive_l3_data')
     cleanup_l3_data = add_task(family, 'cleanup_l3_data')
 
-    add_trigger(get_sat_data, prefamily)
+    add_trigger(wrt_main_cfgs, prefamily)
+    add_trigger(get_sat_data, wrt_main_cfgs)
     add_trigger(set_cpu_number, get_sat_data)
     add_trigger(retrieval, set_cpu_number)
-    add_trigger(make_l3u_data, retrieval)
-    add_trigger(make_l3c_data, retrieval)
-    add_trigger_expr(cleanup_l1_data, 
+    add_trigger(cleanup_l1_data, retrieval)
+    add_trigger(make_l3u_data, cleanup_l1_data)
+    add_trigger(make_l3c_data, cleanup_l1_data)
+    add_trigger_expr(archive_data, 
                      make_l3u_data, make_l3c_data)
-    add_trigger_expr(cleanup_l2_data, 
-                     make_l3u_data, make_l3c_data)
-    add_trigger_expr(archive_l3_data, 
-                     cleanup_l1_data, cleanup_l2_data)
-    add_trigger(cleanup_l3_data, archive_l3_data)
+    add_trigger(cleanup_l2_data, archive_data)
+    add_trigger(cleanup_l3_data, archive_data)
 
-    return dict(get_sat_data=get_sat_data,
+    return dict(wrt_main_cfgs=wrt_main_cfgs,
+                get_sat_data=get_sat_data,
                 set_cpu_number=set_cpu_number,
                 retrieval=retrieval,
+                cleanup_l1_data=cleanup_l1_data,
                 make_l3u_data=make_l3u_data,
                 make_l3c_data=make_l3c_data,
-                cleanup_l1_data=cleanup_l1_data,
+                archive_data=archive_data,
                 cleanup_l2_data=cleanup_l2_data,
-                archive_l3_data=archive_l3_data,
                 cleanup_l3_data=cleanup_l3_data
                )
 
@@ -276,7 +285,7 @@ def build_suite():
 
     # Create list of available satellites
     if args.satellite:
-        sat_list = [args.satellite.upper()]
+        sat_list = args.satellite
     else:
         # connect to database and get_sats list
         db = AvhrrGacDatabase( dbfile=gacdb_file )
@@ -307,6 +316,7 @@ def build_suite():
 
     # loop over months for given date range
     for mm in rrule(MONTHLY, dtstart=args.sdate, until=args.edate): 
+
         year_string  = mm.strftime("%Y")
         month_string = mm.strftime("%m")
         
@@ -325,12 +335,12 @@ def build_suite():
         # ----------------------------------------------------
         # add get aux/era family
         # ----------------------------------------------------
-        fam_aux = add_fam(fam_month, "GET_AUX_DATA")
+        fam_aux = add_fam( fam_month, "GET_AUX_DATA" )
         add_aux_tasks( fam_aux )
 
         # trigger for next month node
         if month_cnt > 0 :
-            add_trigger(fam_aux, fam_month_previous)
+            add_trigger( fam_aux, fam_month_previous )
 
 
         # ----------------------------------------------------
@@ -363,7 +373,7 @@ def build_suite():
         # ----------------------------------------------------
         # add cleanup aux/era family
         # ----------------------------------------------------
-        fam_cleanup_aux = add_fam(fam_month, "CLEANUP_AUX_DATA")
+        fam_cleanup_aux = add_fam( fam_month, "CLEANUP_AUX_DATA" )
         add_cleanup_aux_task( fam_cleanup_aux, fam_main )
 
         # remember fam_month
@@ -421,16 +431,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=sys.argv[0]+'''
     creates the suite '''+mysuite+''' required by ecflow.''')
     
-    parser.add_argument('--sdate', type=str2date,
-            help='start date, e.g. 20090101', required=True)
-    parser.add_argument('--edate', type=str2date,
-            help='end date, e.g. 20091231',required=True)
-    parser.add_argument( '--satellite', type=str,
-            help='''satellite name, e.g. noaa15, metopa, 
-            terra, aqua''')
-    parser.add_argument('--testrun',
+    parser.add_argument('--sdate', type=str2date, required=True,
+            help='start date, e.g. 20090101')
+    parser.add_argument('--edate', type=str2date, required=True,
+            help='end date, e.g. 20091231')
+    parser.add_argument( '--satellite', type=str2upper, nargs='*', 
+            help='''satellite name, e.g. noaa15, metopa, terra, aqua''')
+    parser.add_argument('--testrun', 
             help='Run a subset of pixels', action="store_true")
-    parser.add_argument('--dummy',
+    parser.add_argument('--dummy', 
             help='Dummy run, i.e. randomsleep only', action="store_true")
     
     args = parser.parse_args()

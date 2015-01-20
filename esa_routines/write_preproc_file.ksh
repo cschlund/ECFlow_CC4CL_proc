@@ -1,5 +1,5 @@
-#these few lines write the driver file for
-#the preprocessing of the current granule/orbit
+# these few lines write the driver file for
+# the preprocessing of the current granule/orbit
 echo "'${sensor}'
 '${path_to_l1b}'
 '${path_to_geo}'
@@ -45,5 +45,7 @@ echo "'${sensor}'
 '${cchunk}'
 '${cfullpath}'
 '${cfullbrdf}'
+'${rttov_version}'
+'${ecmwf_version}'
+'${svn_version}'
 #END">${preproc_driver}
-

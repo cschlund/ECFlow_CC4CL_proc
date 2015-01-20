@@ -1,7 +1,5 @@
 #!/bin/ksh
 #
-# #####################################################################
-#
 # NAME
 #       proc_2_process.ksh
 #
@@ -19,7 +17,6 @@
 #       2014-04-15 MJ migration to cca/sf7 Stage I
 #       2014-11-26 C. Schlundt, adaption for ecflow
 #
-# #####################################################################
 
 set -x
 
@@ -37,6 +34,7 @@ config_file_proc2=${2}
 . ${config_file_proc2}
 config_file_attributes=${3}
 . ${config_file_attributes}
+
 # set other parameters passed
 YEAR=${4}
 MONTH=${5}
@@ -150,6 +148,9 @@ cverbose=${cverbose}
 cchunk=${cchunk}
 cfullpath=${cfullpath}
 cfullbrdf=${cinclude_full_brdf}
+rttov_version=${RTTOV_version}
+ecmwf_version=${ECMWF_version}
+svn_version=${SVN_version}
 
 #END"> ${logs_monthly}/process_single_day_${DAILY_PATH}.config
 

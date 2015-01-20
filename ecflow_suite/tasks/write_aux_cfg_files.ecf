@@ -1,0 +1,30 @@
+%include <pbs_serial.h>
+%include <head.h>
+%include <export.h>
+
+echo "I am task %TASK% in family %FAMILY% responsible for writing auxdata config files"
+
+if [ %DUMMYRUN% == 1 ]; then 
+
+    python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+
+else
+
+    # -- write config file for get_aux_data
+
+    python %MAKE_CFG_FILE% -cf %CFG_P1_AUX% \
+        -sy %START_YEAR% -ey %END_YEAR% \
+        -sm %START_MONTH% -em %END_MONTH% \
+        getaux -get aux
+    
+
+    # -- write config file for get_mars_data
+
+    python %MAKE_CFG_FILE% -cf %CFG_P1_MARS% \
+        -sy %START_YEAR% -ey %END_YEAR% \
+        -sm %START_MONTH% -em %END_MONTH% \
+        getaux -get era
+    
+fi
+
+%include <tail.h>

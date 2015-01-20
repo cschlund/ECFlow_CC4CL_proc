@@ -21,10 +21,10 @@ def find_nearest_date(args):
     files = get_file_list( args.inpdir, '*.'+args.suffix )
     files.sort()
 
-    # remove climatology files
-    climatology_files = [f for f in files if 'XXXX' in f]
-    for i in climatology_files:
-        files.remove(i)
+    ## remove climatology files
+    #climatology_files = [f for f in files if 'XXXX' in f]
+    #for i in climatology_files:
+    #    files.remove(i)
 
     # get date list
     dates = map( extract_date, files )
