@@ -15,10 +15,10 @@ else
         --year %START_YEAR% --month %START_MONTH% \
         l3 --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR% \
 
-    # -- archive L2 data
-    python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
-        --year %START_YEAR% --month %START_MONTH% \
-        l2 --inpdir %ESA_OUTPUTDIR% --ecfsdir %ECFS_L2_DIR% \
+    ## -- archive L2 data
+    #python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
+    #    --year %START_YEAR% --month %START_MONTH% \
+    #    l2 --inpdir %ESA_OUTPUTDIR% --ecfsdir %ECFS_L2_DIR% \
 
 fi
 
