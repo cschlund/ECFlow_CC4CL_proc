@@ -473,9 +473,12 @@ if __name__ == '__main__':
     print (" * Script %s started " % sys.argv[0])
     print (" * start date  : %s" % args.sdate)
     print (" * end date    : %s" % args.edate)
-    print (" * satellites  : %s" % args.satellites)
+    if args.satellites: 
+        print (" * satellites  : %s" % args.satellites)
+    else:
+        print (" * satellites  : take all (archive based)")
     print (" * ignore sats : %s" % args.ignoresats)
-    pritn (" * dummycase   : %s (%s)" % (dummycase, dummymess))
+    print (" * dummycase   : %s (%s)" % (dummycase, dummymess))
     print (" * testcase    : %s (%s)" % (testcase, message))
     print "\n"
 
