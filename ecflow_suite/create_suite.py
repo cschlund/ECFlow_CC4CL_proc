@@ -283,16 +283,24 @@ def build_suite():
     fam_proc.add_variable('ECF_JOB_CMD', serial_job_cmd)
 
 
+    # ignored satellites
+    default_ignore_sats = ['NOAA6', 'NOAA8', 'NOAA10']
+
+    if args.ignoresats:
+        add_ignore_sats = args.ignoresats
+        ignore_list = default_ignore_sats + add_ignore_sats
+    else:
+        ignore_list = default_ignore_sats
+
+
     # Create list of available satellites
-    if args.satellite:
-        sat_list = args.satellite
+    if args.satellites:
+        sat_list = args.satellites
     else:
         # connect to database and get_sats list
         db = AvhrrGacDatabase( dbfile=gacdb_file )
-        sat_list = db.get_sats( start_date=args.sdate, 
-                                end_date=args.edate,
-                                ignore_sats=['NOAA6', 'NOAA8',
-                                    'NOAA10'])
+        sat_list = db.get_sats( start_date=args.sdate, end_date=args.edate,
+                                ignore_sats=ignore_list)
 
         mod_list = get_modis_list()
         for key in mod_list:
@@ -435,8 +443,10 @@ if __name__ == '__main__':
             help='start date, e.g. 20090101')
     parser.add_argument('--edate', type=str2date, required=True,
             help='end date, e.g. 20091231')
-    parser.add_argument( '--satellite', type=str2upper, nargs='*', 
-            help='''satellite name, e.g. noaa15, metopa, terra, aqua''')
+    parser.add_argument( '--satellites', type=str2upper, nargs='*', 
+            help='''List of satellites, which should be processed.''')
+    parser.add_argument('--ignoresats', type=str2upper, nargs='*',
+            help='''List of satellites which should be ignored.''')
     parser.add_argument('--testrun', 
             help='Run a subset of pixels', action="store_true")
     parser.add_argument('--dummy', 
@@ -461,11 +471,12 @@ if __name__ == '__main__':
 
     print "\n"
     print (" * Script %s started " % sys.argv[0])
-    print (" * start date : %s" % args.sdate)
-    print (" * end date   : %s" % args.edate)
-    print (" * satellites : %s" % args.satellite)
-    pritn (" * dummycase  : %s (%s)" % (dummycase, dummymess))
-    print (" * testcase   : %s (%s)" % (testcase, message))
+    print (" * start date  : %s" % args.sdate)
+    print (" * end date    : %s" % args.edate)
+    print (" * satellites  : %s" % args.satellites)
+    print (" * ignore sats : %s" % args.ignoresats)
+    pritn (" * dummycase   : %s (%s)" % (dummycase, dummymess))
+    print (" * testcase    : %s (%s)" % (testcase, message))
     print "\n"
 
     build_suite()
