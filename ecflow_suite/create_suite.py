@@ -446,8 +446,10 @@ if __name__ == '__main__':
 
     if args.dummy == True:
         dummycase = 1
+        dummymess = "Only randomsleep commands will be executed."
     else:
         dummycase = 0
+        dummymess = "Real processing will be executed."
 
     if args.testrun == True:
         testcase = 1
@@ -457,10 +459,14 @@ if __name__ == '__main__':
         message = '''Note: Full orbits are being processed\n.'''
 
 
-    print ("\n * Script %s started " % sys.argv[0])
+    print "\n"
+    print (" * Script %s started " % sys.argv[0])
     print (" * start date : %s" % args.sdate)
     print (" * end date   : %s" % args.edate)
+    print (" * satellites : %s" % args.satellite)
+    pritn (" * dummycase  : %s (%s)" % (dummycase, dummymess))
     print (" * testcase   : %s (%s)" % (testcase, message))
+    print "\n"
 
     build_suite()
 
