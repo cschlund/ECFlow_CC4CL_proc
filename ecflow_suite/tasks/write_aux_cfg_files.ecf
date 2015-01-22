@@ -12,12 +12,12 @@ else
 
     mkdir -p %ESA_CONFIGDIR%
 
-    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+    date_base="%START_YEAR%_%START_MONTH%"
 
     # -- write config file for get_aux_data
 
     cfg_typ="1_getdata_aux"
-    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_PREFIX%"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_base}%CFG_PREFIX%"
     cfg_fil=%ESA_CONFIGDIR%/cfg_bas
 
     python %MAKE_CFG_FILE% -cf ${cfg_fil} \
@@ -29,7 +29,7 @@ else
     # -- write config file for get_mars_data
 
     cfg_typ="1_getdata_era"
-    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_PREFIX%"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_base}%CFG_PREFIX%"
     cfg_fil=%ESA_CONFIGDIR%/cfg_bas
 
     python %MAKE_CFG_FILE% -cf ${cfg_fil} \
