@@ -10,6 +10,8 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    mkdir -p %ESA_CONFIGDIR%
+
     date_sat_base="%START_YEAR%_%START_MONTH%"_"%SATELLITE%"
 
     # -- write config file for get_aux_data
