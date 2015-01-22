@@ -629,7 +629,7 @@ if __name__ == '__main__':
         message = '''Note: Full orbits are being processed.'''
 
 
-    if args.satellites and args.ignoresat:
+    if args.satellites and args.ignoresats:
         print ("""\n *** Either choose some satellites from list
                 or ignore some satellites from list.\n\n
                 *** Third option: neither use --satellites nor --ignoresats, 
