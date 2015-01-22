@@ -17,23 +17,99 @@ from pycmsaf.ssh_client import SSHClient
 def str2upper(string_object): 
     return string_object.upper()
 
+
 # ----------------------------------------------------------------
-def get_modis_list():
+def enddate_of_month( year, month ):
     """
-    MODIS data list
+    Returns date of end of month.
     """
-    mlist = dict()
+    last_days = [31, 30, 29, 28, 27]
+    for i in last_days:
+        try:
+            end = datetime.datetime(year, month, i)
+        except ValueError:
+            continue
+        else:
+            return end.date()
+
+    return None
+
+
+# ----------------------------------------------------------------
+def get_modis_avail( sat, sd, ed ):
+    """
+    Returns True or False for MODIS availability.
+    """
+    modis_dict = get_modis_dict()
+
+    for sat_key in modis_dict:
+        if sat_key == sat:
+            for dat_key in modis_dict[sat_key]:
+                if dat_key == "start_date":
+                    msd = modis_dict[sat_key][dat_key]
+                else:
+                    med = modis_dict[sat_key][dat_key]
+
+            # modis lies between user start and end date
+            if sd >= msd and ed <= med:
+                return True
+            # modis lies partly between start and end date
+            elif msd < sd < med:
+                return True
+            elif msd < ed < med:
+                return True
+
+    return False
+
+
+# ----------------------------------------------------------------
+def get_modis_list( user_sd, user_ed ):
+    """
+    Returns a list of modis satellites if available.
+    """
+    modis_list = list()
+
+    modis_dict = get_modis_dict()
+
+    for sat_key in modis_dict:
+        for dat_key in modis_dict[sat_key]:
+
+            if dat_key == "start_date":
+                msd = modis_dict[sat_key][dat_key]
+            else:
+                med = modis_dict[sat_key][dat_key]
+
+        # modis lies between user start and end date
+        if user_sd >= msd and user_ed <= med:
+            modis_list.append( sat_key )
+        # modis lies partly between start and end date
+        elif msd < user_sd < med:
+            modis_list.append( sat_key )
+        elif msd < user_ed < med:
+            modis_list.append( sat_key )
+
+    return modis_list
+
+
+# ----------------------------------------------------------------
+def get_modis_dict():
+    """
+    MODIS dictionary containing start and end dates of archive.
+    """
+    modis_dict = dict()
+
     for sat in ("TERRA", "AQUA"):
-        mlist[sat] = dict()
+        modis_dict[sat] = dict()
         for dt in ("start_date", "end_date"):
-            mlist[sat][dt] = 0
+            modis_dict[sat][dt] = 0
 
-    mlist["TERRA"]["start_date"] = datetime.date(2000, 2, 24)
-    mlist["TERRA"]["end_date"] = datetime.date(2012, 12, 31)
-    mlist["AQUA"]["start_date"] = datetime.date(2002, 7, 4)
-    mlist["AQUA"]["end_date"] = datetime.date(2012, 12, 31)
+    modis_dict["TERRA"]["start_date"] = datetime.date(2000, 2, 24)
+    modis_dict["TERRA"]["end_date"]   = datetime.date(2012, 12, 31)
+    modis_dict["AQUA"]["start_date"]  = datetime.date(2002, 7, 4)
+    modis_dict["AQUA"]["end_date"]    = datetime.date(2012, 12, 31)
 
-    return mlist
+    return modis_dict
+
 
 # ----------------------------------------------------------------
 def get_sensor(satellite):
@@ -282,6 +358,8 @@ def build_suite():
     # Define job commands
     fam_proc.add_variable('ECF_JOB_CMD', serial_job_cmd)
 
+    # connect to database and get_sats list
+    db = AvhrrGacDatabase( dbfile=gacdb_file )
 
     # ignored satellites
     default_ignore_sats = ['NOAA6', 'NOAA8', 'NOAA10']
@@ -295,24 +373,35 @@ def build_suite():
 
     # Create list of available satellites
     if args.satellites:
-        sat_list = args.satellites
-    else:
-        # connect to database and get_sats list
-        db = AvhrrGacDatabase( dbfile=gacdb_file )
-        sat_list = db.get_sats( start_date=args.sdate, end_date=args.edate,
-                                ignore_sats=ignore_list)
+        all_list = args.satellites
+        avh_list = all_list
+        mod_list = ["AQUA", "TERRA"]
 
-        mod_list = get_modis_list()
-        for key in mod_list:
-            cnt = 0
-            for key2 in mod_list[key]:
-                if cnt == 0: 
-                    msdt = mod_list[key][key2]
-                if cnt == 1: 
-                    medt = mod_list[key][key2]
-                cnt =+ 1
-            if args.sdate >= msdt and args.edate <= medt: 
-                sat_list.append(key)
+        # avhrr database sat list
+        db_sat_list = db.get_sats( start_date=args.sdate, 
+                end_date=args.edate, ignore_sats=ignore_list)
+
+        # update avhrr list (remove sat. with no data)
+        verified_list = list(set(db_sat_list) - set(avh_list))
+
+        # terra/aqua at the end of list, if data avail.
+        for item in mod_list: 
+            if item in all_list: 
+                check = get_modis_avail( item, 
+                        args.sdate, args.edate )
+                if check == True: 
+                    verified_list.append(item)
+
+        # get final sat_list: match between verified and user list
+        sat_list = list(set(all_list).intersection(verified_list))
+
+    else:
+        # avhrr
+        sat_list = db.get_sats( start_date=args.sdate, 
+                end_date=args.edate, ignore_sats=ignore_list)
+        # modis
+        mod_list  = get_modis_list( args.sdate, args.edate )
+        sat_list += mod_list
 
 
     # ===============================
@@ -325,19 +414,52 @@ def build_suite():
     # loop over months for given date range
     for mm in rrule(MONTHLY, dtstart=args.sdate, until=args.edate): 
 
-        year_string  = mm.strftime("%Y")
-        month_string = mm.strftime("%m")
+        yearstr  = mm.strftime("%Y")
+        monthstr = mm.strftime("%m")
         
+
+        # ----------------------------------------------------
+        # check if AVHRR or/and MODIS are avail.
+        # ----------------------------------------------------
+        for s in sat_list:
+
+            sensor = get_sensor( s )
+
+            modis_flag = False
+            avhrr_flag = False
+
+            if sensor == "AVHRR" and avhrr_flag == False: 
+
+                days = db.get_days( sat=s, year=int(yearstr), 
+                        month=int(monthstr) )
+
+                if len(days) > 0: 
+                    avhrr_flag = True
+
+            if sensor == "MODIS" and modis_flag == False: 
+
+                modsd = datetime.date( int(yearstr), int(monthstr), 1)
+                moded = enddate_of_month( int(yearstr), int(monthstr) )
+                modis_flag = get_modis_avail( s, modsd, moded )
+
+        if avhrr_flag == False and modis_flag == False:
+            continue
+
+
+        # ----------------------------------------------------
+        # There is data
+        # ----------------------------------------------------
+
         try: 
-            fam_year = add_fam( fam_proc, year_string )
-            fam_year.add_variable("START_YEAR", year_string)
-            fam_year.add_variable("END_YEAR", year_string)
+            fam_year = add_fam( fam_proc, yearstr )
+            fam_year.add_variable("START_YEAR", yearstr)
+            fam_year.add_variable("END_YEAR", yearstr)
         except:
             pass
 
-        fam_month = add_fam(fam_year, month_string) 
-        fam_month.add_variable("START_MONTH", month_string)
-        fam_month.add_variable("END_MONTH", month_string)
+        fam_month = add_fam(fam_year, monthstr) 
+        fam_month.add_variable("START_MONTH", monthstr)
+        fam_month.add_variable("END_MONTH", monthstr)
 
 
         # ----------------------------------------------------
@@ -354,28 +476,52 @@ def build_suite():
         # ----------------------------------------------------
         # add family for satellite processing in general
         # ----------------------------------------------------
-        fam_main = add_fam(fam_month, "MAIN_PROC")
+        fam_main = add_fam( fam_month, "MAIN_PROC" )
+
+        # check if any ahvrr is available
+        if avhrr_flag == True:
+            fam_avhrr = add_fam( fam_main, "AVHRR" )
+            fam_avhrr.add_variable("SENSOR", "AVHRR")
+
+        # check if any modis is available
+        if modis_flag == True:
+            fam_modis = add_fam( fam_main, "MODIS" )
+            fam_modis.add_variable("SENSOR", "MODIS")
+
 
         # process avail. satellites
-        for counter, satellite in enumerate(sat_list): 
+        for counter, satellite in enumerate( sat_list ): 
 
-            # get sensor for satellite
-            sensor = get_sensor(satellite)
+            sensor = get_sensor( satellite )
 
-            # add satellite and sensor families
-            fam_instr = add_fam(fam_main, satellite+'_'+sensor)
-            fam_instr.add_variable("SATELLITE", satellite)
-            fam_instr.add_variable("SENSOR", sensor)
+            if sensor == "AVHRR":
 
-            # trigger for next satellite
-            if counter > 0:
-                add_trigger(fam_instr, fam_instr_previous)
+                days = db.get_days( sat=satellite, 
+                            year=int(yearstr), 
+                            month=int(monthstr) )
 
-            # remember previous sat_ins node
-            fam_instr_previous = fam_instr
+                if len( days ) == 0: 
+                    continue
 
-            # add tasks
-            add_tasks( fam_instr, fam_aux )
+                fam_sat = add_fam( fam_avhrr, satellite )
+                fam_sat.add_variable( "SATELLITE", satellite )
+                add_tasks( fam_sat, fam_aux )
+
+            else:
+
+                msdate = datetime.date( int(yearstr), int(monthstr), 1)
+                medate = enddate_of_month( int(yearstr), int(monthstr) )
+                mcheck = get_modis_avail( satellite, msdate, medate )
+
+                if mcheck == False:
+                    continue
+
+                fam_sat = add_fam( fam_modis, satellite )
+                fam_sat.add_variable( "SATELLITE", satellite )
+                if avhrr_flag == True: 
+                    add_tasks( fam_sat, fam_avhrr )
+                else:
+                    add_tasks( fam_sat, fam_aux )
 
 
         # ----------------------------------------------------
@@ -388,6 +534,11 @@ def build_suite():
         fam_month_previous = fam_month
         month_cnt += 1
 
+
+    # close connection to database
+    db.close()
+    
+    
     # ============================
     # CREATE SUITE DEFINITION FILE
     # ============================
