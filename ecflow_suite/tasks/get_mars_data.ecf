@@ -10,7 +10,7 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    date_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+    date_base="%START_YEAR%_%START_MONTH%"
 
     cfg_typ="1_getdata_era"
     cfg_bas="%CFG_PREFIX%${cfg_typ}${date_base}%CFG_PREFIX%"
