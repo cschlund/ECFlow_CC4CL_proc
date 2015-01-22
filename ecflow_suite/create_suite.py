@@ -362,7 +362,7 @@ def build_suite():
     db = AvhrrGacDatabase( dbfile=gacdb_file )
 
     # ignored satellites
-    default_ignore_sats = ['NOAA6', 'NOAA8', 'NOAA10']
+    default_ignore_sats = ['TIROSN', 'NOAA6', 'NOAA8', 'NOAA10']
 
     if args.ignoresats:
         add_ignore_sats = args.ignoresats
@@ -405,7 +405,7 @@ def build_suite():
 
 
     if len(sat_list) == 0:
-        print (" *** There are no data for %s - %s " % 
+        print ("\n *** There are no data for %s - %s \n" % 
                 (args.sdate, args.edate))
         db.close()
         sys.exit(0)
@@ -621,10 +621,10 @@ if __name__ == '__main__':
 
     if args.testrun == True:
         testcase = 1
-        message = '''Note: Only 11x11 pixels of each orbit are being processed.\n''' 
+        message = '''Note: Only 11x11 pixels of each orbit are being processed.''' 
     else:
         testcase = 0
-        message = '''Note: Full orbits are being processed\n.'''
+        message = '''Note: Full orbits are being processed.'''
 
 
     print "\n"
