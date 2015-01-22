@@ -10,15 +10,25 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+
     if [ %SENSOR% == "AVHRR" ]; then
     
+        cfg_typ="1_getdata_avhrr_"
+        cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+        cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
         # -- execute ksh script
-        %GET_AVHRR_KSH% %CFG_PATHS_FILE% %CFG_P1_AVHRR%
+        %GET_AVHRR_KSH% %CFG_PATHS_FILE% ${cfg_fil}
     
     else
     
+        cfg_typ="1_getdata_modis_"
+        cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+        cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
         # -- execute ksh script
-        %GET_MODIS_KSH% %CFG_PATHS_FILE% %CFG_P1_MODIS%
+        %GET_MODIS_KSH% %CFG_PATHS_FILE% ${cfg_fil}
     
     fi
 
