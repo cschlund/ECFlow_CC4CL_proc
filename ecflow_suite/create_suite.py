@@ -417,6 +417,9 @@ def build_suite():
         yearstr  = mm.strftime("%Y")
         monthstr = mm.strftime("%m")
         
+        modis_flag = False
+        avhrr_flag = False
+
 
         # ----------------------------------------------------
         # check if AVHRR or/and MODIS are avail.
@@ -424,9 +427,6 @@ def build_suite():
         for s in sat_list:
 
             sensor = get_sensor( s )
-
-            modis_flag = False
-            avhrr_flag = False
 
             if sensor == "AVHRR" and avhrr_flag == False: 
 
