@@ -366,6 +366,7 @@ def build_suite():
 
     if args.ignoresats:
         add_ignore_sats = args.ignoresats
+
         ignore_list = default_ignore_sats + add_ignore_sats
     else:
         ignore_list = default_ignore_sats
@@ -402,6 +403,11 @@ def build_suite():
         # modis
         mod_list  = get_modis_list( args.sdate, args.edate )
         sat_list += mod_list
+
+        # check ignoresats
+        for ml in mod_list:
+            if ml in ignore_list:
+                sat_list.remove(ml)
 
 
     if len(sat_list) == 0:
