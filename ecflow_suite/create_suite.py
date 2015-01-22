@@ -612,6 +612,7 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
+
     if args.dummy == True:
         dummycase = 1
         dummymess = "Only randomsleep commands will be executed."
@@ -619,12 +620,21 @@ if __name__ == '__main__':
         dummycase = 0
         dummymess = "Real processing will be executed."
 
+
     if args.testrun == True:
         testcase = 1
         message = '''Note: Only 11x11 pixels of each orbit are being processed.''' 
     else:
         testcase = 0
         message = '''Note: Full orbits are being processed.'''
+
+
+    if args.satellites and args.ignoresat:
+        print ("""\n *** Either choose some satellites from list
+                or ignore some satellites from list.\n\n
+                *** Third option: neither use --satellites nor --ignoresats, 
+                which means you will get all satellites that are available.\n""")
+        sys.exit(0)
 
 
     print "\n"
