@@ -178,17 +178,13 @@ def set_vars(suite, dummycase, testcase):
     suite.add_variable("ESA_LEVEL3DIR", esa_level3dir)
     suite.add_variable("ESA_INPUTDIR", esa_inputdir)
     suite.add_variable("ESA_LOGDIR", esa_logdir)
+    suite.add_variable("ESA_CONFIGDIR", esa_configdir)
 
     # Config files
     suite.add_variable("CFG_PATHS_FILE", cfg_paths_file)
     suite.add_variable("CFG_ATTRI_FILE", cfg_attri_file)
-    suite.add_variable("CFG_P1_AVHRR", cfg_pro1_avhrr)
-    suite.add_variable("CFG_P1_MODIS", cfg_pro1_modis)
-    suite.add_variable("CFG_P1_MARS", cfg_pro1_mars)
-    suite.add_variable("CFG_P1_AUX", cfg_pro1_aux)
-    suite.add_variable("CFG_P2_ORAC", cfg_pro2_orac)
-    suite.add_variable("CFG_L3U_FILE", cfg_lev3u_file)
-    suite.add_variable("CFG_L3C_FILE", cfg_lev3c_file)
+    suite.add_variable("CFG_PREFIX", cfg_prefix)
+    suite.add_variable("CFG_SUFFIX", cfg_suffix)
 
     # ksh scripts
     suite.add_variable("GET_AVHRR_KSH", get_avhrr_ksh)

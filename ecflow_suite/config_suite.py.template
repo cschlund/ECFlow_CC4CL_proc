@@ -51,6 +51,7 @@ esa_inputdir  = os.path.join( scratch_base, "input" )
 esa_outputdir = os.path.join( scratch_base, "output" )
 esa_level3dir = os.path.join( scratch_base, "output/level3" )
 esa_logdir    = os.path.join( scratch_base, "logs/processing" )
+esa_configdir = os.path.join( scratch_base, "temp_cfg_files")
 
 # new programs
 make_cfg_files    = os.path.join( esa_routine, "create_config_files.py" )
@@ -61,13 +62,8 @@ archive_data      = os.path.join( esa_routine, "proc_4_archive_data.py" )
 # config files
 cfg_paths_file = os.path.join( esa_routine, "config_paths.file" )
 cfg_attri_file = os.path.join( esa_routine, "config_attributes.file" )
-cfg_pro1_avhrr = os.path.join( esa_routine, "config_proc_1_getdata_avhrr.file" )
-cfg_pro1_modis = os.path.join( esa_routine, "config_proc_1_getdata_modis.file" )
-cfg_pro1_mars  = os.path.join( esa_routine, "config_proc_1_getdata_mars.file" )
-cfg_pro1_aux   = os.path.join( esa_routine, "config_proc_1_getdata_aux.file" )
-cfg_pro2_orac  = os.path.join( esa_routine, "config_proc_2_process.file" )
-cfg_lev3u_file = os.path.join( esa_routine, "config_proc_3_make_l3u.file" )
-cfg_lev3c_file = os.path.join( esa_routine, "config_proc_3_make_l3c.file" )
+cfg_prefix     = "config_proc_"
+cfg_suffix     = ".file"
 
 # ksh scripts
 get_avhrr_ksh  = os.path.join( esa_routine, "proc_1_getdata_avhrr.ksh" )

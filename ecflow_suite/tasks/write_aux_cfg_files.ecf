@@ -10,15 +10,23 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    date_sat_base="%START_YEAR%_%START_MONTH%"_"%SATELLITE%"
+
     # -- write config file for get_aux_data
 
-    python %MAKE_CFG_FILE% -cf %CFG_P1_AUX% \
+    cfg_bas="%CFG_PREFIX%1_getdata_aux${date_sat_base}%CFG_PREFIX%"
+    cfg_fil=%ESA_CONFIGDIR%/cfg_bas
+
+    python %MAKE_CFG_FILE% -cf ${cfg_aux_fil} \
         -sy %START_YEAR% -ey %END_YEAR% \
         -sm %START_MONTH% -em %END_MONTH% \
         getaux -get aux
     
 
     # -- write config file for get_mars_data
+
+    cfg_bas="%CFG_PREFIX%1_getdata_era${date_sat_base}%CFG_PREFIX%"
+    cfg_fil=%ESA_CONFIGDIR%/cfg_bas
 
     python %MAKE_CFG_FILE% -cf %CFG_P1_MARS% \
         -sy %START_YEAR% -ey %END_YEAR% \
