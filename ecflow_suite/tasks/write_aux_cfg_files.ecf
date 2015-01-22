@@ -12,14 +12,15 @@ else
 
     mkdir -p %ESA_CONFIGDIR%
 
-    date_sat_base="%START_YEAR%_%START_MONTH%"_"%SATELLITE%"
+    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
 
     # -- write config file for get_aux_data
 
-    cfg_bas="%CFG_PREFIX%1_getdata_aux${date_sat_base}%CFG_PREFIX%"
+    cfg_typ="1_getdata_aux"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_PREFIX%"
     cfg_fil=%ESA_CONFIGDIR%/cfg_bas
 
-    python %MAKE_CFG_FILE% -cf ${cfg_aux_fil} \
+    python %MAKE_CFG_FILE% -cf ${cfg_fil} \
         -sy %START_YEAR% -ey %END_YEAR% \
         -sm %START_MONTH% -em %END_MONTH% \
         getaux -get aux
@@ -27,10 +28,11 @@ else
 
     # -- write config file for get_mars_data
 
-    cfg_bas="%CFG_PREFIX%1_getdata_era${date_sat_base}%CFG_PREFIX%"
+    cfg_typ="1_getdata_era"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_PREFIX%"
     cfg_fil=%ESA_CONFIGDIR%/cfg_bas
 
-    python %MAKE_CFG_FILE% -cf %CFG_P1_MARS% \
+    python %MAKE_CFG_FILE% -cf ${cfg_fil} \
         -sy %START_YEAR% -ey %END_YEAR% \
         -sm %START_MONTH% -em %END_MONTH% \
         getaux -get era

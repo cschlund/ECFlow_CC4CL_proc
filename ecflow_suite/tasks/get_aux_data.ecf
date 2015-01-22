@@ -10,8 +10,14 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+
+    cfg_typ="1_getdata_aux"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_PREFIX%"
+    cfg_fil=%ESA_CONFIGDIR%/cfg_bas
+
     # -- execute ksh script
-    %GET_AUX_KSH% %CFG_PATHS_FILE% %CFG_P1_AUX%
+    %GET_AUX_KSH% %CFG_PATHS_FILE% ${cfg_fil}
 
 fi
 

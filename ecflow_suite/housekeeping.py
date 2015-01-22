@@ -378,18 +378,15 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         db_sat_list = db.get_sats( start_date=sdate, 
                 end_date=edate, ignore_sats=ignore_list)
 
-        # update avhrr list (remove sat. with no data)
-        verified_list = list(set(db_sat_list) - set(avh_list))
-
         # terra/aqua at the end of list, if data avail.
         for item in mod_list: 
             if item in all_list: 
                 check = get_modis_avail( item, sdate, edate )
                 if check == True: 
-                    verified_list.append( item )
+                    db_sat_list.append( item )
 
         # get final sat_list: match between verified and user list
-        sat_list = list(set(all_list).intersection(verified_list))
+        sat_list = list(set(all_list).intersection(db_sat_list))
 
     else:
         # avhrr
