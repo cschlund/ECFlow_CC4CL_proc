@@ -630,10 +630,10 @@ if __name__ == '__main__':
 
 
     if args.satellites and args.ignoresats:
-        print ("""\n *** Either choose some satellites from list
-                or ignore some satellites from list.\n\n
-                *** Third option: neither use --satellites nor --ignoresats, 
-                which means you will get all satellites that are available.\n""")
+        print ('''\n *** Either choose some satellites from list (1) or '''
+               '''ignore some satellites from list (2).\n''' 
+               '''\n *** Third option: neither use --satellites nor --ignoresats, '''
+               '''which means you will get all satellites that are available.\n''')
         sys.exit(0)
 
 
