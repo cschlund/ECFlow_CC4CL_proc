@@ -404,6 +404,13 @@ def build_suite():
         sat_list += mod_list
 
 
+    if len(sat_list) == 0:
+        print (" *** There are no data for %s - %s " % 
+                (args.sdate, args.edate))
+        db.close()
+        sys.exit(0)
+
+
     # ===============================
     # DEFINE DYNAMIC FAMILIES & TASKS
     # ===============================
