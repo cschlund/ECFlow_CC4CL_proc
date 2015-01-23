@@ -6,8 +6,11 @@
 #
 
 import argparse
-import os, sys, fnmatch
+import os, sys
 import time, datetime
+from housekeeping import get_file_list_via_pattern
+from housekeeping import split_filename
+from housekeeping import date_from_year_doy
 
 
 # -------------------------------------------------------------------
@@ -18,7 +21,7 @@ def find_nearest_date(args):
             args.hour, args.minute, args.seconds)
 
     # get file list
-    files = get_file_list( args.inpdir, '*.'+args.suffix )
+    files = get_file_list_via_pattern( args.inpdir, '*.'+args.suffix )
     files.sort()
 
     ## remove climatology files
@@ -38,6 +41,7 @@ def find_nearest_date(args):
     min_idx = diffs.index( min_val )
 
     return files[min_idx]
+
 
 # -------------------------------------------------------------------
 def extract_date(file):
@@ -89,39 +93,6 @@ def extract_date(file):
                                 int(fstime[0]),
                                 int(fstime[1]) )
     return dt
-
-# -------------------------------------------------------------------
-def date_from_year_doy(year, doy):
-    '''
-    This function converts the day of year into 
-    a datetime object.
-    '''
-    return datetime.datetime(year=year, month=1, day=1) + \
-            datetime.timedelta(days=int(doy)-1)
-
-# -------------------------------------------------------------------
-def split_filename(file):
-    '''
-    This function splits the full qualified file
-    into directory and filename.
-    '''
-    dirn = os.path.dirname(file)
-    base = os.path.basename(file)
-    return (dirn, base)
-
-# -------------------------------------------------------------------
-def get_file_list( path, pattern ):
-    '''
-    This function collects all files in a given
-    path which matches the given pattern.
-    '''
-    result = []
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            if fnmatch.fnmatch( name, pattern ):
-                result.append( os.path.join( root, name ) )
-
-    return result
 
 
 # -------------------------------------------------------------------

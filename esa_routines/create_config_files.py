@@ -8,23 +8,8 @@
 import os, sys
 import argparse
 import time, datetime
+from housekeeping import get_id
 
-# -------------------------------------------------------------------
-def get_id( tmpdir ):
-    '''
-    Split string and find ID...US... number.
-    '''
-    split = tmpdir.split('_')
-
-    for i in split:
-        if i.startswith('ID'):
-            id = i
-        elif i.startswith('US'):
-            us = i
-        else:
-            pass
-
-    return id+'_'+us
 
 # -------------------------------------------------------------------
 def getsat(args):

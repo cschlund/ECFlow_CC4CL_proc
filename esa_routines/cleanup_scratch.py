@@ -2,14 +2,15 @@
 #
 # -*- coding: utf-8 -*-
 #
-# C. Schlundt, December 2014
+# C. Schlundt, December 2014, original version
+# C. Schlundt, January 2015, delete config files added
 #
 
 import argparse
 import os, sys
 import shutil
 import time, datetime
-
+from housekeeping import delete_dir, get_id
 
 # -------------------------------------------------------------------
 def clear_l1(args):
@@ -42,6 +43,11 @@ def clear_l1(args):
         sensor = "MODIS"
     else:
         sensor = "AVHRR"
+
+
+    ## find corr. config file
+    #cfgfile = find_file( fname, search_path )
+    #sys.exit(0)
 
 
     ipath = os.path.join( args.inpdir, sensor, platform,
@@ -234,29 +240,7 @@ def clear_aux(args):
                     % ispath) 
 
 # -------------------------------------------------------------------
-def get_id( tmpdir ):
-    '''
-    Split string and find ID...US... number.
-    '''
-    split = tmpdir.split('_')
 
-    for i in split:
-        if i.startswith('ID'):
-            id = i
-        elif i.startswith('US'):
-            us = i
-        else:
-            pass
-
-    return id+'_'+us
-
-# -------------------------------------------------------------------
-def delete_dir( tmpdir ):
-    '''
-    Deleting non-empty directory.
-    '''
-    if os.path.exists( tmpdir ):
-        shutil.rmtree( tmpdir )
 
 # -------------------------------------------------------------------
 # --- main ---

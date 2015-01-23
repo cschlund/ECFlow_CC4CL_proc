@@ -1,13 +1,51 @@
 #!/usr/bin/env python2.7
 
 import os, sys
+import fnmatch
 import shutil
 import re, tarfile
 import subprocess
+import time, datetime
 
 
 # -------------------------------------------------------------------
-def get_file_list(idir, iend):
+def date_from_year_doy(year, doy):
+    '''
+    This function converts the day of year into 
+    a datetime object.
+    '''
+    return datetime.datetime(year=year, month=1, day=1) + \
+            datetime.timedelta(days=int(doy)-1)
+
+
+# -------------------------------------------------------------------
+def split_filename(file):
+    '''
+    This function splits the full qualified file
+    into directory and filename.
+    '''
+    dirn = os.path.dirname(file)
+    base = os.path.basename(file)
+    return (dirn, base)
+
+
+# -------------------------------------------------------------------
+def get_file_list_via_pattern( path, pattern ):
+    '''
+    This function collects all files in a given
+    path which matches the given pattern.
+    '''
+    result = []
+    for root, dirs, files in os.walk(path):
+        for name in files:
+            if fnmatch.fnmatch( name, pattern ):
+                result.append( os.path.join( root, name ) )
+
+    return result
+
+
+# -------------------------------------------------------------------
+def get_file_list_via_filext( idir, iend ):
     """
     Returns a list of files for a given directory and file
     extension.
@@ -140,7 +178,7 @@ def create_l2_tarball( inpdir, idnumber, tempdir, l2_tarfile ):
         idate = idate_folder.split("_")[0]
 
         # list all orbitfiles
-        files = get_file_list(daily, "fv1.0.nc")
+        files = get_file_list_via_filext(daily, "fv1.0.nc")
 
         # create daily tarfilename
         ncfile = files.pop()
@@ -437,5 +475,15 @@ def delete_file( file ):
             print (" * Error: %s - %s." % (e.file,e.strerror)) 
     else: 
         print( " * Sorry, I can not find %s file." % file )
+
+
+# -------------------------------------------------------------------
+def find_file(name, path):
+    """
+    Find a specific file and return full qualified filename.
+    """
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
 
 # -------------------------------------------------------------------
