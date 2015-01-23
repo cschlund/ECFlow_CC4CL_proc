@@ -437,10 +437,13 @@ if __name__ == '__main__':
     sday = 1 #13
     eday = 0 #13
 
+
+    print ("\n *** %s start for %s" % (sys.argv[0], args))
+
     # Call function associated with the selected subcommand
     args.func(args)
 
+    print (" *** %s succesfully finished \n" % sys.argv[0])
 
-print ("\n *** %s finished for %s \n" % (sys.argv[0], args.cfile))
-
+# -------------------------------------------------------------------
 

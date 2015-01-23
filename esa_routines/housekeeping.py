@@ -7,6 +7,33 @@ import re, tarfile
 import subprocess
 import time, datetime
 
+# -------------------------------------------------------------------
+def get_config_file_dict():
+    """
+    Dictionary containing prefix and suffix of config files.
+    cfg_dict["type"]["prefix"]["suffix"]
+    """
+    cfg_dict = dict()
+
+    type_list = ( "1_getdata_aux", "1_getdata_avhrr", 
+                  "1_getdata_modis", "1_getdata_era",
+                  "2_process", "3_make_l3c", "3_make_l3u" )
+
+    for ctype in type_list:
+
+        cfg_dict[ctype] = dict()
+
+        for add in ("prefix", "suffix", "dir"):
+
+            if add == "prefix": 
+                cfg_dict[ctype][add] = "config_proc_"
+            elif add == "suffix": 
+                cfg_dict[ctype][add] = ".file"
+            else:
+                cfg_dict[ctype][add] = "temp_cfg_files"
+
+    return cfg_dict
+
 
 # -------------------------------------------------------------------
 def date_from_year_doy(year, doy):
