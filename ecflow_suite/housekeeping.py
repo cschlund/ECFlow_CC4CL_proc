@@ -401,7 +401,7 @@ def familytree(node, tree=None):
 
 # ----------------------------------------------------------------
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
-        useprimes, dummycase, testcase):
+        useprimes, modisonly, dummycase, testcase):
     """
     Build the ecflow suite.
     """
@@ -450,7 +450,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         ignore_list = default_ignore_sats
 
 
+    # ----------------------------------------------------
     # Create list of available satellites
+    # ----------------------------------------------------
     if satellites_list:
         all_list = satellites_list
         avh_list = all_list
@@ -470,10 +472,22 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         # get final sat_list: match between verified and user list
         sat_list = list(set(all_list).intersection(db_sat_list))
 
+
+    # ----------------------------------------------------
+    # modis only
+    # ----------------------------------------------------
+    elif modisonly == True:
+
+        sat_list = get_modis_list( sdate, edate )
+
+
+    # ----------------------------------------------------
+    # take all except ignore_sats
+    # ----------------------------------------------------
     else:
         # avhrr
-        sat_list = db.get_sats( start_date=sdate, end_date=edate, 
-                ignore_sats=ignore_list)
+        sat_list = db.get_sats( start_date=sdate, 
+                end_date=edate, ignore_sats=ignore_list)
         # modis
         mod_list  = get_modis_list( sdate, edate )
         sat_list += mod_list
@@ -486,6 +500,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                     del sat_list[idx]
 
 
+    # ----------------------------------------------------
+    # Security Check:
+    # ----------------------------------------------------
     if len(sat_list) == 0:
         print ("\n *** There are no data for %s - %s \n" % 
                 (sdate, edate))
