@@ -91,6 +91,88 @@ def get_modis_list( user_sd, user_ed ):
 
 
 # ----------------------------------------------------------------
+def get_avhrr_list():
+    """
+    Returns a list of avhrr satellites.
+    """
+    avhrr_list = [ 'NOAA7', 'NOAA9', 'NOAA11', 'NOAA12', 
+                   'NOAA14', 'NOAA15', 'NOAA16', 'NOAA17', 
+                   'NOAA18', 'NOAA19', 'METOPA', 'METOPB' ]
+    return avhrr_list
+
+
+# ----------------------------------------------------------------
+def get_avhrr_prime_dict():
+    """
+    Returns a dictionary containing ahvrr prime information.
+    ec_time    = equator crossing time
+    start_date = Start of operational date.
+    end_date   = End of operational date or new sat. in orbit.
+    """
+    avhrr_dict = dict()
+    avhrr_list = get_avhrr_list()
+    attri_list = ["ec_time", "start_date", "end_date"]
+
+    am_sats_list = [ "NOAA12", "NOAA15", "NOAA17",
+                     "METOPA", "METOPB" ]
+
+    # initialize dictionary
+    for s in avhrr_list:
+        avhrr_dict[s] = dict()
+        for i in attri_list:
+            avhrr_dict[s][i] = 0
+
+    # fill dictionary
+    for s in avhrr_list: 
+        for i in attri_list: 
+            if i == "ec_time":
+                if s in am_sats_list:
+                    avhrr_dict[s][i] = "AM"
+                else:
+                    avhrr_dict[s][i] = "PM"
+            
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA7"]["start_date"]  = datetime.date(1982, 1, 1)
+    avhrr_dict["NOAA7"]["end_date"]    = datetime.date(1985, 2, 1)
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA9"]["start_date"]  = datetime.date(1985, 2, 25)
+    avhrr_dict["NOAA9"]["end_date"]    = datetime.date(1988, 11, 7)
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA11"]["start_date"] = datetime.date(1988, 11, 8)
+    avhrr_dict["NOAA11"]["end_date"]   = datetime.date(1994, 10, 16)
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA12"]["start_date"] = datetime.date(1991, 9, 17)
+    avhrr_dict["NOAA12"]["end_date"]   = datetime.date(1998, 12, 31)#->n15
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA14"]["start_date"] = datetime.date(1995, 4, 10)
+    avhrr_dict["NOAA14"]["end_date"]   = datetime.date(2001, 3, 31) #->n16
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA15"]["start_date"] = datetime.date(1999, 1, 1)
+    avhrr_dict["NOAA15"]["end_date"]   = datetime.date(2002, 10, 31)#->n17
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA16"]["start_date"] = datetime.date(2001, 4, 1)
+    avhrr_dict["NOAA16"]["end_date"]   = datetime.date(2005, 8, 31) #->n18
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA17"]["start_date"] = datetime.date(2002, 11, 1)
+    avhrr_dict["NOAA17"]["end_date"]   = datetime.date(2007, 5, 31) #->m02
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA18"]["start_date"] = datetime.date(2005, 9, 1)
+    avhrr_dict["NOAA18"]["end_date"]   = datetime.date(2009, 6, 30) #->n19
+    # --------------------------------------------------------------------
+    avhrr_dict["NOAA19"]["start_date"] = datetime.date(2009, 7, 1)
+    avhrr_dict["NOAA19"]["end_date"]   = datetime.date(2014, 12, 31)
+    # --------------------------------------------------------------------
+    avhrr_dict["METOPA"]["start_date"] = datetime.date(2007, 6, 1)
+    avhrr_dict["METOPA"]["end_date"]   = datetime.date(2013, 4, 30) #->m01
+    # --------------------------------------------------------------------
+    avhrr_dict["METOPB"]["start_date"] = datetime.date(2013, 5, 1)
+    avhrr_dict["METOPB"]["end_date"]   = datetime.date(2014, 12, 31)
+    # --------------------------------------------------------------------
+
+    return avhrr_dict
+
+
+# ----------------------------------------------------------------
 def get_modis_dict():
     """
     MODIS dictionary containing start and end dates of archive.
@@ -319,7 +401,7 @@ def familytree(node, tree=None):
 
 # ----------------------------------------------------------------
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
-        dummycase, testcase):
+        useprimes, dummycase, testcase):
     """
     Build the ecflow suite.
     """
@@ -399,7 +481,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         # check ignoresats
         for ml in mod_list:
             if ml in ignore_list:
-                sat_list.remove(ml)
+                if ml in sat_list:
+                    idx = sat_list.index(ml)
+                    del sat_list[idx]
 
 
     if len(sat_list) == 0:
@@ -422,13 +506,37 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         yearstr  = mm.strftime("%Y")
         monthstr = mm.strftime("%m")
         
-        modis_flag = False
-        avhrr_flag = False
+        act_date = datetime.date(int(yearstr), int(monthstr), 1)
+
+
+        # ----------------------------------------------------
+        # check for avhrr primes
+        # ----------------------------------------------------
+        if useprimes == True: 
+
+            plist = list()
+            pdict = get_avhrr_prime_dict()
+
+            for s in sat_list: 
+
+                if s == "AQUA" or s == "TERRA":
+                    plist.append(s)
+                    continue
+
+                if act_date >= pdict[s]["start_date"] and \
+                        act_date <= pdict[s]["end_date"]:
+                            plist.append(s)
+
+            # update sat_list: non-primes removed
+            sat_list = plist
 
 
         # ----------------------------------------------------
         # check if AVHRR or/and MODIS are avail.
         # ----------------------------------------------------
+        modis_flag = False
+        avhrr_flag = False
+
         for s in sat_list:
 
             sensor = get_sensor( s )
@@ -447,6 +555,8 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 moded = enddate_of_month( int(yearstr), int(monthstr) )
                 modis_flag = get_modis_avail( s, modsd, moded )
 
+
+        # neither avhrr nor modis -> go to next month
         if avhrr_flag == False and modis_flag == False:
             continue
 
