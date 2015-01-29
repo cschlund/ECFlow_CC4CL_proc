@@ -189,8 +189,8 @@ def proc2(args):
         f.write("#channel indices to use\n")
         f.write("proc_flag[0]=1   # ch1\n")
         f.write("proc_flag[1]=1   # ch2\n")
-        f.write("proc_flag[2]=0   # ch3a\n")
-        f.write("proc_flag[3]=1   # ch3b\n")
+        f.write("proc_flag[2]=1   # ch3a\n")
+        f.write("proc_flag[3]=0   # ch3b\n")
         f.write("proc_flag[4]=1   # ch4\n")
         f.write("proc_flag[5]=1   # ch5\n")
         f.write("\n")
@@ -243,7 +243,7 @@ def proc2(args):
         f.write("cinclude_full_brdf='T'\n")
         f.write("RTTOV_version='11'\n")
         f.write("ECMWF_version='ERA-Interim'\n")
-        f.write("SVN_version='2875'\n")
+        f.write("SVN_version='2889'\n")
         f.close()
     except (IndexError, ValueError, RuntimeError,
             Exception) as err:
