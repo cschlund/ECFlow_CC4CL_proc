@@ -650,10 +650,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
                 fam_sat = add_fam( fam_modis, satellite )
                 fam_sat.add_variable( "SATELLITE", satellite )
+
                 if avhrr_flag == True: 
                     add_tasks( fam_sat, fam_avhrr )
+                    fam_avhrr = fam_sat
                 else:
                     add_tasks( fam_sat, fam_aux )
+                    fam_aux = fam_sat
 
 
         # ----------------------------------------------------
