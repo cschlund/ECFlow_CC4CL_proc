@@ -8,23 +8,8 @@
 import os, sys
 import argparse
 import time, datetime
+from housekeeping import get_id
 
-# -------------------------------------------------------------------
-def get_id( tmpdir ):
-    '''
-    Split string and find ID...US... number.
-    '''
-    split = tmpdir.split('_')
-
-    for i in split:
-        if i.startswith('ID'):
-            id = i
-        elif i.startswith('US'):
-            us = i
-        else:
-            pass
-
-    return id+'_'+us
 
 # -------------------------------------------------------------------
 def getsat(args):
@@ -452,10 +437,13 @@ if __name__ == '__main__':
     sday = 1 #13
     eday = 0 #13
 
+
+    print ("\n *** %s start for %s" % (sys.argv[0], args))
+
     # Call function associated with the selected subcommand
     args.func(args)
 
+    print (" *** %s succesfully finished \n" % sys.argv[0])
 
-print ("\n *** %s finished for %s \n" % (sys.argv[0], args.cfile))
-
+# -------------------------------------------------------------------
 

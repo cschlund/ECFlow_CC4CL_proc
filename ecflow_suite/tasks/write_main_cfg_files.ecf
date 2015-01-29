@@ -10,18 +10,30 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    mkdir -p %ESA_CONFIGDIR%
+
+    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+
     # -- write config file for get_sat_data
 
     if [ %SENSOR% == "AVHRR" ]; then
     
-        python %MAKE_CFG_FILE% -cf %CFG_P1_AVHRR% \
+        cfg_typ="1_getdata_avhrr_"
+        cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+        cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
+        python %MAKE_CFG_FILE% -cf ${cfg_fil} \
             -sy %START_YEAR% -ey %END_YEAR% \
             -sm %START_MONTH% -em %END_MONTH% \
             getsat -sat %SATELLITE% -ins %SENSOR%
     
     else
     
-        python %MAKE_CFG_FILE% -cf %CFG_P1_MODIS% \
+        cfg_typ="1_getdata_modis_"
+        cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+        cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
+        python %MAKE_CFG_FILE% -cf ${cfg_fil} \
             -sy %START_YEAR% -ey %END_YEAR% \
             -sm %START_MONTH% -em %END_MONTH% \
             getsat -sat %SATELLITE% -ins %SENSOR%
@@ -31,16 +43,20 @@ else
 
     # -- write config file for retrieval
 
+    cfg_typ="2_process_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
     if [ %TESTRUN% == 1 ]; then
     
-        python %MAKE_CFG_FILE% -cf %CFG_P2_ORAC% \
+        python %MAKE_CFG_FILE% -cf ${cfg_fil} \
             -sy %START_YEAR% -ey %END_YEAR% \
             -sm %START_MONTH% -em %END_MONTH% \
             proc2 -sat %SATELLITE% -ins %SENSOR% --testrun
     
     else
     
-        python %MAKE_CFG_FILE% -cf %CFG_P2_ORAC% \
+        python %MAKE_CFG_FILE% -cf ${cfg_fil} \
             -sy %START_YEAR% -ey %END_YEAR% \
             -sm %START_MONTH% -em %END_MONTH% \
             proc2 -sat %SATELLITE% -ins %SENSOR%
@@ -50,7 +66,11 @@ else
 
     # -- write config file for l3a
 
-    python %MAKE_CFG_FILE% -cf %CFG_L3C_FILE% \
+    cfg_typ="3_make_l3c_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
+    python %MAKE_CFG_FILE% -cf ${cfg_fil} \
         -sy %START_YEAR% -ey %END_YEAR% \
         -sm %START_MONTH% -em %END_MONTH% \
         l2tol3 -sat %SATELLITE% -ins %SENSOR% \
@@ -59,7 +79,11 @@ else
 
     # -- write config file for l2b
 
-    python %MAKE_CFG_FILE% -cf %CFG_L3U_FILE% \
+    cfg_typ="3_make_l3u_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
+    python %MAKE_CFG_FILE% -cf ${cfg_fil} \
         -sy %START_YEAR% -ey %END_YEAR% \
         -sm %START_MONTH% -em %END_MONTH% \
         l2tol3 -sat %SATELLITE% -ins %SENSOR% \

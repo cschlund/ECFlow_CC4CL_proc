@@ -210,12 +210,11 @@ if __name__ == '__main__':
     # Parse arguments
     args = parser.parse_args()
     
+    print ("\n *** %s start for %s" % (sys.argv[0], args))
+
     # Call function associated with the selected subcommand
     args.func(args)
 
-    # -- make some screen output
-    print ( " * %s finished for %s/%s : %s/%s - %s copied to: %s! " 
-             %( os.path.basename(__file__), args.instrument,
-                args.satellite, args.year, args.month,
-                args.inpdir, args.ecfsdir) )
-    
+    print (" *** %s succesfully finished \n" % sys.argv[0])
+
+# -------------------------------------------------------------------

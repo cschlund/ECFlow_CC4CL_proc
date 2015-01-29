@@ -87,13 +87,26 @@ please create your suite using "--testrun"
             please test ECFlow_CC4CL_proc using the option "--dummy",
             in order to check if your settings are OK.
 
-            ./create_suite.py --sdate 20080101 --edate 20081231 --satellite noaa18 --dummy
+            ./create_suite.py --sdate 20080101 --edate 20081231 --satellites noaa18 --dummy
 
         if everything worked out, then you can try to run a 11x11 pixel box:
-            ./create_suite.py --sdate 20080101 --edate 20081231 --satellite noaa18 --testrun
+            ./create_suite.py --sdate 20080101 --edate 20081231 --satellites noaa18 --testrun
 
         if everything worked out, then you can do the hard work:
-            ./create_suite.py --sdate 20080101 --edate 20081231 --satellite noaa18
+            ./create_suite.py --sdate 20080101 --edate 20081231 --satellites noaa18
+
+
+        possibilities, for example:
+
+        (1) process all available satellites
+            ./create_suite.py --sdate 20080101 --edate 20081231
+
+        (2) process only noaa18 and terra
+            ./create_suite.py --sdate 20080101 --edate 20081231 --satellites noaa18 terra
+
+        (3) process all available satellites except noaa18 and terra
+            ./create_suite.py --sdate 20080101 --edate 20081231 --ignoresats noaa18 terra
+
 
     load suite
         ./load.sh

@@ -14,6 +14,13 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+
+    # -- config file
+    cfg_typ="2_process_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
     # -- working directory: write core file here
     cd %ESA_ROUTINE%
     
@@ -33,7 +40,7 @@ else
     # -- source config files
     . %CFG_PATHS_FILE%
     . %CFG_ATTRI_FILE%
-    . %CFG_P2_ORAC%
+    . ${cfg_fil}
     
     
     # -- define unix start and stop times
@@ -79,7 +86,7 @@ else
     
     
         # -- write daily config
-        %PROC2_ORAC_KSH% %CFG_PATHS_FILE% %CFG_P2_ORAC% %CFG_ATTRI_FILE% \
+        %PROC2_ORAC_KSH% %CFG_PATHS_FILE% ${cfg_fil} %CFG_ATTRI_FILE% \
             ${ACTYEAR} ${ACTMONTH} ${STARTDAY} ${day_stop} \
             ${instrument} ${platform} ${jid} 
     

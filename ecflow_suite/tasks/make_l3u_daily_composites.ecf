@@ -14,6 +14,13 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+
+    # -- config file
+    cfg_typ="3_make_l3u_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
     # -- working directory: write core file here
     cd %ESA_ROUTINE%
     
@@ -24,7 +31,7 @@ else
     jid=ID${primary_id}_US${id}
     
     # -- execute ksh script
-    %RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% %CFG_L3U_FILE%
+    %RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% ${cfg_fil}
 
 fi
 

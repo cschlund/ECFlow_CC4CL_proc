@@ -10,8 +10,14 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    date_base="%START_YEAR%_%START_MONTH%"
+
+    cfg_typ="1_getdata_aux_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
     # -- execute ksh script
-    %GET_AUX_KSH% %CFG_PATHS_FILE% %CFG_P1_AUX%
+    %GET_AUX_KSH% %CFG_PATHS_FILE% ${cfg_fil}
 
 fi
 
