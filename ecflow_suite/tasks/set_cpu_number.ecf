@@ -22,7 +22,7 @@ else
         cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
         cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
-        val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% ${cfg_fil}`
+        val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% ${cfg_fil} %PROCDAY%`
 
     else
 
@@ -30,7 +30,7 @@ else
         cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
         cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
-        val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% ${cfg_fil}`
+        val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% ${cfg_fil} %PROCDAY%`
 
         # for MODIS we must set a maximum!
         maxval=2400

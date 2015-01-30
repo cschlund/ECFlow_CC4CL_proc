@@ -87,25 +87,34 @@ please create your suite using "--testrun"
             please test ECFlow_CC4CL_proc using the option "--dummy",
             in order to check if your settings are OK.
 
-            ./create_suite.py --sdate 20080101 --edate 20081231 --satellites noaa18 --dummy
+            ./create_suite.py --start_date 20080101 --end_date 20081231 --satellites noaa18 --dummy
 
         if everything worked out, then you can try to run a 11x11 pixel box:
-            ./create_suite.py --sdate 20080101 --edate 20081231 --satellites noaa18 --testrun
+            ./create_suite.py --start_date 20080101 --end_date 20081231 --satellites noaa18 --testrun
 
         if everything worked out, then you can do the hard work:
-            ./create_suite.py --sdate 20080101 --edate 20081231 --satellites noaa18
+            ./create_suite.py --start_date 20080101 --end_date 20081231 --satellites noaa18
 
 
         possibilities, for example:
 
         (1) process all available satellites
-            ./create_suite.py --sdate 20080101 --edate 20081231
+            ./create_suite.py --start_date 20080101 --end_date 20081231
 
         (2) process only noaa18 and terra
-            ./create_suite.py --sdate 20080101 --edate 20081231 --satellites noaa18 terra
+            ./create_suite.py --start_date 20080101 --end_date 20081231 --satellites noaa18 terra
 
         (3) process all available satellites except noaa18 and terra
-            ./create_suite.py --sdate 20080101 --edate 20081231 --ignoresats noaa18 terra
+            ./create_suite.py --start_date 20080101 --end_date 20081231 --ignoresats noaa18 terra
+
+        (4) process avhrr primes and modis satellites
+            ./create_suite.py --start_date 20080101 --end_date 20081231 --use_avhrr_primes
+
+        (5) process avhrr primes but not modis satellites
+            ./create_suite.py --start_date 20080101 --end_date 20081231 --use_avhrr_primes --ignore_sats terra aqua
+
+        (6) process only modis satellites
+            ./create_suite.py --start_date 20080101 --end_date 20081231 --use_modis_only
 
 
     load suite
