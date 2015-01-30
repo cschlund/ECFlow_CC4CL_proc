@@ -1,6 +1,6 @@
 #!/usr/bin/env python2.7
 import sys
-import argparse
+import argparse, datetime
 from pycmsaf.argparser import str2date
 from config_suite import mysuite
 from housekeeping import build_suite, str2upper
@@ -30,6 +30,9 @@ if __name__ == '__main__':
     parser.add_argument('--use_modis_only', action="store_true",
             help="Process only MODIS.")
 
+    parser.add_argument('--proc_day', type=int, default=-1,
+            help="Process only this day for given month instead of whole month!")
+
     parser.add_argument('--test_run', action="store_true",
             help='Run a subset of pixels')
 
@@ -45,6 +48,22 @@ if __name__ == '__main__':
     else:
         dummycase = 0
         dummymess = "Real processing will be executed."
+
+
+    if args.proc_day != -1:
+        diff = args.end_date.month - args.start_date.month
+        if diff > 1:
+            print ("\n *** If you want to process a single day, "
+                    "then you can choose only 1 specific month!\n")
+            sys.exit(0)
+        else:
+            proc_year  = args.start_date.year
+            proc_month = args.start_date.month
+            pday = datetime.date( proc_year, proc_month, args.proc_day )
+            proc_day_message = "Only {d} will be processed".\
+                                format(d=pday)
+    else: 
+        proc_day_message = "Whole month will be processed"
 
 
     # help message
@@ -88,6 +107,7 @@ if __name__ == '__main__':
     print (" * avhrr primes: %s" % args.use_avhrr_primes)
     print (" * modis only  : %s" % args.use_modis_only)
     print (" * ignore sats : %s" % args.ignore_sats)
+    print (" * proc. status: %s" % proc_day_message)
     print (" * dummycase   : %s (%s)" % (dummycase, dummymess))
     print (" * testcase    : %s (%s)" % (testcase, message))
     print "\n"
@@ -96,7 +116,7 @@ if __name__ == '__main__':
     build_suite( args.start_date, args.end_date, 
                  args.satellites, args.ignore_sats, 
                  args.use_avhrr_primes, args.use_modis_only, 
-                 dummycase, testcase )
+                 args.proc_day, dummycase, testcase )
 
 
 # ================================================================

@@ -131,8 +131,14 @@ def proc2(args):
         f.write("STOPYEAR="+str(args.end_year)+"\n")
         f.write("STARTMONTH="+str(args.start_month)+"\n")
         f.write("STOPMONTH="+str(args.end_month)+"\n")
-        f.write("STARTDAY="+str(sday)+"\n")
-        f.write("STOPDAY="+str(eday)+"\n")
+
+        if args.procday < 0: 
+            f.write("STARTDAY=1\n")
+            f.write("STOPDAY=0\n")
+        else:
+            f.write("STARTDAY="+str(args.procday)+"\n")
+            f.write("STOPDAY="+str(args.procday)+"\n")
+
         f.write("\n")
         f.write("# define sensor and platform\n")
         f.write("instrument="+args.instrument.upper()+"\n")
@@ -408,6 +414,8 @@ if __name__ == '__main__':
             help='''Testrun: only a few pixels are processed, i.e.
             across: 200-210, along: 200-210''',
             action="store_true")
+    proc2_parser.add_argument('-pday', '--procday', type=int,
+            help="-1: whole month otherwise this day")
     proc2_parser.set_defaults(func=proc2)
 
     # -> create config file for l2 to l3 processing
@@ -431,11 +439,6 @@ if __name__ == '__main__':
 
     # Parse arguments
     args = parser.parse_args()
-
-    # Testing: only one/few day(s)
-    # Processing: eday=0 until last day of month
-    sday = 1 #13
-    eday = 0 #13
 
 
     print ("\n *** %s start for %s" % (sys.argv[0], args))

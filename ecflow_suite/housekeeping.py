@@ -210,7 +210,7 @@ def get_sensor(satellite):
     return sensor
 
 # ----------------------------------------------------------------
-def set_vars(suite, dummycase, testcase):
+def set_vars(suite, procday, dummycase, testcase):
     """
     Set suite level variables
     """
@@ -251,6 +251,7 @@ def set_vars(suite, dummycase, testcase):
     suite.add_variable("ECFS_L3_DIR", ecfs_l3_dir)
     suite.add_variable("ECFS_L2_DIR", ecfs_l2_dir)
     suite.add_variable("LD_LIB_PATH", ld_lib_path)
+    suite.add_variable("PROCDAY", procday)
     suite.add_variable("TESTRUN", testcase)
     suite.add_variable("DUMMYRUN", dummycase)
 
@@ -401,7 +402,7 @@ def familytree(node, tree=None):
 
 # ----------------------------------------------------------------
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
-        useprimes, modisonly, dummycase, testcase):
+        useprimes, modisonly, procday, dummycase, testcase):
     """
     Build the ecflow suite.
     """
@@ -415,7 +416,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     suite = defs.add_suite( mysuite )
 
     # Set suite level variables
-    set_vars( suite, dummycase, testcase )
+    set_vars( suite, procday, dummycase, testcase )
     
     # Set default status
     suite.add_defstatus(ecflow.DState.suspended)
