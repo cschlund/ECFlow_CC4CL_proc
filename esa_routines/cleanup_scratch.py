@@ -7,42 +7,41 @@
 #
 
 import argparse
-import os, sys
-import shutil
-import time, datetime
+import os
+import sys
+
 from housekeeping import delete_dir, get_id
 from housekeeping import get_config_file_dict
 from housekeeping import delete_file
 
-# -------------------------------------------------------------------
-def clear_l1(args):
-    '''
+
+def clear_l1(args_l1):
+    """
     Remove L1 satellite input data if retrieval was successful.
-    '''
+    """
 
     # find platform
-    if args.satellite.upper() == "TERRA" or \
-            args.satellite.upper() == "MOD":
-        platform="MOD"
+    if args_l1.satellite.upper() == "TERRA" or \
+                    args_l1.satellite.upper() == "MOD":
+        platform = "MOD"
         sensor = "MODIS"
 
-    elif args.satellite.upper() == "AQUA" or \
-            args.satellite.upper() == "MYD":
-        platform="MYD"
+    elif args_l1.satellite.upper() == "AQUA" or \
+                    args_l1.satellite.upper() == "MYD":
+        platform = "MYD"
         sensor = "MODIS"
 
-    elif args.satellite.upper().startswith("NOAA"):
-        platform=args.satellite.lower()
+    elif args_l1.satellite.upper().startswith("NOAA"):
+        platform = args_l1.satellite.lower()
         sensor = "AVHRR"
 
-    elif args.satellite.upper().startswith("METOP"):
-        platform=args.satellite.lower()
+    elif args_l1.satellite.upper().startswith("METOP"):
+        platform = args_l1.satellite.lower()
         sensor = "AVHRR"
 
     else:
         print " ! Wrong satellite name !\n"
         sys.exit(0)
-
 
     # find corr. config file and delete it
     cfgdict = get_config_file_dict()
@@ -55,62 +54,58 @@ def clear_l1(args):
                 strlist.append(cfgdict[key][key2])
 
     if len(strlist) != 4:
-        print (" * No information for cfg filename found in dictionary!")
-        print ("   -> Thus, config file cannot be deleted!")
+        print " * No information for cfg filename found in dictionary!"
+        print "   -> Thus, config file cannot be deleted!"
 
-    fname = strlist[1]+strlist[0]+'_'+\
-            str(args.year)+'_'+str('%02d' % args.month)+\
-            '_'+args.satellite.upper()+strlist[2]
+    fname = strlist[1] + strlist[0] + '_' + \
+            str(args_l1.year) + '_' + str('%02d' % args_l1.month) + \
+            '_' + args_l1.satellite.upper() + strlist[2]
 
-    splitpath = os.path.split( args.inpdir )
-    cfgfile   = os.path.join( splitpath[0], strlist[3], fname )
+    splitpath = os.path.split(args_l1.inpdir)
+    cfgfile = os.path.join(splitpath[0], strlist[3], fname)
 
-    if os.path.isfile( cfgfile ) == True:
-        print ("   - Delete: \'%s\' " % cfgfile)
-        delete_file( cfgfile )
+    if os.path.isfile(cfgfile):
+        print "   - Delete: \'{0}\' ".format(cfgfile)
+        delete_file(cfgfile)
     else:
-        print ("   - Nothing to delete: \'%s\' does not exist!" 
-                % cfgfile ) 
+        print "   - Nothing to delete: \'{0}\' " \
+              "does not exist!".format(cfgfile)
 
+    ipath = os.path.join(args_l1.inpdir, sensor, platform,
+                         str(args_l1.year), str('%02d' % args_l1.month))
 
+    if os.path.isdir(ipath):
 
-    ipath = os.path.join( args.inpdir, sensor, platform,
-            str(args.year), str('%02d' % args.month) )
-
-    if os.path.isdir( ipath ) == True:
-
-        print ("   - Delete: \'%s\' since retrieval was successful!" 
-                % ipath)
-        delete_dir( ipath )
+        print "   - Delete: \'{0}\' since " \
+              "retrieval was successful!".format(ipath)
+        delete_dir(ipath)
 
     else:
 
-        print ("   - Nothing to delete: \'%s\' does not exist!" 
-                % ipath) 
+        print "   - Nothing to delete: \'{0}\' " \
+              "does not exist!".format(ipath)
 
 
-# -------------------------------------------------------------------
-def clear_l2(args):
-    '''
+def clear_l2(args_l2):
+    """
     Search for ID and then remove all directories,
     which belong to this ID and satellite and sensor and date.
-    '''
-    if args.satellite.upper() == "TERRA":
-        platform="TERRA"
-    elif args.satellite.upper() == "AQUA":
-        platform="AQUA"
-    elif args.satellite.upper() == "MOD":
-        platform="TERRA"
-    elif args.satellite.upper() == "MYD":
-        platform="AQUA"
-    elif args.satellite.upper().startswith("NOAA"):
-        platform=args.satellite.lower()
-    elif args.satellite.upper().startswith("METOP"):
-        platform=args.satellite.lower()
+    """
+    if args_l2.satellite.upper() == "TERRA":
+        platform = "TERRA"
+    elif args_l2.satellite.upper() == "AQUA":
+        platform = "AQUA"
+    elif args_l2.satellite.upper() == "MOD":
+        platform = "TERRA"
+    elif args_l2.satellite.upper() == "MYD":
+        platform = "AQUA"
+    elif args_l2.satellite.upper().startswith("NOAA"):
+        platform = args_l2.satellite.lower()
+    elif args_l2.satellite.upper().startswith("METOP"):
+        platform = args_l2.satellite.lower()
     else:
         print " ! Wrong satellite name !\n"
         sys.exit(0)
-
 
     # find corr. config file and delete it
     cfgdict = get_config_file_dict()
@@ -123,29 +118,28 @@ def clear_l2(args):
                 strlist.append(cfgdict[key][key2])
 
     if len(strlist) != 4:
-        print (" * No information for cfg filename found in dictionary!")
-        print ("   -> Thus, config file cannot be deleted!")
+        print " * No information for cfg filename found in dictionary!"
+        print "   -> Thus, config file cannot be deleted!"
 
-    fname = strlist[1]+strlist[0]+'_'+\
-            str(args.year)+'_'+str('%02d' % args.month)+\
-            '_'+args.satellite.upper()+strlist[2]
+    fname = strlist[1] + strlist[0] + '_' + \
+            str(args_l2.year) + '_' + str('%02d' % args_l2.month) + \
+            '_' + args_l2.satellite.upper() + strlist[2]
 
-    splitpath = os.path.split( args.inpdir )
-    cfgfile   = os.path.join( splitpath[0], strlist[3], fname )
+    splitpath = os.path.split(args_l2.inpdir)
+    cfgfile = os.path.join(splitpath[0], strlist[3], fname)
 
-    if os.path.isfile( cfgfile ) == True:
-        print ("   - Delete: \'%s\' " % cfgfile)
-        delete_file( cfgfile )
+    if os.path.isfile(cfgfile):
+        print "   - Delete: \'{0}\' ".format(cfgfile)
+        delete_file(cfgfile)
     else:
-        print ("   - Nothing to delete: \'%s\' does not exist!" 
-                % cfgfile ) 
-
+        print "   - Nothing to delete: \'{0}\' " \
+              "does not exist!".format(cfgfile)
 
     # date string
-    datestr = str(args.year)+str('%02d' % args.month)
+    datestr = str(args_l2.year) + str('%02d' % args_l2.month)
 
     # get dirs list containing all subdirs of given path
-    alldirs = os.listdir( args.inpdir )
+    alldirs = os.listdir(args_l2.inpdir)
 
     # if alldirs is not empty
     if len(alldirs) > 0:
@@ -154,17 +148,17 @@ def clear_l2(args):
         getdirs = list()
         for ad in alldirs:
             if datestr in ad \
-                    and args.instrument.upper() in ad \
+                    and args_l2.instrument.upper() in ad \
                     and platform in ad and 'retrieval' in ad:
-                        getdirs.append( ad )
-
+                getdirs.append(ad)
 
         # check if getdirs list is empty
         if len(getdirs) == 0:
 
-            print ("   - Nothing to delete in %s for %s %s %s" 
-                    % (args.inpdir, args.instrument.upper(),
-                        platform, datestr))
+            print "   - Nothing to delete in {0} " \
+                  "for {1} {2} {3}".format(args_l2.inpdir,
+                                           args_l2.instrument.upper(),
+                                           platform, datestr)
 
         else:
 
@@ -175,57 +169,56 @@ def clear_l2(args):
             lastdir = getdirs.pop()
 
             # get ID number from the last job
-            id = get_id( lastdir )
+            id_number = get_id(lastdir)
 
             # remove all subdirs matching the id number
-            for dir in getdirs:
-                if id in dir:
-                    delete_dir( dir )
+            for gdir in getdirs:
+                if id_number in gdir:
+                    delete_dir(gdir)
 
             # pattern
-            pattern = datestr+'*'+args.instrument.upper()+'_'+\
-                      platform+'_retrieval_'+id
+            pattern = datestr + '*' + args_l2.instrument.upper() + '_' + \
+                      platform + '_retrieval_' + id_number
 
             # remove all dirs matching pattern
-            print ('''   - Delete: \'%s\' '''
-                   '''because retrieval failed or '''
-                   '''was successful!''' % pattern )
+            print "   - Delete: \'{0}\' because retrieval " \
+                  "failed or was successful!".format(pattern)
 
     else:
 
-        print ("   - Nothing to delete in %s for %s %s %s" 
-                % (args.inpdir, args.instrument.upper(),
-                    platform, datestr))
+        print "   - Nothing to delete in {0} for " \
+              "{1} {2} {3}".format(args_l2.inpdir,
+                                   args_l2.instrument.upper(),
+                                   platform, datestr)
 
-# -------------------------------------------------------------------
-def clear_l3(args):
-    '''
+
+def clear_l3(args_l3):
+    """
     Remove L3 results if archiving was successful.
-    '''
+    """
 
     # find platform
-    if args.satellite.upper() == "TERRA" or \
-            args.satellite.upper() == "MOD":
-        platform="TERRA"
+    if args_l3.satellite.upper() == "TERRA" or \
+                    args_l3.satellite.upper() == "MOD":
+        platform = "TERRA"
         sensor = "MODIS"
 
-    elif args.satellite.upper() == "AQUA" or \
-            args.satellite.upper() == "MYD":
-        platform="AQUA"
+    elif args_l3.satellite.upper() == "AQUA" or \
+                    args_l3.satellite.upper() == "MYD":
+        platform = "AQUA"
         sensor = "MODIS"
 
-    elif args.satellite.upper().startswith("NOAA"):
-        platform=args.satellite.upper()
+    elif args_l3.satellite.upper().startswith("NOAA"):
+        platform = args_l3.satellite.upper()
         sensor = "AVHRR"
 
-    elif args.satellite.upper().startswith("METOP"):
-        platform=args.satellite.upper()
+    elif args_l3.satellite.upper().startswith("METOP"):
+        platform = args_l3.satellite.upper()
         sensor = "AVHRR"
 
     else:
         print " ! Wrong satellite name !\n"
         sys.exit(0)
-
 
     # find corr. config files and delete them (l3u, l3c)
     numcfgs = 2
@@ -238,57 +231,51 @@ def clear_l3(args):
             for key2 in cfgdict[key]:
                 strlist.append(cfgdict[key][key2])
 
-    if len(strlist) != 4*numcfgs:
-        print (" * No information for cfg filename found in dictionary!")
-        print ("   -> Thus, config file cannot be deleted!")
+    if len(strlist) != 4 * numcfgs:
+        print " * No information for cfg filename found in dictionary!"
+        print "   -> Thus, config file cannot be deleted!"
 
     nc = 0
     while nc < numcfgs:
 
-        cnt = nc * (len(strlist)/numcfgs)
-        
-        fname = strlist[1+cnt]+strlist[0+cnt]+'_'+\
-                str(args.year)+'_'+str('%02d' % args.month)+\
-                '_'+args.satellite.upper()+strlist[2+cnt]
+        cnt = nc * (len(strlist) / numcfgs)
 
-        splitpath = os.path.split( os.path.split(args.inpdir)[0] )
-        cfgfile   = os.path.join( splitpath[0], strlist[3+cnt], fname )
+        fname = strlist[1 + cnt] + strlist[0 + cnt] + '_' + \
+                str(args_l3.year) + '_' + str('%02d' % args_l3.month) + \
+                '_' + args_l3.satellite.upper() + strlist[2 + cnt]
 
-        if os.path.isfile( cfgfile ) == True:
-            print ("   - Delete: \'%s\' " % cfgfile)
-            delete_file( cfgfile )
+        splitpath = os.path.split(os.path.split(args_l3.inpdir)[0])
+        cfgfile = os.path.join(splitpath[0], strlist[3 + cnt], fname)
+
+        if os.path.isfile(cfgfile):
+            print "   - Delete: \'{0}\' ".format(cfgfile)
+            delete_file(cfgfile)
         else:
-            print ("   - Nothing to delete: \'%s\' does not exist!" 
-                    % cfgfile ) 
+            print "   - Nothing to delete: \'{0}\' " \
+                  "does not exist!".format(cfgfile)
 
         nc += 1
 
-
     # date string
-    datestr = str(args.year)+str('%02d' % args.month)
+    datestr = str(args_l3.year) + str('%02d' % args_l3.month)
 
     # get dirs list containing all subdirs of given path
-    alldirs = os.listdir( args.inpdir )
+    alldirs = os.listdir(args_l3.inpdir)
 
     if len(alldirs) > 0:
-
         # get dirs list matching the arguments
         getdirs = list()
         for ad in alldirs:
-            if datestr in ad \
-                    and sensor in ad \
-                    and 'ORAC' in ad \
-                    and platform in ad:
-                        getdirs.append( ad )
+            if datestr in ad and sensor in ad \
+                    and 'ORAC' in ad and platform in ad:
+                getdirs.append(ad)
 
         # check if getdirs list is empty
         if len(getdirs) == 0:
-
-            print ("   - Nothing to delete in %s for %s %s %s" 
-                    % (args.inpdir, sensor, platform, datestr))
-
+            print "   - Nothing to delete in {0} " \
+                  "for {1} {2} {3}".format(args_l3.inpdir,
+                                           sensor, platform, datestr)
         else:
-
             # sort list
             getdirs.sort()
 
@@ -296,172 +283,159 @@ def clear_l3(args):
             lastdir = getdirs.pop()
 
             # get ID number from the last job
-            id = get_id( lastdir )
+            id_num = get_id(lastdir)
 
             # remove all subdirs matching the id number
-            for dir in getdirs:
-                if id in dir:
-                    delete_dir( dir )
+            for gdir in getdirs:
+                if id_num in gdir:
+                    delete_dir(gdir)
 
             # pattern
-            pattern = datestr+'*'+sensor+'_ORAC*'+platform+'*'+id
+            pattern = datestr + '*' + sensor + '_ORAC*' + \
+                      platform + '*' + id_num
 
             # remove all dirs matching pattern
-            print ('''   - Delete: \'%s\' '''
-                   '''because L2toL3 was successful!''' % pattern )
+            print "   - Delete: '{0}' because " \
+                  "L2toL3 was successful!".format(pattern)
 
     else:
+        print "   - Nothing to delete in {0} " \
+              "for {1} {2} {3}".format(args_l3.inpdir,
+                                       sensor, platform, datestr)
 
-        print ("   - Nothing to delete in %s for %s %s %s" 
-                % (args.inpdir, sensor, platform, datestr))
 
-# -------------------------------------------------------------------
-def clear_aux(args):
-    '''
+def clear_aux(args_aux):
+    """
     Remove auxiliary data if complete month was successful.
-    '''
+    """
 
-    ipath = os.path.join( args.inpdir, args.auxdata )
+    ipath = os.path.join(args_aux.inpdir, args_aux.auxdata)
 
-    if os.path.isdir ( ipath ) == False:
-        print ("\n ! The argument for --auxdata should be equal "\
-               "to the name of the subfolder you want to clean up.\n")
+    if not os.path.isdir(ipath):
+        print "\n ! The argument for --auxdata should be equal " \
+              "to the name of the subfolder you want to clean up.\n"
         sys.exit(0)
-
 
     # find corr. config file and delete it
     cfgdict = get_config_file_dict()
     strlist = list()
 
-    if args.auxdata.lower().startswith("aux"):
+    if args_aux.auxdata.lower().startswith("aux"):
         auxkey = "aux"
-    elif args.auxdata.lower().startswith("era"):
+    elif args_aux.auxdata.lower().startswith("era"):
         auxkey = "era"
 
     for key in cfgdict:
+        # noinspection PyUnboundLocalVariable
         if "1" in key and auxkey in key:
             strlist.append(key)
             for key2 in cfgdict[key]:
                 strlist.append(cfgdict[key][key2])
 
     if len(strlist) != 4:
-        print (" * No information for cfg filename found in dictionary!")
-        print ("   -> Thus, config file cannot be deleted!")
+        print " * No information for cfg filename found in dictionary!"
+        print "   -> Thus, config file cannot be deleted!"
 
-    fname = strlist[1]+strlist[0]+'_'+\
-            str(args.year)+'_'+str('%02d' % args.month)+strlist[2]
+    fname = strlist[1] + strlist[0] + '_' + \
+            str(args_aux.year) + '_' + \
+            str('%02d' % args_aux.month) + strlist[2]
 
-    splitpath = os.path.split( args.inpdir )
-    cfgfile   = os.path.join( splitpath[0], strlist[3], fname )
+    splitpath = os.path.split(args_aux.inpdir)
+    cfgfile = os.path.join(splitpath[0], strlist[3], fname)
 
-    if os.path.isfile( cfgfile ) == True:
-        print ("   - Delete: \'%s\' " % cfgfile)
-        delete_file( cfgfile )
+    if os.path.isfile(cfgfile):
+        print "   - Delete: \'{0}\' ".format(cfgfile)
+        delete_file(cfgfile)
     else:
-        print ("   - Nothing to delete: \'%s\' does not exist!" 
-                % cfgfile ) 
+        print "   - Nothing to delete: \'{0}\' " \
+              "does not exist!".format(cfgfile)
 
-
-    ilist = os.listdir( ipath )
+    ilist = os.listdir(ipath)
 
     for i in ilist:
 
-        if i.isdigit() == False: 
+        if not i.isdigit():
             # aux
-            ispath = os.path.join( ipath, i, str(args.year), 
-                    str('%02d' % args.month) )
+            ispath = os.path.join(ipath, i, str(args_aux.year),
+                                  str('%02d' % args_aux.month))
         else:
             # ERAinterim
-            ispath = os.path.join( ipath, str(args.year), 
-                    str('%02d' % args.month) )
+            ispath = os.path.join(ipath, str(args_aux.year),
+                                  str('%02d' % args_aux.month))
 
-        if os.path.isdir( ispath ) == True:
+        if os.path.isdir(ispath):
 
-            print ("   - Delete: \'%s\' since month was successful!" 
-                    % ispath)
-            delete_dir( ispath )
+            print "   - Delete: \'{0}\' since month " \
+                  "was successful!".format(ispath)
+            delete_dir(ispath)
 
         else:
 
-            print ("   - Nothing to delete: \'%s\' does not exist!" 
-                    % ispath) 
-
-# -------------------------------------------------------------------
+            print "   - Nothing to delete: \'{0}\' " \
+                  "does not exist!".format(ispath)
 
 
-# -------------------------------------------------------------------
-# --- main ---
-# -------------------------------------------------------------------
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description=u''' {0:s} removes directories/files/etc.
+        for given data and date.'''.format(os.path.basename(__file__)))
 
-    parser = argparse.ArgumentParser(description='''
-            %s removes directories/files/etc. for given data 
-            and date.''' % os.path.basename(__file__))
-    
     # add main arguments
     parser.add_argument('--inpdir', type=str, required=True,
-            help="String: /path/where/to/search")
+                        help="String: /path/where/to/search")
+
     parser.add_argument('--year', type=int, required=True,
-            help="Integer: yyyy, e.g. 2008")
+                        help="Integer: yyyy, e.g. 2008")
+
     parser.add_argument('--month', type=int, required=True,
-            help="Integer: mm, e.g. 1")
+                        help="Integer: mm, e.g. 1")
 
     # define subcommands
     subparsers = parser.add_subparsers(help="Select a Subcommand")
 
     # -> remove l1 satellite data if retrieval was successful
     clear_l1_parser = subparsers.add_parser('clear_l1',
-            description='''Remove L1 input data if retrieval 
-            was successful''')
-    clear_l1_parser.add_argument('--satellite', 
-            type=str, help="String, e.g. noaa18, TERRA, MYD", 
-            required=True)
-    clear_l1_parser.add_argument('--instrument', 
-            type=str, help="String, e.g. AVHRR, MODIS", 
-            required=True)
+                                            description="Remove L1 input data if "
+                                                        "retrieval was successful")
+    clear_l1_parser.add_argument('--satellite', type=str, required=True,
+                                 help="String, e.g. noaa18, TERRA, MYD")
+    clear_l1_parser.add_argument('--instrument', type=str, required=True,
+                                 help="String, e.g. AVHRR, MODIS")
     clear_l1_parser.set_defaults(func=clear_l1)
 
     # -> remove retrieval subfolders
     clear_l2_parser = subparsers.add_parser('clear_l2',
-            description='''Clean up if retrieval.ecf failed 
-            or was successful.''')
-    clear_l2_parser.add_argument('--satellite', 
-            type=str, help="String, e.g. noaa18, TERRA, MYD", 
-            required=True)
-    clear_l2_parser.add_argument('--instrument', 
-            type=str, help="String, e.g. AVHRR, MODIS", 
-            required=True)
+                                            description="Clean up if retrieval.ecf "
+                                                        "failed or was successful.")
+    clear_l2_parser.add_argument('--satellite', type=str, required=True,
+                                 help="String, e.g. noaa18, TERRA, MYD")
+    clear_l2_parser.add_argument('--instrument', type=str, required=True,
+                                 help="String, e.g. AVHRR, MODIS")
     clear_l2_parser.set_defaults(func=clear_l2)
 
     # -> remove l2tol3 subfolders
     clear_l3_parser = subparsers.add_parser('clear_l3',
-            description='''Clean up if l2tol3 failed 
-            or was successful.''')
-    clear_l3_parser.add_argument('--satellite', 
-            type=str, help="String, e.g. noaa18, TERRA, MYD", 
-            required=True)
-    clear_l3_parser.add_argument('--instrument', 
-            type=str, help="String, e.g. AVHRR, MODIS", 
-            required=True)
+                                            description="Clean up if l2tol3 "
+                                                        "failed or was successful.")
+    clear_l3_parser.add_argument('--satellite', type=str, required=True,
+                                 help="String, e.g. noaa18, TERRA, MYD")
+    clear_l3_parser.add_argument('--instrument', type=str, required=True,
+                                 help="String, e.g. AVHRR, MODIS")
     clear_l3_parser.set_defaults(func=clear_l3)
 
     # -> remove auxiliary dataset if month was successful
     clear_aux_parser = subparsers.add_parser('clear_aux',
-            description='''Remove auxiliary data if month 
-            was successfully processed''')
-    clear_aux_parser.add_argument('--auxdata', 
-            type=str, help="String: e.g. \'aux\', \'ERAinterim\'", 
-            required=True)
+                                             description="Remove auxiliary data if "
+                                                         "month was successfully processed")
+    clear_aux_parser.add_argument('--auxdata', type=str, required=True,
+                                  help="String: e.g. \'aux\', \'ERAinterim\'")
     clear_aux_parser.set_defaults(func=clear_aux)
 
     # Parse arguments
     args = parser.parse_args()
 
-    print ("\n *** %s start for %s" % (sys.argv[0], args))
-
     # Call function associated with the selected subcommand
+    print "\n *** {0} start for {1}".format(sys.argv[0], args)
     args.func(args)
 
-    print (" *** %s succesfully finished \n" % sys.argv[0])
-
-# -------------------------------------------------------------------
+    print " *** {0} succesfully finished \n".format(sys.argv[0])

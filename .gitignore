@@ -1,0 +1,6 @@
+*idea
+*.pyc
+*.log
+*.txt
+*.sqlite3
+config_suite.py
