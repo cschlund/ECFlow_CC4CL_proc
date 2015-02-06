@@ -606,9 +606,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
             fam_year = add_fam(fam_proc, yearstr)
             fam_year.add_variable("START_YEAR", yearstr)
             fam_year.add_variable("END_YEAR", yearstr)
-        except Exception as e:
-            print e.__doc__
-            print e.message
+        except RuntimeError:
             pass
 
         # add fam. month
