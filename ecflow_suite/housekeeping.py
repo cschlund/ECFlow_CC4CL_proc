@@ -14,12 +14,17 @@ from pycmsaf.ssh_client import SSHClient
 
 
 def str2upper(string_object):
+    """
+    Converts given string into upper case.
+    :rtype : string
+    """
     return string_object.upper()
 
 
 def enddate_of_month(year, month):
     """
     Returns date of end of month.
+    :rtype: datetime object
     """
     last_days = [31, 30, 29, 28, 27]
     for i in last_days:
@@ -36,6 +41,7 @@ def enddate_of_month(year, month):
 def get_modis_avail(sat, sd, ed):
     """
     Returns True or False for MODIS availability.
+    :rtype: bool
     """
     global msd, med
     modis_dict = get_modis_dict()
@@ -63,6 +69,7 @@ def get_modis_avail(sat, sd, ed):
 def get_modis_list(user_sd, user_ed):
     """
     Returns a list of modis satellites if available.
+    :rtype : List
     """
     modis_list = list()
 
@@ -91,6 +98,7 @@ def get_modis_list(user_sd, user_ed):
 def get_avhrr_list():
     """
     Returns a list of avhrr satellites.
+    :rtype: list
     """
     avhrr_list = ['NOAA7', 'NOAA9', 'NOAA11', 'NOAA12',
                   'NOAA14', 'NOAA15', 'NOAA16', 'NOAA17',
@@ -104,6 +112,7 @@ def get_avhrr_prime_dict():
     ec_time    = equator crossing time
     start_date = Start of operational date.
     end_date   = End of operational date or new sat. in orbit.
+    :rtype: dictionary
     """
     avhrr_dict = dict()
     avhrr_list = get_avhrr_list()
@@ -171,6 +180,7 @@ def get_avhrr_prime_dict():
 def get_modis_dict():
     """
     MODIS dictionary containing start and end dates of archive.
+    :rtype: dictionary
     """
     modis_dict = dict()
 
@@ -190,6 +200,7 @@ def get_modis_dict():
 def get_sensor(satellite):
     """
     Return sensor for given satellite.
+    :rtype: string
     """
 
     global sensor
@@ -208,6 +219,7 @@ def get_sensor(satellite):
 def set_vars(suite, procday, dummycase, testcase):
     """
     Set suite level variables
+    :rtype: None
     """
     # suite.add_variable('TURTLES', 'I like turtles')
     suite.add_variable("ECF_MICRO", "%")
@@ -285,17 +297,29 @@ def add_fam(node, fam):
 
 
 def add_task(family, taskname):
+    """
+    Adds the given task to the given family.
+    """
     task = family.add_task(taskname)
     return task
 
 
 def add_cleanup_aux_task(family, prefamily):
+    """
+    Adds task for cleanup aux data on.
+    :rtype : dictionary
+    """
     cleanup_aux_data = add_task(family, 'cleanup_aux_data')
     add_trigger(cleanup_aux_data, prefamily)
-    return dict(cleanup_aux_data=cleanup_aux_data)
+
+    return {'cleanup_aux_data': cleanup_aux_data}
 
 
 def add_aux_tasks(family):
+    """
+    Adds aux specific tasks to the given family.
+    :rtype : dictionary
+    """
     wrt_aux_cfgs = add_task(family, 'write_aux_cfg_files')
     get_aux_data = add_task(family, 'get_aux_data')
     get_mars_data = add_task(family, 'get_mars_data')
@@ -303,12 +327,16 @@ def add_aux_tasks(family):
     add_trigger(get_aux_data, wrt_aux_cfgs)
     add_trigger(get_mars_data, wrt_aux_cfgs)
 
-    return dict(wrt_aux_cfgs=wrt_aux_cfgs,
-                get_aux_data=get_aux_data,
-                get_mars_data=get_mars_data)
+    return {'wrt_aux_cfgs': wrt_aux_cfgs,
+            'get_aux_data': get_aux_data,
+            'get_mars_data': get_mars_data}
 
 
-def add_tasks(family, prefamily):
+def add_main_proc_tasks(family, prefamily):
+    """
+    Adds main processing specific tasks to the given family.
+    :rtype : dictionary
+    """
     wrt_main_cfgs = add_task(family, 'write_main_cfg_files')
     get_sat_data = add_task(family, 'get_sat_data')
     set_cpu_number = add_task(family, 'set_cpu_number')
@@ -332,19 +360,23 @@ def add_tasks(family, prefamily):
     add_trigger(cleanup_l2_data, archive_data_into_ecfs)
     add_trigger(cleanup_l3_data, archive_data_into_ecfs)
 
-    return dict(wrt_main_cfgs=wrt_main_cfgs,
-                get_sat_data=get_sat_data,
-                set_cpu_number=set_cpu_number,
-                retrieval=retrieval,
-                cleanup_l1_data=cleanup_l1_data,
-                make_l3u_data=make_l3u_data,
-                make_l3c_data=make_l3c_data,
-                archive_data=archive_data_into_ecfs,
-                cleanup_l2_data=cleanup_l2_data,
-                cleanup_l3_data=cleanup_l3_data)
+    return {'wrt_main_cfgs': wrt_main_cfgs,
+            'get_sat_data': get_sat_data,
+            'set_cpu_number': set_cpu_number,
+            'retrieval': retrieval,
+            'cleanup_l1_data': cleanup_l1_data,
+            'make_l3u_data': make_l3u_data,
+            'make_l3c_data': make_l3c_data,
+            'archive_data': archive_data_into_ecfs,
+            'cleanup_l2_data': cleanup_l2_data,
+            'cleanup_l3_data': cleanup_l3_data}
 
 
 def add_trigger_expr(node, trigger1, trigger2):
+    """
+    Make a given node wait for both trigger nodes to complete.
+    :rtype : None
+    """
     big_expr = ecflow.Expression(ecflow.PartExpression(
         '{0} == complete and {1} == complete'.format(
             trigger1.get_abs_node_path(),
@@ -396,6 +428,83 @@ def familytree(node, tree=None):
     return tree
 
 
+def verify_avhrr_primes(sat_list, act_date):
+    """
+    Selects only prime AVHRRs from given satellite list for given date.
+    :rtype : list
+    """
+    plist = list()
+    pdict = get_avhrr_prime_dict()
+
+    for s in sat_list:
+        if s == "AQUA" or s == "TERRA":
+            plist.append(s)
+            continue
+        if pdict[s]["start_date"] <= act_date <= pdict[s]["end_date"]:
+            plist.append(s)
+
+    return plist
+
+
+def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
+                              ignoresats_list, modisonly):
+    """
+    Provides a list of available satellites based on the
+    user specification and on databases.
+    :rtype : list
+    """
+    # ignored satellites
+    default_ignore_sats = ['TIROSN', 'NOAA6', 'NOAA8', 'NOAA10']
+    if ignoresats_list:
+        add_ignore_sats = ignoresats_list
+        ignore_list = default_ignore_sats + add_ignore_sats
+    else:
+        ignore_list = default_ignore_sats
+
+    # Create list of available satellites
+    if satellites_list:
+        all_list = satellites_list
+        # noinspection PyUnusedLocal
+        avh_list = all_list
+        mod_list = ["AQUA", "TERRA"]
+
+        # avhrr database sat list
+        db_sat_list = dbfile.get_sats(start_date=sdate, end_date=edate,
+                                      nore_sats=ignore_list)
+
+        # terra/aqua at the end of list, if data avail.
+        for item in mod_list:
+            if item in all_list:
+                check = get_modis_avail(item, sdate, edate)
+                if check:
+                    db_sat_list.append(item)
+
+        # get final sat_list: match between verified and user list
+        sat_list = list(set(all_list).intersection(db_sat_list))
+
+    # modis only
+    elif modisonly is True:
+        sat_list = get_modis_list(sdate, edate)
+
+    # take all except ignore_sats
+    else:
+        # avhrr
+        sat_list = dbfile.get_sats(start_date=sdate, end_date=edate,
+                                   ignore_sats=ignore_list)
+        # modis
+        mod_list = get_modis_list(sdate, edate)
+        sat_list += mod_list
+
+        # check ignoresats
+        for ml in mod_list:
+            if ml in ignore_list:
+                if ml in sat_list:
+                    idx = sat_list.index(ml)
+                    del sat_list[idx]
+
+    return sat_list
+
+
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 useprimes, modisonly, procday, dummycase, testcase):
     """
@@ -436,123 +545,50 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # connect to database and get_sats list
     db = AvhrrGacDatabase(dbfile=gacdb_file)
 
-    # ignored satellites
-    default_ignore_sats = ['TIROSN', 'NOAA6', 'NOAA8', 'NOAA10']
+    # verify user input and database content
+    sat_list = verify_satellite_settings(db, sdate, edate,
+                                         satellites_list,
+                                         ignoresats_list,
+                                         modisonly)
 
-    if ignoresats_list:
-        add_ignore_sats = ignoresats_list
-
-        ignore_list = default_ignore_sats + add_ignore_sats
-    else:
-        ignore_list = default_ignore_sats
-
-    # ----------------------------------------------------
-    # Create list of available satellites
-    # ----------------------------------------------------
-    if satellites_list:
-        all_list = satellites_list
-        # noinspection PyUnusedLocal
-        avh_list = all_list
-        mod_list = ["AQUA", "TERRA"]
-
-        # avhrr database sat list
-        db_sat_list = db.get_sats(start_date=sdate,
-                                  end_date=edate, ignore_sats=ignore_list)
-
-        # terra/aqua at the end of list, if data avail.
-        for item in mod_list:
-            if item in all_list:
-                check = get_modis_avail(item, sdate, edate)
-                if check:
-                    db_sat_list.append(item)
-
-        # get final sat_list: match between verified and user list
-        sat_list = list(set(all_list).intersection(db_sat_list))
-
-    # ----------------------------------------------------
-    # modis only
-    # ----------------------------------------------------
-    elif modisonly is True:
-
-        sat_list = get_modis_list(sdate, edate)
-
-    # ----------------------------------------------------
-    # take all except ignore_sats
-    # ----------------------------------------------------
-    else:
-        # avhrr
-        sat_list = db.get_sats(start_date=sdate,
-                               end_date=edate, ignore_sats=ignore_list)
-        # modis
-        mod_list = get_modis_list(sdate, edate)
-        sat_list += mod_list
-
-        # check ignoresats
-        for ml in mod_list:
-            if ml in ignore_list:
-                if ml in sat_list:
-                    idx = sat_list.index(ml)
-                    del sat_list[idx]
-
-    # ----------------------------------------------------
-    # Security Check:
-    # ----------------------------------------------------
+    # Are there any data for processing?
     if len(sat_list) == 0:
-        print ("\n *** There are no data for %s - %s \n" %
-               (sdate, edate))
+        print ("\n *** There are no data for "
+               "{0} - {1} \n".format(sdate, edate))
         db.close()
         sys.exit(0)
 
-    # ===============================
+    # ================================
     # DEFINE DYNAMIC FAMILIES & TASKS
-    # ===============================
+    # ================================
 
     # month counter
     month_cnt = 0
 
+    # ----------------------------------------------------
     # loop over months for given date range
+    # ----------------------------------------------------
     for mm in rrule(MONTHLY, dtstart=sdate, until=edate):
 
         yearstr = mm.strftime("%Y")
         monthstr = mm.strftime("%m")
+        act_date = datetime.date(int(yearstr),
+                                 int(monthstr), 1)
 
-        act_date = datetime.date(int(yearstr), int(monthstr), 1)
-
-        # ----------------------------------------------------
         # check for avhrr primes
-        # ----------------------------------------------------
         if useprimes:
+            sat_list = verify_avhrr_primes(sat_list,
+                                           act_date)
 
-            plist = list()
-            pdict = get_avhrr_prime_dict()
-
-            for s in sat_list:
-
-                if s == "AQUA" or s == "TERRA":
-                    plist.append(s)
-                    continue
-
-                if pdict[s]["start_date"] <= act_date <= pdict[s]["end_date"]:
-                    plist.append(s)
-
-            # update sat_list: non-primes removed
-            sat_list = plist
-
-        # ----------------------------------------------------
-        # check if AVHRR or/and MODIS are avail.
-        # ----------------------------------------------------
+        # check if any AVHRR or/and MODIS are avail.
         modis_flag = False
         avhrr_flag = False
-
         for s in sat_list:
-
             isensor = get_sensor(s)
 
             if isensor == "AVHRR" and avhrr_flag is False:
-
                 days = db.get_days(sat=s, year=int(yearstr),
                                    month=int(monthstr))
-
                 if len(days) > 0:
                     avhrr_flag = True
 
@@ -565,25 +601,22 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         if avhrr_flag is False and modis_flag is False:
             continue
 
-        # ----------------------------------------------------
-        # There is data
-        # ----------------------------------------------------
-
-        # noinspection PyBroadException
+        # there is data: add fam. year if not already existing
         try:
             fam_year = add_fam(fam_proc, yearstr)
             fam_year.add_variable("START_YEAR", yearstr)
             fam_year.add_variable("END_YEAR", yearstr)
-        except:
+        except Exception as e:
+            print e.__doc__
+            print e.message
             pass
 
+        # add fam. month
         fam_month = add_fam(fam_year, monthstr)
         fam_month.add_variable("START_MONTH", monthstr)
         fam_month.add_variable("END_MONTH", monthstr)
 
-        # ----------------------------------------------------
         # add get aux/era family
-        # ----------------------------------------------------
         fam_aux = add_fam(fam_month, "GET_AUX_DATA")
         add_aux_tasks(fam_aux)
 
@@ -591,41 +624,35 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         if month_cnt > 0:
             add_trigger(fam_aux, fam_month_previous)
 
-        # ----------------------------------------------------
-        # add family for satellite processing in general
-        # ----------------------------------------------------
+        # add fam. main processing
         fam_main = add_fam(fam_month, "MAIN_PROC")
 
-        # check if any ahvrr is available
+        # if avhrr data available for current month
         if avhrr_flag:
             fam_avhrr = add_fam(fam_main, "AVHRR")
             fam_avhrr.add_variable("SENSOR", "AVHRR")
 
-        # check if any modis is available
+        # if modis data available for current month
         if modis_flag:
             fam_modis = add_fam(fam_main, "MODIS")
             fam_modis.add_variable("SENSOR", "MODIS")
 
-        # process avail. satellites
+        # process avail. satellites for current month
         for counter, satellite in enumerate(sat_list):
-
             isensor = get_sensor(satellite)
 
             if isensor == "AVHRR":
-
                 days = db.get_days(sat=satellite,
                                    year=int(yearstr),
                                    month=int(monthstr))
-
                 if len(days) == 0:
                     continue
 
                 fam_sat = add_fam(fam_avhrr, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
-                add_tasks(fam_sat, fam_aux)
+                add_main_proc_tasks(fam_sat, fam_aux)
 
             else:
-
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
                 medate = enddate_of_month(int(yearstr), int(monthstr))
                 mcheck = get_modis_avail(satellite, msdate, medate)
@@ -637,21 +664,23 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 fam_sat.add_variable("SATELLITE", satellite)
 
                 if avhrr_flag:
-                    add_tasks(fam_sat, fam_avhrr)
+                    add_main_proc_tasks(fam_sat, fam_avhrr)
                     fam_avhrr = fam_sat
                 else:
-                    add_tasks(fam_sat, fam_aux)
+                    add_main_proc_tasks(fam_sat, fam_aux)
                     fam_aux = fam_sat
 
-        # ----------------------------------------------------
         # add cleanup aux/era family
-        # ----------------------------------------------------
         fam_cleanup_aux = add_fam(fam_month, "CLEANUP_AUX_DATA")
         add_cleanup_aux_task(fam_cleanup_aux, fam_main)
 
         # remember fam_month
         fam_month_previous = fam_month
         month_cnt += 1
+
+    # ----------------------------------------------------
+    # end of loop over months
+    # ----------------------------------------------------
 
     # close connection to database
     db.close()
