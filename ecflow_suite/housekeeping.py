@@ -470,7 +470,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
 
         # avhrr database sat list
         db_sat_list = dbfile.get_sats(start_date=sdate, end_date=edate,
-                                      nore_sats=ignore_list)
+                                      ignore_sats=ignore_list)
 
         # terra/aqua at the end of list, if data avail.
         for item in mod_list:
