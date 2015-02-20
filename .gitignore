@@ -11,4 +11,4 @@ ecflow_suite/include/pbs_serial_cleanup.h
 ecflow_suite/include/pbs_serial_l2tol3.h
 ecflow_suite/include/pbs_serial_mars.h
 ecflow_suite/*.def
-
+esa_routines/config_paths.file
