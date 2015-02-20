@@ -14,11 +14,11 @@ remote_user_name = "sf7"
 basepath = "ms/de/sf7/cschlund"
 
 # subfolder, where your repository is located
-# e.g. /perm/ms/de/sf7/cschlund/test/ECFlow_CC4CL_proc
-itype = "test"
+# e.g. /perm/ms/de/sf7/cschlund/cloud_cci_master/ECFlow_CC4CL_proc
+itype = "cloud_cci_master"
 
 # suite name
-mysuite = itype + "_cc4cl_proc"
+mysuite = itype + "_proc"
 
 # ECFS path: final level3, level2 data
 ecfs_l3_dir = "ec:/sf7/ESA_Cloud_cci_data/L3"

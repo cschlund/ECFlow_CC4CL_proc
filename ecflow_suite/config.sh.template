@@ -5,7 +5,7 @@ CWD=`pwd`
 # -- modify here --------------------------------------------
 
 # subfolder name, where you clone your repository
-TYPE="test"
+TYPE="cloud_cci_master"
 
 # Base path (local & remote), user specific
 BASE="ms/de/sf7/cschlund"
@@ -17,7 +17,7 @@ export ECF_NODE=ecgb11
 export ECF_PORT=35816
 
 # Name of the ecflow suite
-export SUITE=${TYPE}_cc4cl_proc
+export SUITE=${TYPE}_proc
 
 # Name of the host finally executing the MPMD tasks
 export REMOTE_HOST=cca
