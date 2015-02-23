@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 
+import os
 import sys
 import argparse
 import datetime
@@ -7,7 +8,30 @@ import datetime
 from pycmsaf.argparser import str2date
 from config_suite import mysuite
 from housekeeping import build_suite, str2upper
+from pycmsaf.logger import setup_root_logger
 
+logger = setup_root_logger(name='root')
+
+
+def help():
+
+    min_opt = "{0} --start_date <yyyymmdd> --end_date <yyyymmdd>".\
+            format(os.path.basename(__file__))
+
+    print "\n"
+    logger.info(" *** Usage ***")
+    logger.info("     ./{0}".format(min_opt))
+    logger.info("     (a)   --dummy_case")
+    logger.info("     (b)   --test_run")
+    logger.info("     (c)   --satellites noaa18 terra metopa")
+    logger.info("     (d)   --ignore_sats noaa18 terra metopa")
+    logger.info("     (e)   --use_avhrr_primes [--ignore_sats terra aqua]")
+    logger.info("     (f)   --use_modis_only")
+    logger.info(" *** TRY for more information")
+    logger.info("     ./{0} --help".format(os.path.basename(__file__)))
+    print "\n"
+    sys.exit(0)
+    
 
 if __name__ == '__main__':
 
@@ -46,36 +70,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # -- dummy or test run
+    if args.dummy_run and args.test_run:
+        logger.info("Either choose --dummy_run or --test_run!")
+        help()
+
     if args.dummy_run:
         dummycase = 1
         dummymess = "Only randomsleep commands will be executed."
     else:
         dummycase = 0
         dummymess = "Real processing will be executed."
-
-    if args.proc_day != -1:
-        diff = args.end_date.month - args.start_date.month
-        if diff > 1:
-            print ("\n *** If you want to process a single day, "
-                   "then you can choose only 1 specific month!\n")
-            sys.exit(0)
-        else:
-            proc_year = args.start_date.year
-            proc_month = args.start_date.month
-            pday = datetime.date(proc_year, proc_month, args.proc_day)
-            proc_day_message = "Only {0} will be processed".format(pday)
-    else:
-        proc_day_message = "Whole month will be processed"
-
-    # help message
-    min_opt = " --start_date <yyyymmdd> --end_date <yyyymmdd> "
-    options = ("\n"
-               " *** Usage information:\n"
-               "     {s} [--test_run] [--dummy_case]\n"
-               "     {s} --satellites noaa18 terra metopa\n"
-               "     {s} --ignore_sats noaa18 terra metopa\n"
-               "     {s} --use_avhrr_primes [--ignore_sats terra aqua]\n"
-               "     {s} --use_modis_only \n").format(s=min_opt)
 
     if args.test_run:
         testcase = 1
@@ -84,34 +89,55 @@ if __name__ == '__main__':
         testcase = 0
         message = "Note: Full orbits are being processed."
 
-    if args.satellites and args.ignore_sats:
-        print ("\n *** Options --satellites AND --ignore_sats not combinable! ")
-        print options
-        sys.exit(0)
+    # -- either one specific day or whole month
+    if args.proc_day != -1:
+        
+        diff = args.end_date.month - args.start_date.month
 
+        if diff > 1:
+            logger.info("""If you want to process a single day, then you can
+            choose only 1 specific month!""")
+            sys.exit(0)
+        else:
+            proc_year = args.start_date.year
+            proc_month = args.start_date.month
+            pday = datetime.date(proc_year, proc_month, args.proc_day)
+            proc_day_message = "Only {0} will be processed".format(pday)
+
+    else:
+        proc_day_message = "Whole month will be processed"
+    
+    # -- either choose or ignore satellites
+    if args.satellites and args.ignore_sats:
+        logger.info("Options --satellites AND --ignore_sats not combinable!")
+        help()
+
+    # -- modis only option not combinable
     if args.use_modis_only:
         if args.satellites or args.ignore_sats or args.use_avhrr_primes:
-            print ("\n *** Option USE MODIS ONLY not combinable!")
-            print options
-            sys.exit(0)
+            logger.info("Option USE MODIS ONLY not combinable!")
+            help()
 
-    print u"\n"
-    print u" * Script {0} started ".format(sys.argv[0])
-    print u" * start date  : {0}".format(args.start_date)
-    print u" * end date    : {0}".format(args.end_date)
+    # -- some screen output
+    logger.info("SCRIPT \'{0}\' started\n".format(os.path.basename(__file__)))
+    logger.info("START DATE  : {0}".format(args.start_date))
+    logger.info("END DATE    : {0}".format(args.end_date))
     if args.satellites:
-        print u" * satellites  : {0}".format(args.satellites)
+        logger.info("SATELLITES  : {0} will be processed".format(args.satellites))
     else:
-        print u" * satellites  : take all (archive based)"
-    print u" * avhrr primes: {0}".format(args.use_avhrr_primes)
-    print u" * modis only  : {0}".format(args.use_modis_only)
-    print u" * ignore sats : {0}".format(args.ignore_sats)
-    print u" * proc. status: {0}".format(proc_day_message)
-    print u" * dummycase   : {0} ({1})".format(dummycase, dummymess)
-    print u" * testcase    : {0} ({1})".format(testcase, message)
-    print u"\n"
+        logger.info("SATELLITES  : take all (archive based)")
+    logger.info("AVHRR PRIMES: {0}".format(args.use_avhrr_primes))
+    logger.info("MODIS ONLY  : {0}".format(args.use_modis_only))
+    logger.info("IGNORE SATS : {0}".format(args.ignore_sats))
+    logger.info("PROC STATUS : {0}".format(proc_day_message))
+    if args.dummy_run: 
+        logger.info("DUMMY RUN   : {0} ({1})\n".format(dummycase, dummymess))
+    else: 
+        logger.info("TESTCASE RUN: {0} ({1})\n".format(testcase, message))
 
     build_suite(args.start_date, args.end_date,
                 args.satellites, args.ignore_sats,
                 args.use_avhrr_primes, args.use_modis_only,
                 args.proc_day, dummycase, testcase)
+
+    logger.info("SCRIPT \'{0}\' finished\n".format(os.path.basename(__file__)))

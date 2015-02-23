@@ -1,17 +1,15 @@
 #!/usr/bin/env python2.7
-from pycmsaf.logger import setup_root_logger
-
-logger = setup_root_logger(name='root')
 
 import sys
-# noinspection PyUnresolvedReferences
 import ecflow
 import datetime
+import logging
 from config_suite import *
 from dateutil.rrule import rrule, MONTHLY
 from pycmsaf.avhrr_gac.database import AvhrrGacDatabase
 from pycmsaf.ssh_client import SSHClient
 
+logger = logging.getLogger('root')
 
 def str2upper(string_object):
     """
@@ -210,7 +208,7 @@ def get_sensor(satellite):
             satellite.startswith("METOP"):
         sensor = "AVHRR"
     else:
-        print " ! I do not know this satellite!\n"
+        logger.info(" *** I do not know this satellite ***")
         exit(0)
 
     return sensor
@@ -453,6 +451,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
     user specification and on databases.
     :rtype : list
     """
+
     # ignored satellites
     default_ignore_sats = ['TIROSN', 'NOAA6', 'NOAA8', 'NOAA10']
     if ignoresats_list:
@@ -546,6 +545,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     db = AvhrrGacDatabase(dbfile=gacdb_file)
 
     # verify user input and database content
+    logger.info('Verify satellite settings')
     sat_list = verify_satellite_settings(db, sdate, edate,
                                          satellites_list,
                                          ignoresats_list,
@@ -553,8 +553,10 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
     # Are there any data for processing?
     if len(sat_list) == 0:
-        print ("\n *** There are no data for "
-               "{0} - {1} \n".format(sdate, edate))
+        logger.info("--------------------------------------------------------")
+        logger.info("*** There are no data for {0} - {1}".format(sdate, edate))
+        logger.info("Please check parameters you have passed!")
+        logger.info("--------------------------------------------------------")
         db.close()
         sys.exit(0)
 
@@ -688,19 +690,19 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # ============================
 
     # Check job creation
-    print defs.check_job_creation()
+    logger.info("Defs Check Job Creation: {0}".
+            format(defs.check_job_creation()))
 
     # Save suite to file
     suite_def_file = mysuite + '.def'
-    logger.info("Saving suite definition "
-                "to file: {0}".format(suite_def_file))
+    logger.info('Saving suite definition to file: {0}'.format(suite_def_file))
     defs.save_as_defs(suite_def_file)
 
     # ======================
     # CREATE LOG DIRECTORIES
     # ======================
-    logger.info('Creating log directories on both the local and '
-                'the remote machine.')
+    logger.info('Creating log directories on both the '
+            'local and the remote machine.\n')
 
     # Create a tree of all families in the suite 
     # (i.e. families, subfamilies, subsubfamilies etc)
