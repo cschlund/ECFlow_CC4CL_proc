@@ -12,6 +12,7 @@
 #           modified original version for AVHRR to use it for MODIS.
 #       2014-04-08 MJ migration to cca/sf7
 #       2014-04-11 MJ introduces some more statements in case of errors.
+#       2015-02-24 C. Schlundt: check data availability before ecp call
 #
 
 
@@ -156,38 +157,69 @@ unix_counter=$unix_start
 
 while [ $unix_counter -le $unix_stop ]; do 
 
+    # availability flag
+    aflag=-1
+
     YEAR=`perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');'` 
     MONS=`perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');'` 
     DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'` 
 
     DATADIR=${INPUTDIR}/MODIS/${platform}/${YEAR}/${MONS}/${DAYS} 
-    echo "CREATE AND WRITE DATA TO TARGETDIR:" $DATADIR 
-    mkdir -p $DATADIR
 
-    # get doy from current date
-    DOY=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS}`
-    echo ${YEAR} ${MONS} ${DAYS} "IS DOY " $DOY "OF " ${YEAR}
+    # check if data already on scratch
+    if [ -d $DATADIR ]; then 
+        echo "YES: $DATADIR exists"
 
-    # Build now path to MODIS files of that given doy
-    SOURCEL1B=${modis_top}/${platform}/${YEAR}${MONS}/${splat}021km_${YEAR}_${MONS}_${DAYS}.tar
-    SOURCEGEO=${modis_top}/${platform}/${YEAR}${MONS}/${splat}03_${YEAR}_${MONS}_${DAYS}.tar
+        nfiles1=$(ls -A $DATADIR/${splat}021KM.* |wc -l)
+        nfiles2=$(ls -A $DATADIR/${splat}03.* |wc -l)
 
-    # Get those files from ECFS
-    get_modis ${SOURCEL1B} ${DATADIR} ${cflag} ${rflag} ${rcut}
-    retcl1b=${?}
-    get_modis ${SOURCEGEO} ${DATADIR} ${cflag} ${rflag} ${rcut}
-    retcgeo=${?}
+        echo "Number of files: $nfiles1 (${splat}021KM) = $nfiles2 (${splat}03)"
 
-    retc=1
-
-    if [ "${retcl1b}" -eq 0 ] && [ "${retcgeo}" -eq 0 ]; then 
-        retc=0
-        echo "SUCCESS: All files  retrieved for " ${splat} "on " ${YEAR}${MONS}${DAYS} "."
-    else
-        echo "ERROR: GET_MODIS FAILED: Not all files were retrieved for " ${splat} "on " ${YEAR}${MONS}{DAYS} "." ${retcl1b} ${retcgeo}
+        if [ $nfiles1 -gt 0 ] && [ $nfiles2 -gt 0 ]; then 
+            if [ $nfiles1 -eq $nfiles2 ]; then 
+                aflag=0
+            fi
+        fi
     fi
 
-    (( unix_counter += 86400 )) # go to next day
+    # get data from ECFS
+    if [ aflag -ne 0 ]; then 
+        echo "No data available on scratch, so get them!"
 
-done
+        echo "CREATE AND WRITE DATA TO TARGETDIR:" $DATADIR 
+        mkdir -p $DATADIR
+
+        # get doy from current date
+        DOY=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS}`
+        echo ${YEAR} ${MONS} ${DAYS} "IS DOY " $DOY "OF " ${YEAR}
+
+        # Build now path to MODIS files of that given doy
+        SOURCEL1B=${modis_top}/${platform}/${YEAR}${MONS}/${splat}021km_${YEAR}_${MONS}_${DAYS}.tar
+        SOURCEGEO=${modis_top}/${platform}/${YEAR}${MONS}/${splat}03_${YEAR}_${MONS}_${DAYS}.tar
+
+        # Get those files from ECFS
+        get_modis ${SOURCEL1B} ${DATADIR} ${cflag} ${rflag} ${rcut}
+        retcl1b=${?}
+        get_modis ${SOURCEGEO} ${DATADIR} ${cflag} ${rflag} ${rcut}
+        retcgeo=${?}
+
+        retc=1
+        if [ "${retcl1b}" -eq 0 ] && [ "${retcgeo}" -eq 0 ]; then 
+            retc=0
+            echo "SUCCESS for ${DATADIR}"
+        else
+            echo "FAILED for ${DATADIR}"
+            echo "return code for l1b: ${retcl1b}"
+            echo "return code for geo: ${retcgeo}"
+        fi
+
+    fi # end of get data loop
+
+    # go to next day
+    (( unix_counter += 86400 ))
+
+done # end of while loop
+
+echo "SUCCESS: $0 finished"
+
 # END
