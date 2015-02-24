@@ -113,7 +113,7 @@ program mpi_wrapper
         CALL GET_COMMAND_ARGUMENT(12,single_day_ksh)
 
      endif
-
+     
      config_paths=trim(adjustl(config_paths))
      !write(*,*) 'cp',trim(adjustl(config_paths))
      config_attributes=trim(adjustl(config_attributes))
@@ -740,9 +740,9 @@ program mpi_wrapper
                       & rc_liq .eq. 0 .and.&
                       & rc_post .eq. 0) then
                     dummyfile1024=adjustl(file_inventory_pre(ifile))
-                    !call clean_up_pre(dummyfile1024)
+                    call clean_up_pre(dummyfile1024)
                     dummyfile2048=adjustl(file_inventory_liq(ifile))
-                    !call clean_up_main(dummyfile2048)
+                    call clean_up_main(dummyfile2048)
                     dummyfile1024=adjustl(file_inventory_post(ifile))
                     write(*,*) "Calling move_post"
                     call move_post(dummyfile1024,instrument,platform,year,month)
