@@ -8,6 +8,9 @@ import re
 import tarfile
 import subprocess
 import datetime
+import logging
+
+logger = logging.getLogger('sissi')
 
 
 def get_config_file_dict():
@@ -91,33 +94,33 @@ def copy_into_ecfs(datestring, file_list, ecfspath):
 
     # -- make dir in ECFS
     args = ['emkdir', '-p'] + [ecfs_target]
-    print (" * %s" % args)
+    logger.info("%s" % args)
     p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE)
     stdout, stderr = p1.communicate()
-    print stdout
-    print stderr
+    logger.info("STDOUT:{0}".format(stdout))
+    logger.info("STDERR:{0}".format(stderr))
 
     # -- copy file into ECFS dir
     args = ['ecp', '-o'] + file_list + [ecfs_target]
-    print (" * %s" % args)
+    logger.info("%s" % args)
     p2 = subprocess.Popen(args, stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE)
     stdout, stderr = p2.communicate()
-    print stdout
-    print stderr
+    logger.info("STDOUT:{0}".format(stdout))
+    logger.info("STDERR:{0}".format(stderr))
 
     # -- change mode of files in ECFS
     for fil in file_list:
         filebase = os.path.basename(fil)
         ecfsfile = os.path.join(ecfs_target, filebase)
         args = ['echmod', '555'] + [ecfsfile]
-        print (" * %s" % args)
+        logger.info(" * %s" % args)
         p3 = subprocess.Popen(args, stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE)
         stdout, stderr = p3.communicate()
-        print stdout
-        print stderr
+        logger.info("STDOUT:{0}".format(stdout))
+        logger.info("STDERR:{0}".format(stderr))
 
 
 def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber):
@@ -132,7 +135,7 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber):
     elif ptype.upper() == "L2":
         typ = ptype.upper()
     else:
-        print (" ! Wrong type name ! Options: L2, L3U, L3C")
+        logger.info("Wrong type name ! Options: L2, L3U, L3C")
         sys.exit(0)
 
     # -- create tarname
@@ -146,7 +149,7 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber):
     ecfs_tarfile = os.path.join(tempdir, tarname)
 
     # -- get final tarball
-    print (" * Create \'%s\'" % ecfs_tarfile)
+    logger.info("Create \'%s\'" % ecfs_tarfile)
     if typ == "L3U":
         tarfile_list = create_l3u_tarball(inpdir, idnumber,
                                           tempdir, ecfs_tarfile)
@@ -173,8 +176,8 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
             if idnumber in idir:
                 daily_list.append(os.path.join(inpdir, idir))
     else:
-        print " * No input in {0} matching {1} ".format(inpdir,
-                                                        idnumber)
+        logger.info("No input in {0} matching {1} ".
+                format(inpdir, idnumber))
         sys.exit(0)
 
     # -- final files to be stored in ECFS (daily .tar.gz)
@@ -244,8 +247,8 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
             if idnumber in idir:
                 daily_list.append(os.path.join(inpdir, idir))
     else:
-        print " * No input in {0} matching {1} ".format(inpdir,
-                                                        idnumber)
+        logger.info("No input in {0} matching {1} ".
+                format(inpdir, idnumber))
         sys.exit(0)
 
     # -- final files to be tared
@@ -342,8 +345,8 @@ def create_l3c_tarball(inpdir, idnumber, tempdir, l3_tarfile):
             if idnumber in idir:
                 l3cdir = os.path.join(inpdir, idir)
     else:
-        print " * No input in {0} matching {1} ".format(inpdir,
-                                                        idnumber)
+        logger.info("No input in {0} matching {1} ".
+                format(inpdir, idnumber))
         sys.exit(0)
 
     # -- list of files to be tared
@@ -477,9 +480,11 @@ def delete_file(dfile):
         try:
             os.remove(dfile)
         except OSError, e:
-            print " * Error: {0} - {1}.".format(e.file, e.strerror)
+            logger.info("Error: {0} - {1}.".
+                    format(e.file, e.strerror))
     else:
-        print" * Sorry, I can not find {0} file.".format(dfile)
+        logger.info("Sorry, I can not find {0} file.".
+                format(dfile))
 
 
 def find_file(name, path):

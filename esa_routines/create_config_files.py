@@ -11,7 +11,10 @@ import argparse
 import time
 import datetime
 
+from pycmsaf.logger import setup_root_logger
 from housekeeping import get_id
+
+logger = setup_root_logger(name='sissi')
 
 
 def getsat(args_sat):
@@ -31,7 +34,7 @@ def getsat(args_sat):
         elif args_sat.satellite.upper().startswith("METOP"):
             platform = args_sat.satellite.lower()
         else:
-            print " ! Wrong satellite name !\n"
+            logger.info("WRONG SATELLITE NAME!")
             exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
@@ -61,7 +64,7 @@ def getsat(args_sat):
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
-        print (u" --- FAILED: {0}".format(err))
+        logger.info("FAILED: {0}".format(err))
 
     return
 
@@ -106,7 +109,7 @@ def getaux(args_aux):
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
-        print (u" --- FAILED: {0}".format(err))
+        logger.info("FAILED: {0}".format(err))
 
     return
 
@@ -130,7 +133,7 @@ def proc2(args_ret):
         elif args_ret.satellite.upper().startswith("METOP"):
             platform = args_ret.satellite.lower()
         else:
-            print " ! Wrong satellite name !\n"
+            logger.info("WRONG SATELLITE NAME!")
             exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
@@ -256,7 +259,7 @@ def proc2(args_ret):
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
-        print u" --- FAILED: {0}".format(err)
+        logger.info("FAILED: {0}".format(err))
 
     return
 
@@ -279,7 +282,7 @@ def l2tol3(args_l3):
         elif args_l3.satellite.upper().startswith("METOP"):
             platform = args_l3.satellite.upper()
         else:
-            print " ! Wrong satellite name !\n"
+            logger.info("WRONG SATELLITE NAME!")
             exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
@@ -372,7 +375,7 @@ def l2tol3(args_l3):
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
-        print u" --- FAILED: {0}".format(err)
+        logger.info("FAILED: {0}".format(err))
 
     return
 
@@ -454,7 +457,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Call function associated with the selected subcommand
-    print "\n *** {0} start for {1}".format(sys.argv[0], args)
+    logger.info("*** {0} start for {1}".format(sys.argv[0], args))
     args.func(args)
 
-    print u" *** {0} succesfully finished \n".format(sys.argv[0])
+    logger.info("*** {0} succesfully finished \n".format(sys.argv[0]))

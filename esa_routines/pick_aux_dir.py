@@ -9,9 +9,13 @@ import argparse
 import os
 import datetime
 
+from pycmsaf.logger import setup_root_logger
+
 from housekeeping import get_file_list_via_pattern
 from housekeeping import split_filename
 from housekeeping import date_from_year_doy
+
+logger = setup_root_logger(name='sissi')
 
 
 def find_nearest_date(args_pick):

@@ -14,6 +14,9 @@ from housekeeping import split_platform_string
 from housekeeping import tar_results
 from housekeeping import copy_into_ecfs
 
+from pycmsaf.logger import setup_root_logger
+logger = setup_root_logger(name='sissi')
+
 
 def l2(args_l2):
     """
@@ -63,15 +66,14 @@ def l2(args_l2):
         tarfile_list = tlist
 
     else:
-        print " ! Check your input directory, maybe it is empty ? \n"
+        logger.info("Check your input directory, maybe it is empty ?")
 
     # copy tarfile into ECFS
-    print " * Copy2ECFS: tarfile_list"
+    logger.info("Copy2ECFS: tarfile_list")
     copy_into_ecfs(datestring, tarfile_list, args_l2.ecfsdir)
 
     # delete tempdir
-    # noinspection PyUnboundLocalVariable
-    print u" * Delete \'{0}\'".format(tempdir)
+    logger.info("Delete \'{0}\'".format(tempdir))
     delete_dir(tempdir)
 
 
@@ -95,7 +97,6 @@ def l3(args_l3):
     alldirs = os.listdir(args_l3.inpdir)
 
     # -- list of files to be archived
-    # noinspection PyUnusedLocal
     tarfile_list = list()
 
     # *** L3C archiving ***
@@ -122,7 +123,7 @@ def l3(args_l3):
                                                datestring, sensor,
                                                platform, idnumber)
     else:
-        print " ! Check your input directory, maybe it is empty ? \n"
+        logger.info("Check your input directory, maybe it is empty ?")
 
     # *** L3U archiving ***
 
@@ -148,22 +149,19 @@ def l3(args_l3):
                                                datestring, sensor,
                                                platform, idnumber)
     else:
-        print " ! Check your input directory, maybe it is empty ? \n"
+        logger.info("Check your input directory, maybe it is empty ?")
 
     # list
-    # noinspection PyUnboundLocalVariable
     tarfile_list = tlist_l3c + tlist_l3u
 
     # copy tarfile into ECFS
-    print " * Copy2ECFS: tarfile_list"
+    logger.info("Copy2ECFS: tarfile_list")
     copy_into_ecfs(datestring, tarfile_list, args_l3.ecfsdir)
 
     # delete tempdir
-    # noinspection PyUnboundLocalVariable
-    print u" * Delete \'{0:s}\'".format(tempdir_l3u)
+    logger.info("Delete \'{0:s}\'".format(tempdir_l3u))
     delete_dir(tempdir_l3u)
-    # noinspection PyUnboundLocalVariable
-    print u" * Delete \'{0:s}\'".format(tempdir_l3c)
+    logger.info("Delete \'{0:s}\'".format(tempdir_l3c))
     delete_dir(tempdir_l3c)
 
 
@@ -208,7 +206,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Call function associated with the selected subcommand
-    print "\n *** {0} start for {1}".format(sys.argv[0], args)
+    logger.info("*** {0} start for {1}".format(sys.argv[0], args))
     args.func(args)
 
-    print " *** {0:s} succesfully finished \n".format(sys.argv[0])
+    logger.info("*** {0:s} succesfully finished \n".format(sys.argv[0]))
