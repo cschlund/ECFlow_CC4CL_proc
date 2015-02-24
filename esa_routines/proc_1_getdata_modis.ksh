@@ -183,7 +183,7 @@ while [ $unix_counter -le $unix_stop ]; do
     fi
 
     # get data from ECFS
-    if [ aflag -ne 0 ]; then 
+    if [ $aflag -ne 0 ]; then 
         echo "No data available on scratch, so get them!"
 
         echo "CREATE AND WRITE DATA TO TARGETDIR:" $DATADIR 
@@ -219,7 +219,5 @@ while [ $unix_counter -le $unix_stop ]; do
     (( unix_counter += 86400 ))
 
 done # end of while loop
-
-echo "SUCCESS: $0 finished"
 
 # END

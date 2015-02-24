@@ -153,7 +153,7 @@ do
         fi
 
 
-        if [ aflag -ne 0 ]; then
+        if [ $aflag -ne 0 ]; then
             echo "No data available on scratch, so get them!"
 
             `$cmd`
@@ -170,7 +170,5 @@ do
 
     done # end of month loop
 done # end of year loop
-
-echo "SUCCESS: $0 finished"
 
 # -- end of ksh script
