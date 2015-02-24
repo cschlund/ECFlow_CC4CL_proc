@@ -12,6 +12,7 @@
 #       2014-04-08 MJ migration to cca/sf7
 #       2015-01-13 C. Schlundt, take either NRT data or 
 #                  if not available then take climatology file
+#       2015-02-24 C. Schlundt: check data availability before ecp call
 #           
 # -------------------------------------------------------------------
 copy_file()
@@ -196,158 +197,180 @@ fi
 unix_stop=`${ESA_ROUT}/ymdhms2unix.ksh $STOPYEAR $STOPMONTH $STOPDAY`
 unix_counter=$unix_start
 
-while [ $unix_counter -le $unix_stop ]
-  do
-  YEAR=`perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');'`
-  MONS=`perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');'`
-  DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'`
+while [ $unix_counter -le $unix_stop ]; do 
 
-  # subdir for climatology files (scratch and ecfs)
-  climat=climatology
+    YEAR=`perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');'`
+    MONS=`perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');'`
+    DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'`
 
-  # this is where the stuff is in the ecfs 
-  source_albedo=${toplevel_aux}/${albedo_ecfs}/${YEAR}/${MONS}/${DAYS}
-  source_albedo_climatology=${toplevel_aux}/${albedo_ecfs}/${climat}/${MONS}/${DAYS}
-  source_BRDF=${toplevel_aux}/${BRDF_ecfs}/${YEAR}/${MONS}/${DAYS}
-  source_BRDF_climatology=${toplevel_aux}/${BRDF_ecfs}/${climat}/${MONS}/${DAYS}
-  source_ice_snow=${toplevel_aux}/${ice_snow_ecfs}/${YEAR}/${MONS}/${DAYS}
-  source_emissivity=${toplevel_aux}/${emissivity_ecfs}/${YEAR}/${MONS}/${DAYS}
-  source_emissivity_climatology=${toplevel_aux}/${emissivity_ecfs}/${climat}
+    CURRENT_DATE=${YEAR}${MONS}${DAYS}
 
-  # this is where the aux data goes on $TEMP
-  target_albedo=${temp_aux}/${albedo_temp}/${YEAR}/${MONS}/${DAYS}
-  target_albedo_climatology=${temp_aux}/${albedo_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
-  target_BRDF=${temp_aux}/${brdf_temp}/${YEAR}/${MONS}/${DAYS}
-  target_BRDF_climatology=${temp_aux}/${brdf_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
-  target_ice_snow=${temp_aux}/${ice_snow_temp}/${YEAR}/${MONS}/${DAYS}
-  target_emissivity=${temp_aux}/${emissivity_temp}/${YEAR}/${MONS}/${DAYS}
-  target_emissivity_climatology=${temp_aux}/${emissivity_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
+    # subdir for climatology files (scratch and ecfs)
+    climat=climatology
 
+    # this is where the stuff is in the ecfs 
+    source_albedo=${toplevel_aux}/${albedo_ecfs}/${YEAR}/${MONS}/${DAYS}
+    source_albedo_climatology=${toplevel_aux}/${albedo_ecfs}/${climat}/${MONS}/${DAYS}
+    source_BRDF=${toplevel_aux}/${BRDF_ecfs}/${YEAR}/${MONS}/${DAYS}
+    source_BRDF_climatology=${toplevel_aux}/${BRDF_ecfs}/${climat}/${MONS}/${DAYS}
+    source_ice_snow=${toplevel_aux}/${ice_snow_ecfs}/${YEAR}/${MONS}/${DAYS}
+    source_emissivity=${toplevel_aux}/${emissivity_ecfs}/${YEAR}/${MONS}/${DAYS}
+    source_emissivity_climatology=${toplevel_aux}/${emissivity_ecfs}/${climat}
 
-  # -- (1) get albedo --
-
-  # required for unpacking source data on $TEMP
-  TYPE=1
-
-  # NRT data
-  SOURCEPATH=${source_albedo}
-  TARGETPATH=${target_albedo}
-  SEARCHSTRING=${albedo_type}_${YEAR}${MONS}${DAYS}
-  SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${albedo_suffix}
-  TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
-
-  # climatology data
-  SOURCEPATH_CLIMAT=${source_albedo_climatology}
-  TARGETPATH_CLIMAT=${target_albedo_climatology}
-  SEARCHSTRING_CLIMAT=${albedo_type}_XXXX${MONS}${DAYS}
-  SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${albedo_suffix}
-  TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
-
-  # now get the data
-  get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
-    ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+    # this is where the aux data goes on $TEMP
+    target_albedo=${temp_aux}/${albedo_temp}/${YEAR}/${MONS}/${DAYS}
+    target_albedo_climatology=${temp_aux}/${albedo_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
+    target_BRDF=${temp_aux}/${brdf_temp}/${YEAR}/${MONS}/${DAYS}
+    target_BRDF_climatology=${temp_aux}/${brdf_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
+    target_ice_snow=${temp_aux}/${ice_snow_temp}/${YEAR}/${MONS}/${DAYS}
+    target_emissivity=${temp_aux}/${emissivity_temp}/${YEAR}/${MONS}/${DAYS}
+    target_emissivity_climatology=${temp_aux}/${emissivity_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
 
 
-  # -- (2) get BRDF --
+    # -- (1) get albedo --
 
-  # required for unpacking source data on $TEMP
-  TYPE=1
+    # required for unpacking source data on $TEMP
+    TYPE=1
 
-  # NRT data
-  SOURCEPATH=${source_BRDF}
-  TARGETPATH=${target_BRDF}
-  SEARCHSTRING=${BRDF_type}_${YEAR}${MONS}${DAYS}
-  SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${BRDF_suffix}
-  TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
+    # NRT data
+    SOURCEPATH=${source_albedo}
+    TARGETPATH=${target_albedo}
+    SEARCHSTRING=${albedo_type}_${YEAR}${MONS}${DAYS}
+    SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${albedo_suffix}
+    TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
 
-  # climatology data
-  SOURCEPATH_CLIMAT=${source_BRDF_climatology}
-  TARGETPATH_CLIMAT=${target_BRDF_climatology}
-  SEARCHSTRING_CLIMAT=${BRDF_type}_XXXX${MONS}${DAYS}
-  SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${BRDF_suffix}
-  TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
+    # climatology data
+    SOURCEPATH_CLIMAT=${source_albedo_climatology}
+    TARGETPATH_CLIMAT=${target_albedo_climatology}
+    SEARCHSTRING_CLIMAT=${albedo_type}_XXXX${MONS}${DAYS}
+    SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${albedo_suffix}
+    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
 
-  # now get the data
-  get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
-    ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
-
-
-
-  # -- (3) get emissivity --
-
-  # required for unpacking source data on $TEMP
-  TYPE=3
-
-  #convert date to DOY for emissivity filename
-  DOY=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS}`
-  DDOY=${DOY} 
-  if [ "${DOY}" -lt 10 ]
-    then
-    DDOY=0${DOY}
-  fi
-  if [ "${DOY}" -lt 100 ]
-    then
-    DDOY=0${DDOY}
-  fi
-  DOY=${DDOY}  
-
-  # NRT data
-  SOURCEPATH=${source_emissivity}
-  TARGETPATH=${target_emissivity}
-  SEARCHSTRING=${emissivity_type}${YEAR}${DOY}
-  SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${emissivity_suffix}
-  TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
-
-  # climatology data
-  SOURCEPATH_CLIMAT=${source_emissivity_climatology}
-  TARGETPATH_CLIMAT=${target_emissivity_climatology}
-  SEARCHSTRING_CLIMAT=${emissivity_type}XXXX${DOY}
-  SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${emissivity_suffix}
-  TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
-
-  # now get the data
-  get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
-    ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+    # availability check
+    if [ ! -f "${TARGETFILE}" ] && [ ! -f "${TARGETFILE_CLIMAT}" ]; then
+        echo "Get ALBEDO data from ECFS for $CURRENT_DATE"
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \ 
+                ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+    else
+        if [ -f $TARGETFILE ]; then echo "$TARGETFILE already exists"; fi
+        if [ -f $TARGETFILE_CLIMAT ]; then echo "$TARGETFILE_CLIMAT already exists"; fi
+    fi
 
 
-  # -- (4) get ice_snow --
+    # -- (2) get BRDF --
 
-  # required for unpacking source data on $TEMP
-  TYPE=2
+    # required for unpacking source data on $TEMP
+    TYPE=1
 
-  # NRT data
-  SOURCEPATH=${source_ice_snow}
-  TARGETPATH=${target_ice_snow}
-  SEARCHSTRING=${ice_snow_type}_${YEAR}${MONS}${DAYS}
-  SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${ice_snow_suffix}
-  SOURCENAME=`els $SOURCEFILE`
-  TARGETFILE=${TARGETPATH}/${SOURCENAME} #`basename ${SOURCEFILE}`
+    # NRT data
+    SOURCEPATH=${source_BRDF}
+    TARGETPATH=${target_BRDF}
+    SEARCHSTRING=${BRDF_type}_${YEAR}${MONS}${DAYS}
+    SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${BRDF_suffix}
+    TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
 
-  # temp. solution
-  MINUNIX=`${ESA_ROUT}/ymdhms2unix.ksh 1995 05 04`
-  ACTUNIX=`${ESA_ROUT}/ymdhms2unix.ksh $YEAR $MONS $DAYS`
+    # climatology data
+    SOURCEPATH_CLIMAT=${source_BRDF_climatology}
+    TARGETPATH_CLIMAT=${target_BRDF_climatology}
+    SEARCHSTRING_CLIMAT=${BRDF_type}_XXXX${MONS}${DAYS}
+    SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${BRDF_suffix}
+    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
 
-  if [ "${ACTUNIX}" -lt "${MINUNIX}" ]; then 
-      TMPYEAR=1996
-  fi
-
-  # NRT before 19950504
-  source_ice_snow=${toplevel_aux}/${ice_snow_ecfs}/${TMPYEAR}/${MONS}/${DAYS}
-  target_ice_snow=${temp_aux}/${ice_snow_temp}/fake_climatology/${YEAR}/${MONS}/${DAYS}
-  SOURCEPATH=${source_ice_snow}
-  TARGETPATH=${target_ice_snow}
-  SEARCHSTRING_CLIMAT=${ice_snow_type}_${TMPYEAR}${MONS}${DAYS}
-  SOURCEFILE_CLIMAT=${SOURCEPATH}/${SEARCHSTRING_CLIMAT}${ice_snow_suffix}
-  SOURCENAME_CLIMAT=`els $SOURCEFILE_CLIMAT`
-  TARGETFILE_CLIMAT=${TARGETPATH}/${SOURCENAME_CLIMAT} #`basename ${SOURCEFILE}`
-
-  # now get the data
-  get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
-    ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+    # availability check
+    if [ ! -f "${TARGETFILE}" ] && [ ! -f "${TARGETFILE_CLIMAT}" ]; then
+        echo "Get BRDF data from ECFS for $CURRENT_DATE"
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
+          ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+    else
+        if [ -f $TARGETFILE ]; then echo "$TARGETFILE already exists"; fi
+        if [ -f $TARGETFILE_CLIMAT ]; then echo "$TARGETFILE_CLIMAT already exists"; fi
+    fi
 
 
-  # go to next day
-  (( unix_counter += 86400 ))
+    # -- (3) get emissivity --
+
+    # required for unpacking source data on $TEMP
+    TYPE=3
+
+    #convert date to DOY for emissivity filename
+    DOY=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS}`
+    DDOY=${DOY} 
+    if [ "${DOY}" -lt 10 ]; then
+      DDOY=0${DOY}
+    fi
+    if [ "${DOY}" -lt 100 ]; then
+      DDOY=0${DDOY}
+    fi
+    DOY=${DDOY}  
+
+    # NRT data
+    SOURCEPATH=${source_emissivity}
+    TARGETPATH=${target_emissivity}
+    SEARCHSTRING=${emissivity_type}${YEAR}${DOY}
+    SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${emissivity_suffix}
+    TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
+
+    # climatology data
+    SOURCEPATH_CLIMAT=${source_emissivity_climatology}
+    TARGETPATH_CLIMAT=${target_emissivity_climatology}
+    SEARCHSTRING_CLIMAT=${emissivity_type}XXXX${DOY}
+    SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${emissivity_suffix}
+    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
+
+    # availability check
+    if [ ! -f "${TARGETFILE}" ] && [ ! -f "${TARGETFILE_CLIMAT}" ]; then
+        echo "Get EMISSIVITY data from ECFS for $CURRENT_DATE"
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
+          ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+    else
+        if [ -f $TARGETFILE ]; then echo "$TARGETFILE already exists"; fi
+        if [ -f $TARGETFILE_CLIMAT ]; then echo "$TARGETFILE_CLIMAT already exists"; fi
+    fi
+
+
+    # -- (4) get ice_snow --
+
+    # required for unpacking source data on $TEMP
+    TYPE=2
+
+    # NRT data
+    SOURCEPATH=${source_ice_snow}
+    TARGETPATH=${target_ice_snow}
+    SEARCHSTRING=${ice_snow_type}_${YEAR}${MONS}${DAYS}
+    SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${ice_snow_suffix}
+    SOURCENAME=`els $SOURCEFILE`
+    TARGETFILE=${TARGETPATH}/${SOURCENAME} #`basename ${SOURCEFILE}`
+
+    # temp. solution
+    MINUNIX=`${ESA_ROUT}/ymdhms2unix.ksh 1995 05 04`
+    ACTUNIX=`${ESA_ROUT}/ymdhms2unix.ksh $YEAR $MONS $DAYS`
+
+    if [ "${ACTUNIX}" -lt "${MINUNIX}" ]; then 
+        TMPYEAR=1996
+    fi
+
+    # NRT before 19950504
+    source_ice_snow=${toplevel_aux}/${ice_snow_ecfs}/${TMPYEAR}/${MONS}/${DAYS}
+    target_ice_snow=${temp_aux}/${ice_snow_temp}/fake_climatology/${YEAR}/${MONS}/${DAYS}
+    SOURCEPATH=${source_ice_snow}
+    TARGETPATH=${target_ice_snow}
+    SEARCHSTRING_CLIMAT=${ice_snow_type}_${TMPYEAR}${MONS}${DAYS}
+    SOURCEFILE_CLIMAT=${SOURCEPATH}/${SEARCHSTRING_CLIMAT}${ice_snow_suffix}
+    SOURCENAME_CLIMAT=`els $SOURCEFILE_CLIMAT`
+    TARGETFILE_CLIMAT=${TARGETPATH}/${SOURCENAME_CLIMAT} #`basename ${SOURCEFILE}`
+
+    # availability check
+    if [ ! -f "${TARGETFILE}" ] && [ ! -f "${TARGETFILE_CLIMAT}" ]; then
+        echo "Get NISE data from ECFS for $CURRENT_DATE"
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
+          ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+    else
+        if [ -f $TARGETFILE ]; then echo "$TARGETFILE already exists"; fi
+        if [ -f $TARGETFILE_CLIMAT ]; then echo "$TARGETFILE_CLIMAT already exists"; fi
+    fi
+
+    # go to next day
+    (( unix_counter += 86400 ))
 
 done
 #----------------------------------------------------------------------------------------------
