@@ -135,7 +135,7 @@ else
             ${instrument} ${platform} \
             ${ACTMONTHS} ${ACTYEAR} \
             ${wrapper_mode} ${jid} ${logs_monthly} \
-            ${OUTPUTDIR} ${out_file} %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
+            ${OUTPUTDIR} %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
             %SINGLE_DAY_KSH%
     
         

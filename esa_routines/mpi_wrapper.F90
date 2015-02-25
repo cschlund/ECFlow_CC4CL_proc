@@ -113,7 +113,7 @@ program mpi_wrapper
         CALL GET_COMMAND_ARGUMENT(12,single_day_ksh)
 
      endif
-     
+
      config_paths=trim(adjustl(config_paths))
      !write(*,*) 'cp',trim(adjustl(config_paths))
      config_attributes=trim(adjustl(config_attributes))
