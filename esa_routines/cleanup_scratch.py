@@ -110,32 +110,33 @@ def clear_l2(args_l2):
         sys.exit(0)
 
     # find corr. config file and delete it
-    cfgdict = get_config_file_dict()
-    strlist = list()
+    if "output" in args_l2.inpdir:
+        cfgdict = get_config_file_dict()
+        strlist = list()
 
-    for key in cfgdict:
-        if "2" in key:
-            strlist.append(key)
-            for key2 in cfgdict[key]:
-                strlist.append(cfgdict[key][key2])
+        for key in cfgdict:
+            if "2" in key:
+                strlist.append(key)
+                for key2 in cfgdict[key]:
+                    strlist.append(cfgdict[key][key2])
 
-    if len(strlist) != 4:
-        logger.info("No information for cfg filename found in dictionary!")
-        logger.info("Thus, config file cannot be deleted!")
+        if len(strlist) != 4:
+            logger.info("No information for cfg filename found in dictionary!")
+            logger.info("Thus, config file cannot be deleted!")
 
-    fname = strlist[1] + strlist[0] + '_' + \
-            str(args_l2.year) + '_' + str('%02d' % args_l2.month) + \
-            '_' + args_l2.satellite.upper() + strlist[2]
+        fname = strlist[1] + strlist[0] + '_' + \
+                str(args_l2.year) + '_' + str('%02d' % args_l2.month) + \
+                '_' + args_l2.satellite.upper() + strlist[2]
 
-    splitpath = os.path.split(args_l2.inpdir)
-    cfgfile = os.path.join(splitpath[0], strlist[3], fname)
+        splitpath = os.path.split(args_l2.inpdir)
+        cfgfile = os.path.join(splitpath[0], strlist[3], fname)
 
-    if os.path.isfile(cfgfile):
-        logger.info("Delete: \'{0}\' ".format(cfgfile))
-        delete_file(cfgfile)
-    else:
-        logger.info("Nothing to delete: \'{0}\' doesn't exist!".
-                format(cfgfile))
+        if os.path.isfile(cfgfile):
+            logger.info("Delete: \'{0}\' ".format(cfgfile))
+            delete_file(cfgfile)
+        else:
+            logger.info("Nothing to delete: \'{0}\' doesn't exist!".
+                    format(cfgfile))
 
     # date string
     datestr = str(args_l2.year) + str('%02d' % args_l2.month)
