@@ -152,7 +152,7 @@ def clear_l2(args_l2):
             if datestr in ad \
                     and args_l2.instrument.upper() in ad \
                     and platform in ad and 'retrieval' in ad:
-                getdirs.append(ad)
+                getdirs.append( os.path.join(args_l2.inpdir, ad) )
 
         # check if getdirs list is empty
         if len(getdirs) == 0:
