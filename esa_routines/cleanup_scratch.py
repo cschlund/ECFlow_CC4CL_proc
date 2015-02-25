@@ -157,8 +157,7 @@ def clear_l2(args_l2):
         # check if getdirs list is empty
         if len(getdirs) == 0:
             logger.info("Nothing to delete in {0} for {1} {2} {3}".
-                    format(args_l2.inpdir, args_l2.instrument.upper(), 
-                        platform, datestr)
+                    format(args_l2.inpdir, args_l2.instrument.upper(), platform, datestr))
         else:
             # sort list
             getdirs.sort()
@@ -184,8 +183,7 @@ def clear_l2(args_l2):
                 format(pattern))
     else:
         logger.info("Nothing to delete in {0} for {1} {2} {3}".
-            format(args_l2.inpdir, args_l2.instrument.upper(), 
-                platform, datestr))
+            format(args_l2.inpdir, args_l2.instrument.upper(), platform, datestr))
 
 
 def clear_l3(args_l3):
@@ -292,10 +290,10 @@ def clear_l3(args_l3):
 
             # remove all dirs matching pattern
             logger.info("Delete: \'{0}\' -> L2toL3 was successful!".
-                    format(pattern)
+                    format(pattern))
     else:
         logger.info("Nothing to delete in {0} for {1} {2} {3}".
-            format(args_l3.inpdir, sensor, platform, datestr)
+                format(args_l3.inpdir, sensor, platform, datestr))
 
 
 def clear_aux(args_aux):
@@ -341,8 +339,7 @@ def clear_aux(args_aux):
         logger.info("Delete: \'{0}\' ".format(cfgfile))
         delete_file(cfgfile)
     else:
-        logger.info("Nothing to delete: \'{0}\' doesn't exist!".
-            format(cfgfile))
+        logger.info("Nothing to delete: \'{0}\' doesn't exist!".format(cfgfile))
 
     ilist = os.listdir(ipath)
 
