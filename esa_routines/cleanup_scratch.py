@@ -164,7 +164,7 @@ def clear_l2(args_l2):
             getdirs.sort()
 
             # get last element from list, should be last job
-            lastdir = getdirs.pop()
+            lastdir = getdirs[-1]
 
             # get ID number from the last job
             id_number = get_id(lastdir)
@@ -274,7 +274,7 @@ def clear_l3(args_l3):
             getdirs.sort()
 
             # get last element from list, should be last job
-            lastdir = getdirs.pop()
+            lastdir = getdirs[-1]
 
             # get ID number from the last job
             id_num = get_id(lastdir)
