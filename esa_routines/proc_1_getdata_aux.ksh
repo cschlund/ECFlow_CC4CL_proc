@@ -15,6 +15,57 @@
 #       2015-02-24 C. Schlundt: check data availability before ecp call
 #           
 # -------------------------------------------------------------------
+
+data_on_scratch()
+{
+    NRT_TARGET=${1}
+    CLI_TARGET=${2}
+
+    printf "*** data_on_scratch() started\n"
+    printf "    NRT PATH: $1\n"
+    printf "    CLI PATH: $2\n"
+
+    # availability flag
+    aflag=-1
+
+    if [ -d $NRT_TARGET ]; then 
+        nfile=$(ls -A $NRT_TARGET/* | wc -l)
+        lfile=$(ls -A $NRT_TARGET/*)
+
+        if [ $nfile -gt 0 ]; then 
+            printf "    NRT data already on scratch\n"
+            printf "    $nfile file(s) in $NRT_TARGET\n"
+            for i in $lfile; do 
+                bas=$(basename $i)
+                printf "    - $bas \n"
+            done
+            printf "\n"
+            aflag=0
+        fi
+    fi
+
+    if [ -d $CLI_TARGET ]; then 
+        nfile=$(ls -A $CLI_TARGET/* |wc -l)
+        lfile=$(ls -A $CLI_TARGET/*)
+
+        if [ $nfile -gt 0 ]; then 
+            printf "    CLIMATOLOGY data already on scratch\n"
+            printf "    $nfile file(s) in $CLI_TARGET\n"
+            for i in $lfile; do 
+                bas=$(basename $i)
+                printf "    - $bas \n"
+            done
+            printf "\n"
+            aflag=0 
+        fi
+    fi
+
+    if [ $aflag -ne 0 ]; then
+        printf "    NO DATA on scratch yet!\n"
+    fi
+}
+
+
 copy_file()
 {
     SOURCE=${1}
@@ -88,13 +139,22 @@ get_aux()
     TARGET_CLIMAT=${5}
     YEAR=${6}
 
+    printf "*** get_aux() started\n"
+    #printf "    SOURCE: $SOURCE\n"
+    #printf "    TARGET: $TARGET\n"
+    #printf "    TYPE  : $TYPE\n"
+    #printf "    SOURCE_CLIMAT: $SOURCE_CLIMAT\n"
+    #printf "    TARGET_CLIMAT: $TARGET_CLIMAT\n"
+    #printf "    YEAR: $YEAR\n"
+
     retcls=-1
     retcli=-1
     retlst=-1
     retrpl=-1
 
     # check if there is a directory and file for this day
-    els ${SOURCE}
+    printf "    SOURCE: $SOURCE\n"
+    check_source=$(els ${SOURCE})
     retcls=${?}
     
     if [ "${retcls}" -eq 0  ]; then 
@@ -103,7 +163,8 @@ get_aux()
 
     else
 
-        els ${SOURCE_CLIMAT}
+        printf "    SOURCE_CLIMAT: $SOURCE_CLIMAT\n"
+        check_source_cli=$(els ${SOURCE_CLIMAT})
         retcli=${?}
 
         if [ "${retcli}" -eq 0 ]; then
@@ -172,6 +233,7 @@ get_aux()
 
     fi
 
+    printf "*** get_aux() finished\n\n"
 }
 
 # -------------------------------------------------------------------
@@ -180,7 +242,7 @@ get_aux()
 #
 # -------------------------------------------------------------------
 
-set -xv
+set -v
 
 # source path configfile 
 . $1
@@ -204,6 +266,7 @@ while [ $unix_counter -le $unix_stop ]; do
     DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'`
 
     CURRENT_DATE=${YEAR}${MONS}${DAYS}
+    echo ""
 
     # subdir for climatology files (scratch and ecfs)
     climat=climatology
@@ -237,23 +300,22 @@ while [ $unix_counter -le $unix_stop ]; do
     TARGETPATH=${target_albedo}
     SEARCHSTRING=${albedo_type}_${YEAR}${MONS}${DAYS}
     SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${albedo_suffix}
-    TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
+    TARGETFILE=${TARGETPATH}/$(basename ${SOURCEFILE})
 
     # climatology data
     SOURCEPATH_CLIMAT=${source_albedo_climatology}
     TARGETPATH_CLIMAT=${target_albedo_climatology}
     SEARCHSTRING_CLIMAT=${albedo_type}_XXXX${MONS}${DAYS}
     SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${albedo_suffix}
-    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
+    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/$(basename ${SOURCEFILE_CLIMAT})
 
     # availability check
-    if [ ! -f "${TARGETFILE}" ] && [ ! -f "${TARGETFILE_CLIMAT}" ]; then
-        echo "Get ALBEDO data from ECFS for $CURRENT_DATE"
-        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \ 
-                ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
-    else
-        if [ -f $TARGETFILE ]; then echo "$TARGETFILE already exists"; fi
-        if [ -f $TARGETFILE_CLIMAT ]; then echo "$TARGETFILE_CLIMAT already exists"; fi
+    printf "\nData already on scratch for MODIS ALBEDO ${CURRENT_DATE}?\n"
+    data_on_scratch ${target_albedo} ${target_albedo_climatology}
+
+    if [ $aflag -ne 0 ]; then
+        printf "\nGet MODIS ALBEDO data from ECFS for $CURRENT_DATE\n"
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
     fi
 
 
@@ -267,23 +329,22 @@ while [ $unix_counter -le $unix_stop ]; do
     TARGETPATH=${target_BRDF}
     SEARCHSTRING=${BRDF_type}_${YEAR}${MONS}${DAYS}
     SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${BRDF_suffix}
-    TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
+    TARGETFILE=${TARGETPATH}/$(basename ${SOURCEFILE})
 
     # climatology data
     SOURCEPATH_CLIMAT=${source_BRDF_climatology}
     TARGETPATH_CLIMAT=${target_BRDF_climatology}
     SEARCHSTRING_CLIMAT=${BRDF_type}_XXXX${MONS}${DAYS}
     SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${BRDF_suffix}
-    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
+    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/$(basename ${SOURCEFILE_CLIMAT})
 
     # availability check
-    if [ ! -f "${TARGETFILE}" ] && [ ! -f "${TARGETFILE_CLIMAT}" ]; then
-        echo "Get BRDF data from ECFS for $CURRENT_DATE"
-        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
-          ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
-    else
-        if [ -f $TARGETFILE ]; then echo "$TARGETFILE already exists"; fi
-        if [ -f $TARGETFILE_CLIMAT ]; then echo "$TARGETFILE_CLIMAT already exists"; fi
+    printf "\nData already on scratch for MODIS BRDF ${CURRENT_DATE}?\n"
+    data_on_scratch ${target_BRDF} ${target_BRDF_climatology}
+
+    if [ $aflag -ne 0 ]; then
+        printf "\nGet BRDF data from ECFS for $CURRENT_DATE\n"
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
     fi
 
 
@@ -308,23 +369,22 @@ while [ $unix_counter -le $unix_stop ]; do
     TARGETPATH=${target_emissivity}
     SEARCHSTRING=${emissivity_type}${YEAR}${DOY}
     SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${emissivity_suffix}
-    TARGETFILE=${TARGETPATH}/`basename ${SOURCEFILE}`
+    TARGETFILE=${TARGETPATH}/$(basename ${SOURCEFILE})
 
     # climatology data
     SOURCEPATH_CLIMAT=${source_emissivity_climatology}
     TARGETPATH_CLIMAT=${target_emissivity_climatology}
     SEARCHSTRING_CLIMAT=${emissivity_type}XXXX${DOY}
     SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${emissivity_suffix}
-    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/`basename ${SOURCEFILE_CLIMAT}`
+    TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/$(basename ${SOURCEFILE_CLIMAT})
 
     # availability check
-    if [ ! -f "${TARGETFILE}" ] && [ ! -f "${TARGETFILE_CLIMAT}" ]; then
-        echo "Get EMISSIVITY data from ECFS for $CURRENT_DATE"
-        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
-          ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
-    else
-        if [ -f $TARGETFILE ]; then echo "$TARGETFILE already exists"; fi
-        if [ -f $TARGETFILE_CLIMAT ]; then echo "$TARGETFILE_CLIMAT already exists"; fi
+    printf "\nData already on scratch for UWisc EMISSIVITY ${CURRENT_DATE}?\n"
+    data_on_scratch ${target_emissivity} ${target_emissivity_climatology}
+
+    if [ $aflag -ne 0 ]; then
+        printf "\nGet EMISSIVITY data from ECFS for $CURRENT_DATE\n"
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
     fi
 
 
@@ -338,10 +398,17 @@ while [ $unix_counter -le $unix_stop ]; do
     TARGETPATH=${target_ice_snow}
     SEARCHSTRING=${ice_snow_type}_${YEAR}${MONS}${DAYS}
     SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${ice_snow_suffix}
-    SOURCENAME=`els $SOURCEFILE`
+    SOURCENAME=$(els $SOURCEFILE)
+    if [ ${?} -ne 0 ]; then
+        printf " --- FAILED: els $SOURCEFILE\n"
+        SOURCENAME=$(basename $SOURCEFILE)
+    else
+        printf "SUCCESS: $SOURCENAME\n"
+    fi
     TARGETFILE=${TARGETPATH}/${SOURCENAME} #`basename ${SOURCEFILE}`
 
     # temp. solution
+    printf "\nNo NISE data available before 1995-05-04\n"
     MINUNIX=`${ESA_ROUT}/ymdhms2unix.ksh 1995 05 04`
     ACTUNIX=`${ESA_ROUT}/ymdhms2unix.ksh $YEAR $MONS $DAYS`
 
@@ -350,24 +417,33 @@ while [ $unix_counter -le $unix_stop ]; do
     fi
 
     # NRT before 19950504
-    source_ice_snow=${toplevel_aux}/${ice_snow_ecfs}/${TMPYEAR}/${MONS}/${DAYS}
-    target_ice_snow=${temp_aux}/${ice_snow_temp}/fake_climatology/${YEAR}/${MONS}/${DAYS}
-    SOURCEPATH=${source_ice_snow}
-    TARGETPATH=${target_ice_snow}
+    printf "\nThus: take TMPYEAR: $TMPYEAR (fake_climatology!) instead of $YEAR"
+    source_ice_snow_fake=${toplevel_aux}/${ice_snow_ecfs}/${TMPYEAR}/${MONS}/${DAYS}
+    target_ice_snow_fake=${temp_aux}/${ice_snow_temp}/fake_climatology/${YEAR}/${MONS}/${DAYS}
+    SOURCEPATH=${source_ice_snow_fake}
+    TARGETPATH=${target_ice_snow_fake}
     SEARCHSTRING_CLIMAT=${ice_snow_type}_${TMPYEAR}${MONS}${DAYS}
     SOURCEFILE_CLIMAT=${SOURCEPATH}/${SEARCHSTRING_CLIMAT}${ice_snow_suffix}
-    SOURCENAME_CLIMAT=`els $SOURCEFILE_CLIMAT`
+    SOURCENAME_CLIMAT=$(els $SOURCEFILE_CLIMAT)
+    if [ ${?} -ne 0 ]; then
+        printf " --- FAILED: els $SOURCEFILE_CLIMAT\n"
+        SOURCENAME_CLIMAT=$(basename $SOURCEFILE_CLIMAT)
+    else
+        printf "\nSUCCESS: $SOURCENAME_CLIMAT\n"
+    fi
     TARGETFILE_CLIMAT=${TARGETPATH}/${SOURCENAME_CLIMAT} #`basename ${SOURCEFILE}`
 
     # availability check
-    if [ ! -f "${TARGETFILE}" ] && [ ! -f "${TARGETFILE_CLIMAT}" ]; then
-        echo "Get NISE data from ECFS for $CURRENT_DATE"
-        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} \
-          ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
-    else
-        if [ -f $TARGETFILE ]; then echo "$TARGETFILE already exists"; fi
-        if [ -f $TARGETFILE_CLIMAT ]; then echo "$TARGETFILE_CLIMAT already exists"; fi
+    printf "\nData already on scratch for NISE ${CURRENT_DATE}?\n"
+    data_on_scratch ${target_ice_snow} ${target_ice_snow_fake}
+
+    if [ $aflag -ne 0 ]; then
+        printf "\nGet NISE data from ECFS for $CURRENT_DATE\n"
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
     fi
+
+    #echo "DAY=$DAYS"
+    #if [ "$DAYS" -eq "02" ]; then exit; fi
 
     # go to next day
     (( unix_counter += 86400 ))

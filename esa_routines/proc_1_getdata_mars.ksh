@@ -49,7 +49,7 @@ while [ $unix_counter -le $unix_stop ]; do
     if [ -d $DATADIRE ]; then
         echo "YES: $DATADIRE exists"
 
-        nfiles=$(ls -A $DATADIR/* |wc -l)
+        nfiles=$(ls $DATADIRE/* | wc -l)
         echo "Number of files: $nfiles"
 
         if [ $nfiles -gt 0 ]; then
