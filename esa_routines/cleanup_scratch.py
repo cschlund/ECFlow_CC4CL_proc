@@ -262,7 +262,7 @@ def clear_l3(args_l3):
         for ad in alldirs:
             if datestr in ad and sensor in ad \
                     and 'ORAC' in ad and platform in ad:
-                getdirs.append(ad)
+                getdirs.append( os.path.join(args_l3.inpdir, ad) )
 
         # check if getdirs list is empty
         if len(getdirs) == 0:
