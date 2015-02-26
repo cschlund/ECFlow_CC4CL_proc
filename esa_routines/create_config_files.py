@@ -332,10 +332,7 @@ def l2tol3(args_l3):
         f.write("platform={0}\n".format(platform))
         f.write("\n")
         f.write("# define product type\n")
-        if args_l3.prodtype == "l2b":
-            f.write("prodtype=l2b\n")
-        if args_l3.prodtype == "l3a":
-            f.write("prodtype=l3a\n")
+        f.write("prodtype={0}\n".format(args_l3.prodtype))
         f.write("\n")
         f.write("# set here some details about the grid:\n")
         f.write("# produce global grid (F) or local grid (T)\n")
@@ -356,20 +353,17 @@ def l2tol3(args_l3):
         f.write("#elat=48\n")
         f.write("\n")
         f.write("# inverse spacing of l3 and l2b grid in deg. for local grid\n")
-        f.write("gridxl3=10\n")
-        f.write("gridyl3=10\n")
+        f.write("gridxl3=2\n")
+        f.write("gridyl3=2\n")
         f.write("\n")
-        f.write("gridxl2b=50\n")
-        f.write("gridyl2b=50\n")
+        f.write("gridxl2b=10\n")
+        f.write("gridyl2b=10\n")
         f.write("\n")
-        f.write("fastl3=0\n")
-        f.write("\n")
-        f.write("# obsolete:\n")
-        f.write("l1closure=F\n")
-        f.write("\n")
+        f.write("# inverse spacing of local grid in deg.\n")
+        f.write("gridxloc=10\n")
+        f.write("gridyloc=10\n")
         f.write("# set id string explicitly in order to avoid\n")
         f.write("# confusion when averaging\n")
-        # f.write("id=ID9314213_US1416834943\n")
         f.write("id={0}\n".format(id_number))
         f.write("\n")
         f.close()
@@ -449,8 +443,7 @@ if __name__ == '__main__':
     l2tol3_parser.add_argument('-inp', '--inpdir', required=True, type=str,
                                help="String, /path/to/input/files")
     l2tol3_parser.add_argument('-typ', '--prodtype', type=str,
-                               help="Choices: \'l2b\' == \'L3U\' or "
-                                    "\'l3a\' == \'L3C\' ")
+                               help="Choices: \'l2b\' or \'l2b_sum\' or \'l3a\'")
     l2tol3_parser.set_defaults(func=l2tol3)
 
     # Parse arguments
