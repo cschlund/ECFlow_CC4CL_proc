@@ -21,6 +21,9 @@ subroutine clean_up_pre(string)
   directory=trim(adjustl(string(1:cut_off)))//trim(adjustl(dir))
 
   command_line="rm -rf "//trim(adjustl(directory))
+
+  write(*,*)  "Clean_up_pre command line call = ", trim(adjustl(command_line))
+
   call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
 
 end subroutine clean_up_pre
@@ -49,6 +52,9 @@ subroutine clean_up_main(string)
   directory=trim(adjustl(string(1:cut_off)))//trim(adjustl(dir))
 
   command_line="rm -rf "//trim(adjustl(directory))
+
+  write(*,*)  "Clean_up_main command line call = ", trim(adjustl(command_line))
+
   call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
 
 end subroutine clean_up_main
@@ -124,6 +130,8 @@ subroutine move_post(string,instrument,platform,year,month)
      command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
      call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
 
+     write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+
   endif
 
   if (trim(adjustl(instrument)) .eq. 'MODIS' .or. trim(adjustl(instrument)) .eq. 'modis') then
@@ -165,7 +173,9 @@ subroutine move_post(string,instrument,platform,year,month)
      command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
      call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
 
-  endif
+     write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
 
+  endif
+  
 end subroutine move_post
 
