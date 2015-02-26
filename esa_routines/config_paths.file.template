@@ -8,19 +8,18 @@
 # ---------------------------------------------------------------
 
 # local & remote
-TYPE="test"
+TYPE="cloud_cci_master"
 BASE="ms/de/sf7/cschlund"
+
 # remote machine!
 MAIN="/perm/ms/de/sf7/esa_cci_c_proc"
 #MAIN="/perm/${BASE}/sissi_orac"
 
 # AVHRR GAC top level directory in ecfs
 # final pygac data
-#avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive
+avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive
 # CMSAF feedback loop months: JAN+JUL 2008, APR 2002, JAN 1983
 #avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive/testdata
-# old pygac version (2008,2009,2010 only)
-avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive/pyGACv0.1.0
 
 # ---------------------------------------------------------------
 # do not change unless you know what you are doing ;-)
@@ -30,7 +29,7 @@ avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive/pyGACv0.1.0
 LIB_common=${MAIN}/orac_repository/trunk/common
 LIB_pre=${MAIN}/orac_repository/trunk/pre_processing
 LIB_main=${MAIN}/orac_repository/trunk/src
-LIB_post=${MAIN}/orac_repository/post_processing
+LIB_post=${MAIN}/orac_repository/trunk/post_processing
 
 # base paths
 REPOSITORY="ECFlow_CC4CL_proc"
@@ -48,6 +47,7 @@ ESA_ROUT=$PERM_BASE/esa_routines
 LOGDIR=$SCRATCH_BASE/logs
 INPUTDIR=$SCRATCH_BASE/input
 OUTPUTDIR=$SCRATCH_BASE/output
+TEMP_CONFIG_DIR=$SCRATCH_BASE/temp_cfg_files
 
 # ---------------------------------------------------------------
 # new python/bash tools, C. Schlundt 2014/2015

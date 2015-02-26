@@ -1,24 +1,24 @@
 #!/usr/bin/env python2.7
 
-import os, sys
+import os
 
 # -------------------------------------------------------
-# -- modify this ----------------------------------------
+#       LINES BELOW MUST BE MODIFIED BY USER
 # -------------------------------------------------------
 
 # user settings
-remote_host_name  = "cca"
-remote_user_name  = "sf7"
+remote_host_name = "cca"
+remote_user_name = "sf7"
 
 # base path, user specific
 basepath = "ms/de/sf7/cschlund"
 
 # subfolder, where your repository is located
-# e.g. /perm/ms/de/sf7/cschlund/test/ECFlow_CC4CL_proc
-type = "test"
+# e.g. /perm/ms/de/sf7/cschlund/cloud_cci_master/ECFlow_CC4CL_proc
+itype = "cloud_cci_master"
 
 # suite name
-mysuite = type+"_cc4cl_proc" 
+mysuite = itype + "_proc"
 
 # ECFS path: final level3, level2 data
 ecfs_l3_dir = "ec:/sf7/ESA_Cloud_cci_data/L3"
@@ -28,74 +28,70 @@ ecfs_l2_dir = "ec:/sf7/ESA_Cloud_cci_data/L2"
 serial_threads_number = 1
 parallel_threads_number = 2
 
-
 # -------------------------------------------------------
-# -- modify below if you know what you are doing!
+#   LINES BELOW SHOULD NOT BE MODIFIED BY USER
 # -------------------------------------------------------
 
-# -- pycmsaf software
+# pycmsaf software
 pycmsaf = "/perm/ms/de/sf7/cschlund/pycmsaf"
-gacdb_file = os.path.join( pycmsaf, "AVHRR_GAC_archive.sqlite3" )
+gacdb_file = os.path.join(pycmsaf, "AVHRR_GAC_archive.sqlite3")
 
-# -- ecgate and cca
-repository   = "ECFlow_CC4CL_proc"
-perm         = os.path.join( "/perm", basepath )
-scratch      = os.path.join( "/scratch", basepath )
-perm_base    = os.path.join( perm, type, repository )
-scratch_base = os.path.join( scratch, type, repository )
+# ecgate and cca
+repository = "ECFlow_CC4CL_proc"
+perm = os.path.join("/perm", basepath)
+scratch = os.path.join("/scratch", basepath)
+perm_base = os.path.join(perm, itype, repository)
+scratch_base = os.path.join(scratch, itype, repository)
 
-
-# -- cca:
-esa_routine   = os.path.join( perm_base, "esa_routines" )
-esa_inputdir  = os.path.join( scratch_base, "input" )
-esa_outputdir = os.path.join( scratch_base, "output" )
-esa_level3dir = os.path.join( scratch_base, "output/level3" )
-esa_logdir    = os.path.join( scratch_base, "logs/processing" )
-esa_configdir = os.path.join( scratch_base, "temp_cfg_files")
+# cca:
+esa_routine = os.path.join(perm_base, "esa_routines")
+esa_inputdir = os.path.join(scratch_base, "input")
+esa_outputdir = os.path.join(scratch_base, "output")
+esa_level3dir = os.path.join(scratch_base, "output/level3")
+esa_logdir = os.path.join(scratch_base, "logs/processing")
+esa_configdir = os.path.join(scratch_base, "temp_cfg_files")
 
 # new programs
-make_cfg_files    = os.path.join( esa_routine, "create_config_files.py" )
-count_orbit_files = os.path.join( esa_routine, "count_orbit_files.sh" )
-cleanup_scratch   = os.path.join( esa_routine, "cleanup_scratch.py" )
-archive_data      = os.path.join( esa_routine, "proc_4_archive_data.py" )
+make_cfg_files = os.path.join(esa_routine, "create_config_files.py")
+count_orbit_files = os.path.join(esa_routine, "count_orbit_files.sh")
+cleanup_scratch = os.path.join(esa_routine, "cleanup_scratch.py")
+archive_data = os.path.join(esa_routine, "proc_4_archive_data.py")
 
 # config files
-cfg_paths_file = os.path.join( esa_routine, "config_paths.file" )
-cfg_attri_file = os.path.join( esa_routine, "config_attributes.file" )
-cfg_prefix     = "config_proc_"
-cfg_suffix     = ".file"
+cfg_paths_file = os.path.join(esa_routine, "config_paths.file")
+cfg_attri_file = os.path.join(esa_routine, "config_attributes.file")
+cfg_prefix = "config_proc_"
+cfg_suffix = ".file"
 
 # ksh scripts
-get_avhrr_ksh  = os.path.join( esa_routine, "proc_1_getdata_avhrr.ksh" )
-get_modis_ksh  = os.path.join( esa_routine, "proc_1_getdata_modis.ksh" )
-get_mars_ksh   = os.path.join( esa_routine, "proc_1_getdata_mars.ksh" )
-get_aux_ksh    = os.path.join( esa_routine, "proc_1_getdata_aux.ksh" )
-proc2_orac_ksh = os.path.join( esa_routine, "proc_2_process.ksh" )
-single_day_ksh = os.path.join( esa_routine, "process_single_day.ksh")
-run_l2tol3_ksh = os.path.join( esa_routine, "proc_3_l2tol3_script.ksh" )
+get_avhrr_ksh = os.path.join(esa_routine, "proc_1_getdata_avhrr.ksh")
+get_modis_ksh = os.path.join(esa_routine, "proc_1_getdata_modis.ksh")
+get_mars_ksh = os.path.join(esa_routine, "proc_1_getdata_mars.ksh")
+get_aux_ksh = os.path.join(esa_routine, "proc_1_getdata_aux.ksh")
+proc2_orac_ksh = os.path.join(esa_routine, "proc_2_process.ksh")
+single_day_ksh = os.path.join(esa_routine, "process_single_day.ksh")
+run_l2tol3_ksh = os.path.join(esa_routine, "proc_3_l2tol3_script.ksh")
 
 # exe scripts
-wrapper_exe    = os.path.join( esa_routine, "mpi_wrapper.x")
+wrapper_exe = os.path.join(esa_routine, "mpi_wrapper.x")
 
+# paths to be exported: $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
+pycmsaf_bin = os.path.join(pycmsaf, "bin")
+python_path = "/usr/local/apps/python/current/bin/python"
+ld_lib_path = "/perm/ms/de/sf7/esa_cci_c_proc/software/" \
+              "epr/epr_api-2.2/build/release:" \
+              "/perm/us/usc/hdfeos/2.19-d/CRAY/82/lib:$LD_LIBRARY_PATH"
 
-# -- paths to be exported: $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
-pycmsaf_bin  = os.path.join( pycmsaf, "bin" )
-python_path  = "/usr/local/apps/python/current/bin/python"
-ld_lib_path  = "/perm/ms/de/sf7/esa_cci_c_proc/software/"\
-               "epr/epr_api-2.2/build/release:"\
-               "/perm/us/usc/hdfeos/2.19-d/CRAY/82/lib:$LD_LIBRARY_PATH"
+# server settings @ ecgate
+ecflow_submit = os.path.join(pycmsaf_bin, "ecf_submit.py")
+ecf_files_dir = os.path.join(perm_base, "ecflow_suite/tasks")
+ecf_include_dir = os.path.join(perm_base, "ecflow_suite/include")
+ecf_home_dir = os.path.join(scratch_base, "generated")
+ecf_out_dir = os.path.join(scratch_base, "log")
+remote_log_dir = os.path.join(scratch_base, "log")
 
-# -- server settings @ ecgate
-ecflow_submit     = os.path.join( pycmsaf_bin, "ecf_submit.py" )
-ecf_files_dir     = os.path.join( perm_base, "ecflow_suite/tasks" )
-ecf_include_dir   = os.path.join( perm_base, "ecflow_suite/include" )
-ecf_home_dir      = os.path.join( scratch_base, "generated" )
-ecf_out_dir       = os.path.join( scratch_base, "log" )
-remote_log_dir    = os.path.join( scratch_base, "log" )
-
-# -- command for submitting serial and mpmd jobs
-serial_job_cmd = "%PYTHON% %ECF_SUBMIT% "\
-            "%REMOTE_USER% %REMOTE_HOST% "\
-            "%ECF_JOB% %REMOTE_LOGDIR%%ECF_NAME%.%ECF_TRYNO% > "\
-            "%ECF_OUT%%ECF_NAME%.%ECF_TRYNO% 2>&1"
-
+# command for submitting serial and mpmd jobs
+serial_job_cmd = "%PYTHON% %ECF_SUBMIT% " \
+                 "%REMOTE_USER% %REMOTE_HOST% " \
+                 "%ECF_JOB% %REMOTE_LOGDIR%%ECF_NAME%.%ECF_TRYNO% > " \
+                 "%ECF_OUT%%ECF_NAME%.%ECF_TRYNO% 2>&1"

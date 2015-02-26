@@ -26,6 +26,7 @@
 #   2014-04-08 MJ migration to cca/sf7
 #   2014-11-12 C. Schlundt: modified in order to get new AVHRR GAC L1C data
 #   2015-01-14 C. Schlundt: ahvrr_top added
+#   2015-02-24 C. Schlundt: check data availability before ecp call
 #
 # ##############################################################################
 
@@ -108,6 +109,7 @@ get_avhrr_data()
 #
 # Main
 #
+# input/sensor/platform/yyyy/mm/dd/yyyymmdd/*h5
 
 set -xv
 
@@ -121,16 +123,52 @@ set -xv
 for year in `seq $STARTYEAR $STOPYEAR`
 do
     for month in `seq $STARTMONTH $STOPMONTH`
-    do
-        get_avhrr_data $year $month $platform $avhrr_top
+    do 
+        # availability flag
+        aflag=-1
 
-        if [ ${?} -ne 0 ]; then
-            print " --- FAILED: get_avhrr_data $year $month $platform $avhrr_top"
-            return 1
-        else
-            print " --- FINISHED: get_avhrr_data $year $month $platform $avhrr_top"
+        # test if data is already on $SCRATCH
+        mm=$(printf %02d ${month})
+        target=$INPUTDIR/$instrument/$platform/$year/$mm
+
+        if [ -d $target ]; then 
+            echo "YES: $target exists"
+
+            ndays=$(ls -A $target |wc -l)
+            echo "Number of days: $ndays"
+
+            if [ $ndays -gt 0 ]; then
+
+                nfiles=$(ls -A $target/*/*/*avhrr* |wc -l)
+                echo "Number of files: $nfiles"
+
+                if [ $nfiles -gt 0 ]; then
+                    aflag=0
+                fi
+
+            fi
         fi
-    done
-done
+
+
+        if [ $aflag -ne 0 ]; then
+            echo "No data available on scratch, so get them!"
+
+            params="$year $month $platform $avhrr_top"
+
+            get_avhrr_data $year $month $platform $avhrr_top
+
+            if [ ${?} -ne 0 ]; then
+                print " --- FAILED: get_avhrr_data $params"
+                return 1
+            else
+                print " --- FINISHED: get_avhrr_data $params"
+            fi
+        else 
+            echo "There is nothing to do for $target" 
+            echo "Data already available on scratch!"
+        fi
+
+    done # end of month loop
+done # end of year loop
 
 # -- end of ksh script

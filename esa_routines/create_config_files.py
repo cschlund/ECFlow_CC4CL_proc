@@ -5,144 +5,165 @@
 # C. Schlundt, November 2014
 #
 
-import os, sys
+import os
+import sys
 import argparse
-import time, datetime
+import time
+import datetime
+
+from pycmsaf.logger import setup_root_logger
 from housekeeping import get_id
 
+logger = setup_root_logger(name='sissi')
 
-# -------------------------------------------------------------------
-def getsat(args):
-    try: 
 
-        if args.satellite.upper() == "TERRA":
-            platform="MOD"
-        elif args.satellite.upper() == "AQUA":
-            platform="MYD"
-        elif args.satellite.upper().startswith("NOAA"):
-            platform=args.satellite.lower()
-        elif args.satellite.upper().startswith("METOP"):
-            platform=args.satellite.lower()
+def getsat(args_sat):
+    """
+    Writes config file for dearchiving satellite data.
+    @param args_sat: command line arguments
+    """
+
+    global platform
+    try:
+        if args_sat.satellite.upper() == "TERRA":
+            platform = "MOD"
+        elif args_sat.satellite.upper() == "AQUA":
+            platform = "MYD"
+        elif args_sat.satellite.upper().startswith("NOAA"):
+            platform = args_sat.satellite.lower()
+        elif args_sat.satellite.upper().startswith("METOP"):
+            platform = args_sat.satellite.lower()
         else:
-            print " ! Wrong satellite name !\n"
+            logger.info("WRONG SATELLITE NAME!")
             exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
 
-        f = open(args.cfile, mode="w")
+        f = open(args_sat.cfile, mode="w")
+
         f.write("# Config file for dearchiving satellite data\n")
-        f.write("# Created: "+timestamp+"\n")
+        f.write("# Created: {0}\n".format(timestamp))
         f.write("\n")
         f.write("# define date range\n")
-        f.write("STARTYEAR="+str(args.start_year)+"\n")
-        f.write("STOPYEAR="+str(args.end_year)+"\n")
-        f.write("STARTMONTH="+str(args.start_month)+"\n")
-        f.write("STOPMONTH="+str(args.end_month)+"\n")
+        f.write("STARTYEAR={0}\n".format(str(args_sat.start_year)))
+        f.write("STOPYEAR={0}\n".format(str(args_sat.end_year)))
+        f.write("STARTMONTH={0}\n".format(str(args_sat.start_month)))
+        f.write("STOPMONTH={0}\n".format(str(args_sat.end_month)))
         f.write("STARTDAY=1\n")
         f.write("STOPDAY=0\n")
         f.write("\n")
         f.write("#define sensor and platform\n")
-        f.write("instrument="+args.instrument.upper()+"\n")
-        f.write("platform="+platform+"\n")
-        if args.instrument.upper() == "MODIS": 
+        f.write("instrument={0}\n".format(args_sat.instrument.upper()))
+        f.write("platform={0}\n".format(platform))
+        if args_sat.instrument.upper() == "MODIS":
             f.write("\n")
             f.write("cflag=0\n")
             f.write("rflag=1\n")
             f.write("rcut=50\n")
         f.close()
-    except (IndexError, ValueError, RuntimeError,
-            Exception) as err:
-        print (" --- FAILED: %s" % err)
-        
+
+    except (IndexError, ValueError, RuntimeError, Exception) as err:
+        logger.info("FAILED: {0}".format(err))
+
     return
 
-# -------------------------------------------------------------------
-def getaux(args):
-    try: 
 
+def getaux(args_aux):
+    """
+    Writes config file for dearchiving auxiliary data.
+    @param args_aux: command line arguments
+    """
+
+    try:
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
 
-        f = open(args.cfile, mode="w")
+        f = open(args_aux.cfile, mode="w")
+
         f.write("# Config file for dearchiving auxiliary data\n")
-        f.write("# Created: "+timestamp+"\n")
+        f.write("# Created: {0}\n".format(timestamp))
         f.write("\n")
         f.write("# define date range\n")
-        f.write("STARTYEAR="+str(args.start_year)+"\n")
-        f.write("STOPYEAR="+str(args.end_year)+"\n")
-        f.write("STARTMONTH="+str(args.start_month)+"\n")
-        f.write("STOPMONTH="+str(args.end_month)+"\n")
+        f.write("STARTYEAR={0}\n".format(str(args_aux.start_year)))
+        f.write("STOPYEAR={0}\n".format(str(args_aux.end_year)))
+        f.write("STARTMONTH={0}\n".format(str(args_aux.start_month)))
+        f.write("STOPMONTH={0}\n".format(str(args_aux.end_month)))
         f.write("STARTDAY=1\n")
         f.write("STOPDAY=0\n")
-        if args.getdata == "aux":
+        if args_aux.getdata == "aux":
             f.write("\n")
             f.write("albedo_type=MCD43C3\n")
             f.write("albedo_suffix=.tar\n")
             f.write("BRDF_type=MCD43C1\n")
             f.write("BRDF_suffix=.tar\n")
-            f.write("ice_snow_type=NISE_SSMI*\n") 
+            f.write("ice_snow_type=NISE_SSMI*\n")
             f.write("ice_snow_suffix=.tar\n")
             f.write("emissivity_type=global_emis_inf10_monthFilled_MYD11C3.A\n")
-            if args.start_year >= 2003 and args.start_year <= 2006 and \
-                    args.end_year >= 2003 and args.end_year <= 2006:
+            if 2003 <= args.start_year <= 2006 and 2003 <= args.end_year <= 2006:
                 # between 2003 and 2006 filename extension
                 f.write("emissivity_suffix=.nc.bz2\n")
             else:
                 # from 2007 onwards and for climatology filename
                 f.write("emissivity_suffix=.041.nc.bz2\n")
         f.close()
-    except (IndexError, ValueError, RuntimeError,
-            Exception) as err:
-        print (" --- FAILED: %s" % err)
-        
+
+    except (IndexError, ValueError, RuntimeError, Exception) as err:
+        logger.info("FAILED: {0}".format(err))
+
     return
 
-# -------------------------------------------------------------------
-def proc2(args):
-    try: 
 
-        if args.satellite.upper() == "TERRA":
-            #platform="MOD"
-            platform="TERRA"
-        elif args.satellite.upper() == "AQUA":
-            #platform="MYD"
-            platform="AQUA"
-        elif args.satellite.upper().startswith("NOAA"):
-            platform=args.satellite.lower()
-        elif args.satellite.upper().startswith("METOP"):
-            platform=args.satellite.lower()
+def proc2(args_ret):
+    """
+    Writes config file for the retrieval.
+    @param args_ret: command line arguments
+    """
+
+    global platform
+    try:
+        if args_ret.satellite.upper() == "TERRA":
+            # platform="MOD"
+            platform = "TERRA"
+        elif args_ret.satellite.upper() == "AQUA":
+            # platform="MYD"
+            platform = "AQUA"
+        elif args_ret.satellite.upper().startswith("NOAA"):
+            platform = args_ret.satellite.lower()
+        elif args_ret.satellite.upper().startswith("METOP"):
+            platform = args_ret.satellite.lower()
         else:
-            print " ! Wrong satellite name !\n"
+            logger.info("WRONG SATELLITE NAME!")
             exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
 
-        f = open(args.cfile, mode="w")
+        f = open(args_ret.cfile, mode="w")
+
         f.write("# Config file for proc2 (ORAC) \n")
-        f.write("# Created: "+timestamp+"\n")
+        f.write("# Created: {0}\n".format(timestamp))
         f.write("\n")
         f.write("nthreads=1\n")
         f.write("wrapper_mode=dyn\n")
         f.write("\n")
         f.write("# define date range\n")
-        f.write("STARTYEAR="+str(args.start_year)+"\n")
-        f.write("STOPYEAR="+str(args.end_year)+"\n")
-        f.write("STARTMONTH="+str(args.start_month)+"\n")
-        f.write("STOPMONTH="+str(args.end_month)+"\n")
+        f.write("STARTYEAR={0}\n".format(str(args_ret.start_year)))
+        f.write("STOPYEAR={0}\n".format(str(args_ret.end_year)))
+        f.write("STARTMONTH={0}\n".format(str(args_ret.start_month)))
+        f.write("STOPMONTH={0}\n".format(str(args_ret.end_month)))
 
-        if args.procday < 0: 
+        if args_ret.procday < 0:
             f.write("STARTDAY=1\n")
             f.write("STOPDAY=0\n")
         else:
-            f.write("STARTDAY="+str(args.procday)+"\n")
-            f.write("STOPDAY="+str(args.procday)+"\n")
+            f.write("STARTDAY={0}\n".format(str(args_ret.procday)))
+            f.write("STOPDAY={0}\n".format(str(args_ret.procday)))
 
         f.write("\n")
         f.write("# define sensor and platform\n")
-        f.write("instrument="+args.instrument.upper()+"\n")
-        f.write("platform="+platform+"\n")
+        f.write("instrument={0}\n".format(args_ret.instrument.upper()))
+        f.write("platform={0}\n".format(platform))
         f.write("\n")
         f.write("# this defines the preprocessing grid\n")
         f.write("# 1: ecmwf grid, 2: L3 grid, 3: own definition\n")
@@ -152,7 +173,7 @@ def proc2(args):
         f.write("dellat=2.0\n")
         f.write("\n")
         f.write("# start and end pixel in across/along track direction\n")
-        if args.testrun is True: 
+        if args_ret.testrun is True:
             f.write("# subset for testing\n")
             f.write("startx=200\n")
             f.write("endx=210\n")
@@ -173,11 +194,11 @@ def proc2(args):
         f.write("#      depending on which AVHRR is just processed.\n")
         f.write("#      (to be implemented)\n")
         f.write("channelflag=0\n")
-        f.write("#number of channels available in files coming from preprocessing\n")
+        f.write("# number of channels available in files coming from preprocessing\n")
         f.write("nchannels_avail=6\n")
-        f.write("#number of channels to use from those\n")
+        f.write("# number of channels to use from those\n")
         f.write("nchannels=${nchannels_avail}\n")
-        f.write("#channel indices to use\n")
+        f.write("# channel indices to use\n")
         f.write("proc_flag[0]=1   # ch1\n")
         f.write("proc_flag[1]=1   # ch2\n")
         f.write("proc_flag[2]=1   # ch3a\n")
@@ -236,27 +257,32 @@ def proc2(args):
         f.write("ECMWF_version='ERA-Interim'\n")
         f.write("SVN_version='2896'\n")
         f.close()
-    except (IndexError, ValueError, RuntimeError,
-            Exception) as err:
-        print (" --- FAILED: %s" % err)
-        
+
+    except (IndexError, ValueError, RuntimeError, Exception) as err:
+        logger.info("FAILED: {0}".format(err))
+
     return
 
 
 # -------------------------------------------------------------------
-def l2tol3(args):
-    try: 
+def l2tol3(args_l3):
+    """
+    Writes config file for the l2 to l3 processing.
+    @param args_l3: command line arguments
+    """
 
-        if args.satellite.upper() == "TERRA":
-            platform="MOD"
-        elif args.satellite.upper() == "AQUA":
-            platform="MYD"
-        elif args.satellite.upper().startswith("NOAA"):
-            platform=args.satellite.upper()
-        elif args.satellite.upper().startswith("METOP"):
-            platform=args.satellite.upper()
+    global platform, id_number
+    try:
+        if args_l3.satellite.upper() == "TERRA":
+            platform = "MOD"
+        elif args_l3.satellite.upper() == "AQUA":
+            platform = "MYD"
+        elif args_l3.satellite.upper().startswith("NOAA"):
+            platform = args_l3.satellite.upper()
+        elif args_l3.satellite.upper().startswith("METOP"):
+            platform = args_l3.satellite.upper()
         else:
-            print " ! Wrong satellite name !\n"
+            logger.info("WRONG SATELLITE NAME!")
             exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
@@ -265,20 +291,21 @@ def l2tol3(args):
         # -- search for current ID number --
 
         # date string
-        datestr = str(args.start_year)+str('%02d' % args.start_month)
+        datestr = str(args_l3.start_year) + \
+                  str('%02d' % args_l3.start_month)
 
         # get dirs list containing all subdirs of given path
-        alldirs = os.listdir( args.inpdir )
+        alldirs = os.listdir(args_l3.inpdir)
 
         # get dirs list matching the arguments
         if len(alldirs) > 0:
             getdirs = list()
             for ad in alldirs:
                 if datestr in ad \
-                        and args.instrument.upper() in ad \
-                        and args.satellite.lower() in ad \
-                        and 'retrieval'in ad:
-                            getdirs.append( ad )
+                        and args_l3.instrument.upper() in ad \
+                        and args_l3.satellite.lower() in ad \
+                        and 'retrieval' in ad:
+                    getdirs.append(ad)
 
             # sort list
             getdirs.sort()
@@ -287,27 +314,27 @@ def l2tol3(args):
             lastdir = getdirs.pop()
 
             # get ID number from the last job
-            id = get_id( lastdir )
+            id_number = get_id(lastdir)
 
         # -- end of search for current ID number --
 
-        f = open(args.cfile, mode="w")
+        f = open(args_l3.cfile, mode="w")
         f.write("# Config file for level3 processing\n")
-        f.write("# Created: "+timestamp+"\n")
+        f.write("# Created: {0}\n".format(timestamp))
         f.write("\n")
         f.write("# define date range\n")
-        f.write("YEAR="+str(args.start_year)+"\n")
-        f.write("MONTH="+str(args.start_month)+"\n")
+        f.write("YEAR={0}\n".format(str(args_l3.start_year)))
+        f.write("MONTH={0}\n".format(str(args_l3.start_month)))
         f.write("DAY=-1\n")
         f.write("\n")
         f.write("# define sensor and platform\n")
-        f.write("sensor="+args.instrument.upper()+"\n")
-        f.write("platform="+platform+"\n")
+        f.write("sensor={0}\n".format(args_l3.instrument.upper()))
+        f.write("platform={0}\n".format(platform))
         f.write("\n")
         f.write("# define product type\n")
-        if args.prodtype == "l2b":
+        if args_l3.prodtype == "l2b":
             f.write("prodtype=l2b\n")
-        if args.prodtype == "l3a":
+        if args_l3.prodtype == "l3a":
             f.write("prodtype=l3a\n")
         f.write("\n")
         f.write("# set here some details about the grid:\n")
@@ -342,111 +369,95 @@ def l2tol3(args):
         f.write("\n")
         f.write("# set id string explicitly in order to avoid\n")
         f.write("# confusion when averaging\n")
-        #f.write("id=ID9314213_US1416834943\n")
-        f.write("id="+id+"\n")
+        # f.write("id=ID9314213_US1416834943\n")
+        f.write("id={0}\n".format(id_number))
         f.write("\n")
         f.close()
-    except (IndexError, ValueError, RuntimeError,
-            Exception) as err:
-        print (" --- FAILED: %s" % err)
-        
+
+    except (IndexError, ValueError, RuntimeError, Exception) as err:
+        logger.info("FAILED: {0}".format(err))
+
     return
 
 
-# -------------------------------------------------------------------
-# --- main ---
-# -------------------------------------------------------------------
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description=u" {0:s} creates config files for given "
+                    u"satellite, sensor, start and end dates "
+                    u"required by CC4CL.".format(os.path.basename(__file__)))
 
-    parser = argparse.ArgumentParser(description='''
-            %s creates config files for given satellite,
-            sensor, start and end dates required 
-            by CC4CL.''' % os.path.basename(__file__))
-    
     # add main arguments
-    parser.add_argument('-cf', '--cfile', type=str,
-            help="String, e.g. /path/to/config_name.file", 
-            required=True)
+    parser.add_argument('-cf', '--cfile', type=str, required=True,
+                        help="String, e.g. /path/to/config_name.file")
+
     parser.add_argument('-sy', '--start_year', type=int,
-            help="Integer, e.g. 2010", required=True)
+                        help="Integer, e.g. 2010", required=True)
+
     parser.add_argument('-ey', '--end_year', type=int,
-            help="Integer, e.g. 2010", required=True)
+                        help="Integer, e.g. 2010", required=True)
+
     parser.add_argument('-sm', '--start_month', type=int,
-            help="Integer, e.g. 1", required=True)
+                        help="Integer, e.g. 1", required=True)
+
     parser.add_argument('-em', '--end_month', type=int,
-            help="Integer, e.g. 1", required=True)
+                        help="Integer, e.g. 1", required=True)
 
     # define subcommands
     subparsers = parser.add_subparsers(help="Select a Subcommand")
 
     # -> create config file for dearchiving avhrr/modis data
     getsat_parser = subparsers.add_parser('getsat',
-            description='''Make config file for dearchiving 
-            avhrr or modis data.''')
-    getsat_parser.add_argument('-sat', '--satellite', 
-            type=str, help="String, e.g. noaa18, terra", 
-            required=True)
-    getsat_parser.add_argument('-ins', '--instrument', 
-            type=str, help="String, e.g. avhrr, modis", 
-            required=True)
+                                          description="Make config file for dearchiving "
+                                                      "avhrr or modis data.")
+    getsat_parser.add_argument('-sat', '--satellite', required=True, type=str,
+                               help="String, e.g. noaa18, terra")
+    getsat_parser.add_argument('-ins', '--instrument', required=True, type=str,
+                               help="String, e.g. avhrr, modis")
     getsat_parser.set_defaults(func=getsat)
 
     # -> create config file for dearchiving aux/mars data
     getaux_parser = subparsers.add_parser('getaux',
-            description='''Make config file for dearchiving 
-            auxiliary or era interim data.''')
-    getaux_parser.add_argument('-get', '--getdata', 
-            type=str, help="Choice: \'aux\' or \'era\'.", 
-            required=True)
+                                          description="Make config file for dearchiving "
+                                                      "auxiliary or era interim data.")
+    getaux_parser.add_argument('-get', '--getdata', required=True, type=str,
+                               help="Choice: \'aux\' or \'era\'.")
     getaux_parser.set_defaults(func=getaux)
 
     # -> create config file for proc2 (ORAC)
     proc2_parser = subparsers.add_parser('proc2',
-            description='''Make config file for proc2,
-            i.e. generate L2 output.''')
-    proc2_parser.add_argument('-sat', '--satellite', 
-            type=str, help="String, e.g. noaa18, terra", 
-            required=True)
-    proc2_parser.add_argument('-ins', '--instrument', 
-            type=str, help="String, e.g. avhrr, modis", 
-            required=True)
-    proc2_parser.add_argument('-test', '--testrun',
-            help='''Testrun: only a few pixels are processed, i.e.
-            across: 200-210, along: 200-210''',
-            action="store_true")
+                                         description="Make config file for proc2,"
+                                                     "i.e. generate L2 output.")
+    proc2_parser.add_argument('-sat', '--satellite', required=True, type=str,
+                              help="String, e.g. noaa18, terra")
+    proc2_parser.add_argument('-ins', '--instrument', required=True, type=str,
+                              help="String, e.g. avhrr, modis")
+    proc2_parser.add_argument('-test', '--testrun', action="store_true",
+                              help="Testrun: only a few pixels are processed, "
+                                   "i.e. across: 200-210, along: 200-210")
     proc2_parser.add_argument('-pday', '--procday', type=int,
-            help="-1: whole month otherwise this day")
+                              help="-1: whole month otherwise this day")
     proc2_parser.set_defaults(func=proc2)
 
     # -> create config file for l2 to l3 processing
     l2tol3_parser = subparsers.add_parser('l2tol3',
-            description='''Make config file for l2tol3,
-            i.e. generate L2B or L3A output.''')
-    l2tol3_parser.add_argument('-sat', '--satellite', 
-            type=str, help="String, e.g. noaa18, terra", 
-            required=True)
-    l2tol3_parser.add_argument('-ins', '--instrument', 
-            type=str, help="String, e.g. avhrr, modis", 
-            required=True)
-    l2tol3_parser.add_argument('-inp', '--inpdir', 
-            type=str, help="String, /path/to/input/files", 
-            required=True)
-    l2tol3_parser.add_argument('-typ', '--prodtype',
-            help='''Choices: \'l2b\' == \'L3U\' or 
-            \'l3a\' == \'L3C\' ''',
-            type=str)
+                                          description="Make config file for l2tol3, "
+                                                      "i.e. generate L2B or L3A output.")
+    l2tol3_parser.add_argument('-sat', '--satellite', required=True, type=str,
+                               help="String, e.g. noaa18, terra")
+    l2tol3_parser.add_argument('-ins', '--instrument', required=True, type=str,
+                               help="String, e.g. avhrr, modis")
+    l2tol3_parser.add_argument('-inp', '--inpdir', required=True, type=str,
+                               help="String, /path/to/input/files")
+    l2tol3_parser.add_argument('-typ', '--prodtype', type=str,
+                               help="Choices: \'l2b\' == \'L3U\' or "
+                                    "\'l3a\' == \'L3C\' ")
     l2tol3_parser.set_defaults(func=l2tol3)
 
     # Parse arguments
     args = parser.parse_args()
 
-
-    print ("\n *** %s start for %s" % (sys.argv[0], args))
-
     # Call function associated with the selected subcommand
+    logger.info("*** {0} start for {1}".format(sys.argv[0], args))
     args.func(args)
 
-    print (" *** %s succesfully finished \n" % sys.argv[0])
-
-# -------------------------------------------------------------------
-
+    logger.info("*** {0} succesfully finished \n".format(sys.argv[0]))
