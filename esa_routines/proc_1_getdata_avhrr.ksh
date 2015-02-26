@@ -127,9 +127,6 @@ do
         # availability flag
         aflag=-1
 
-        # command
-        cmd="get_avhrr_data $year $month $platform $avhrr_top"
-
         # test if data is already on $SCRATCH
         mm=$(printf %02d ${month})
         target=$INPUTDIR/$instrument/$platform/$year/$mm
@@ -156,12 +153,15 @@ do
         if [ $aflag -ne 0 ]; then
             echo "No data available on scratch, so get them!"
 
-            `$cmd`
+            params="$year $month $platform $avhrr_top"
+
+            get_avhrr_data $year $month $platform $avhrr_top
+
             if [ ${?} -ne 0 ]; then
-                print " --- FAILED: $cmd"
+                print " --- FAILED: get_avhrr_data $params"
                 return 1
             else
-                print " --- FINISHED: $cmd"
+                print " --- FINISHED: get_avhrr_data $params"
             fi
         else 
             echo "There is nothing to do for $target" 
