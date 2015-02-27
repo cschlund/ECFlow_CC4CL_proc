@@ -14,6 +14,7 @@ from pycmsaf.logger import setup_root_logger
 from housekeeping import get_file_list_via_pattern
 from housekeeping import split_filename
 from housekeeping import date_from_year_doy
+from housekeeping import verify_aux_files
 
 logger = setup_root_logger(name='sissi')
 
@@ -33,10 +34,8 @@ def find_nearest_date(args_pick):
     files = get_file_list_via_pattern(args_pick.inpdir, '*.' + args_pick.suffix)
     files.sort()
 
-    # remove climatology files
-    # climatology_files = [f for f in files if 'XXXX' in f]
-    # for i in climatology_files:
-    #    files.remove(i)
+    # verify file list
+    file_list = verify_aux_files(files)
 
     # get date list
     dates = map(extract_date, files)
@@ -89,7 +88,7 @@ def extract_date(ifile):
                                int(fsplit[2][4:-2]),
                                int(fsplit[2][6:]))
 
-    # ERA_Interim_an_20080101_00+00.grb
+    # ERA_Interim_an_20080101_00+00.nc
     elif fil.startswith('ERA_Interim'):
         fbasen = os.path.splitext(fil)
         fsplit = fbasen[0].split('_')
