@@ -17,26 +17,24 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
 
-    #date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+    # -- config file
+    cfg_typ="3_make_l3c_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
-    ## -- config file
-    #cfg_typ="3_make_l3c_"
-    #cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
-    #cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
-
-    ## -- working directory: write core file here
-    #cd %ESA_ROUTINE%
-    #
-    ## -- create job id number
-    #primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
-    #id=`date +%%s`
-    #sleep 3
-    #jid=ID${primary_id}_US${id}
-    #
-    ## -- execute ksh script
-    #%RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% ${cfg_fil}
+    # -- working directory: write core file here
+    cd %ESA_ROUTINE%
+    
+    # -- create job id number
+    primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
+    id=`date +%%s`
+    sleep 3
+    jid=ID${primary_id}_US${id}
+    
+    # -- execute ksh script
+    %RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% ${cfg_fil}
 
 fi
 

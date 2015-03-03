@@ -267,7 +267,9 @@ def proc2(args_ret):
 # -------------------------------------------------------------------
 def l2tol3(args_l3):
     """
-    Writes config file for the l2 to l3 processing.
+    Writes config file for the l2 to l3 processing:
+    l3a = L3C
+    l3b = L3S
     @param args_l3: command line arguments
     """
 
@@ -310,11 +312,12 @@ def l2tol3(args_l3):
             getdirs = list()
             for ad in alldirs:
                 # L3S: no platform, sensor fam. monthly averages
-                if args_l3.prodtype.lower() == "l3s":
+                # WARNING: ID numbers of different satellites are not equal
+                if args_l3.prodtype.lower() == "l3b":
                     if datestr in ad \
                             and args_l3.instrument.upper() in ad \
                             and args_l3.prodtype.upper() in ad \
-                            and 'retrieval' in ad:
+                            and 'L2B_SUM' in ad:
                         getdirs.append(ad)
                 # L3C: sensor and platform in subdirectory_name
                 else:
@@ -322,7 +325,7 @@ def l2tol3(args_l3):
                             and args_l3.instrument.upper() in ad \
                             and args_l3.satellite.lower() in ad \
                             and args_l3.prodtype.upper() in ad \
-                            and 'retrieval' in ad:
+                            and 'L2B_SUM' in ad:
                         getdirs.append(ad)
 
             # sort list
@@ -347,7 +350,7 @@ def l2tol3(args_l3):
         f.write("\n")
         f.write("# define sensor and platform\n")
         f.write("sensor={0}\n".format(args_l3.instrument.upper()))
-        if args_l3.prodtype.lower() == "l3u" and args_l3.satellite:
+        if args_l3.prodtype.lower() == "l3a" and args_l3.satellite:
             f.write("platform={0}\n".format(platform))
         f.write("\n")
         f.write("# define product type\n")

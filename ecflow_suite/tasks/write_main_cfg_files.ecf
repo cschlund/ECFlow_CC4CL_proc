@@ -67,20 +67,20 @@ else
     fi
 
 
-    ## -- write config file for l3a = L3C
+    # -- write config file for l3a = L3C (based on L2B_SUM)
 
-    #cfg_typ="3_make_l3c_"
-    #cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
-    #cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+    cfg_typ="3_make_l3c_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
-    #python %MAKE_CFG_FILE% -cf ${cfg_fil} \
-    #    -sy %START_YEAR% -ey %END_YEAR% \
-    #    -sm %START_MONTH% -em %END_MONTH% \
-    #    l2tol3 -sat %SATELLITE% -ins %SENSOR% \
-    #    -inp %ESA_OUTPUTDIR% -typ l3a
+    python %MAKE_CFG_FILE% -cf ${cfg_fil} \
+        -sy %START_YEAR% -ey %END_YEAR% \
+        -sm %START_MONTH% -em %END_MONTH% \
+        l2tol3 -sat %SATELLITE% -ins %SENSOR% \
+        -inp %ESA_LEVEL3DIR% -typ l3a
 
 
-    ## -- write config file for l3b = L3S
+    ## -- write config file for l3b = L3S (based on L2B_SUM)
 
     #cfg_typ="3_make_l3s_"
     #cfg_bas="%CFG_PREFIX%${cfg_typ}${date_ins_base}%CFG_SUFFIX%"
@@ -90,7 +90,7 @@ else
     #    -sy %START_YEAR% -ey %END_YEAR% \
     #    -sm %START_MONTH% -em %END_MONTH% \
     #    l2tol3 -ins %SENSOR% \
-    #    -inp %ESA_OUTPUTDIR% -typ l3b
+    #    -inp %ESA_LEVEL3DIR% -typ l3b
 
 fi
 

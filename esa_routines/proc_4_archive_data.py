@@ -84,79 +84,76 @@ def l3(args_l3):
     # -- create date string
     datestring = str(args_l3.year) + str('%02d' % args_l3.month)
 
-    # -- sensor and platform settings
-    if args_l3.instrument.upper() == "AVHRR":
-        (satstr, satnum) = split_platform_string(args_l3.satellite)
-        sensor = args_l3.instrument.upper()
-        platform = satstr.upper() + '-' + satnum
+    # -- sensor and platform settings for L3U and L3C
+    if args_l3.prodtype.upper() != "L3S" and args_l3.satellite:
+
+        if args_l3.instrument.upper() == "AVHRR":
+            (satstr, satnum) = split_platform_string(args_l3.satellite)
+            sensor = args_l3.instrument.upper()
+            platform = satstr.upper() + '-' + satnum
+        else:
+            sensor = args_l3.instrument.upper()
+            platform = args_l3.satellite.upper()
+
     else:
-        sensor = args_l3.instrument.upper()
-        platform = args_l3.satellite.upper()
+        logger.info("You chose prodtype={0},"
+                    "thus give me also a satellite name".
+                    format(args_l3.prodtype))
+        sys.exit(0)
+
+    # -- set prodtype_name
+    if args_l3.prodtype.upper() == "L3U": 
+        prodtype_name = "daily_samples"
+
+    elif args_l3.prodtype.upper() == "L3C" or args_l3.prodtype.upper() == "L3S":
+        prodtype_name = "monthly_means"
+
+    else:
+        logger.info("Wrong --prodtype input!")
+        sys.exit(0)
 
     # -- list everything in input directory
     alldirs = os.listdir(args_l3.inpdir)
 
-    # *** L3C archiving ***
-    if args_l3.prodtype.upper() == "L3C":
+    # -- archive now: L3U or L3C (satellite AND instrument)
+    if args_l3.prodtype.upper() != "L3S":
 
         # -- find latest job via ID-US number
         if len(alldirs) > 0:
             getdirs = list()
+
             # collect right subfolders
             for ad in alldirs:
                 if datestring in ad \
                         and args_l3.instrument.upper() in ad \
                         and args_l3.satellite.upper() in ad \
-                        and 'monthly_means' in ad: 
+                        and args_l3.prodtype.upper() in ad \
+                        and prodtype_name in ad: 
                             getdirs.append(ad)
+
             # sort list
             getdirs.sort()
+
             # get last element from list, should be last job
             lastdir = getdirs.pop()
+
             # get ID number from the last job
             idnumber = get_id(lastdir)
+
             # make tarfile
-            (tlist_l3c, tempdir_l3c) = tar_results(args_l3.prodtype.upper(), args_l3.inpdir, 
-                                                   datestring, sensor, platform, idnumber)
-            logger.info("Copy2ECFS: {0}".format(tlist_l3c))
-            copy_into_ecfs(datestring, tlist_l3c, args_l3.ecfsdir)
-            logger.info("Delete \'{0}\'".format(tempdir_l3c))
-            delete_dir(tempdir_l3c)
+            (tlist, tempdir) = tar_results(args_l3.prodtype.upper(), args_l3.inpdir, 
+                                           datestring, sensor, platform, idnumber)
+
+            logger.info("Copy2ECFS: {0}".format(tlist))
+            copy_into_ecfs(datestring, tlist, args_l3.ecfsdir)
+
+            logger.info("Delete \'{0}\'".format(tempdir))
+            delete_dir(tempdir)
 
         else:
             logger.info("Check your input directory, maybe it is empty ?")
 
-    # *** L3U archiving ***
-    elif args_l3.prodtype.upper() == "L3U":
-
-        # find latest job via ID-US number
-        if len(alldirs) > 0:
-            getdirs = list()
-            # collect right subfolders
-            for ad in alldirs:
-                if datestring in ad \
-                        and args_l3.instrument.upper() in ad \
-                        and args_l3.satellite.upper() in ad \
-                        and 'daily_samples' in ad: 
-                            getdirs.append(ad)
-            # sort list
-            getdirs.sort()
-            # get last element from list, should be last job
-            lastdir = getdirs.pop()
-            # get ID number from the last job
-            idnumber = get_id(lastdir)
-            # make tarfile
-            (tlist_l3u, tempdir_l3u) = tar_results(args_l3.prodtype.upper(), args_l3.inpdir, 
-                                                   datestring, sensor, platform, idnumber)
-            logger.info("Copy2ECFS: {0}".format(tlist_l3u))
-            copy_into_ecfs(datestring, tlist_l3u, args_l3.ecfsdir)
-            logger.info("Delete \'{0:s}\'".format(tempdir_l3u))
-            delete_dir(tempdir_l3u)
-
-        else:
-            logger.info("Check your input directory, maybe it is empty ?")
-
-    # *** L3S archiving ***
+    # -- archive now: L3S (sensor family, i.e. all AVHRR or MODIS)
     elif args_l3.prodtype.upper() == "L3S":
         logger.info("L3S archiving not yet coded!")
 
@@ -178,8 +175,11 @@ if __name__ == '__main__':
     parser.add_argument('--instrument', type=str, required=True,
                         help='String, e.g. AVHRR')
 
-    parser.add_argument('--satellite', type=str, required=True,
+    # L3S: only instrument (no platform): sensor family
+    parser.add_argument('--satellite', type=str,
                         help='String, e.g. NOAA18')
+    #parser.add_argument('--satellite', type=str, required=True,
+    #                    help='String, e.g. NOAA18')
     parser.add_argument('--year', type=int, required=True,
                         help='Integer, e.g. 2008')
     parser.add_argument('--month', type=int, required=True,
