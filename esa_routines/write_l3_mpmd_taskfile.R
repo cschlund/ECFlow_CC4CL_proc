@@ -21,13 +21,28 @@ config_paths = paste(base_path, "config_paths.file", sep="")
 
 # create vector containing MPMD task calls
 tasks = 1:ndays
+
 # create MPMD task call for each day
 for (i in 1:ndays){
-   config_file = paste(base_path, "config_L3_day", i, "_", jobID, ".file", sep="")
-   log_file = paste(base_path, "log_L3_mpmd_day", i, "_", jobID, ".txt", sep="")
+
+   # convert single digit days to double digits
+   i_dd = as.character(i)
+   i_dd = ifelse(nchar(i_dd) == 1, paste("0", i_dd, sep=""), i_dd)
+
+   # build config file name
+   config_file = paste(base_path, "config_L3_day", i_dd, "_", jobID, ".file",
+   sep="")
+   
+   # build log file name
+   log_file = paste(base_path, "log_L3_mpmd_day", i_dd, "_", jobID, ".txt",
+   sep="")
+
+   # concatenate elements to build task call
    tasks[i] = paste(ksh_script, " ", jobID, " ", config_attributes, " ",
       config_paths, " ", config_file, sep="")
-   tasks[i] = ifelse(individual_logs, paste(tasks[i], " > ", log_file, sep=""), tasks[i])
+   tasks[i] = ifelse(individual_logs, paste(tasks[i], " > ", log_file,
+   sep=""), tasks[i])
+
 }
 
 # write tasks vector to text file

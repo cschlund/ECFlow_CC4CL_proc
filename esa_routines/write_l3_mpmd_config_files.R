@@ -28,7 +28,7 @@ if ( length( L2_folder ) > 1 ) {
    L2_folder = L2_folder[ order( creation_time$ctime, decreasing = T )[1] ]
 }
 
-# ectract ID from L2 output folder
+# extract ID from L2 output folder
 L2_id = paste( "ID", unlist( strsplit( L2_folder, "_ID" ) )[2], sep="" )
 
 for (i in 1:ndays) {
