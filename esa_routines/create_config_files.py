@@ -35,7 +35,7 @@ def getsat(args_sat):
             platform = args_sat.satellite.lower()
         else:
             logger.info("WRONG SATELLITE NAME!")
-            exit(0)
+            sys.exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
@@ -134,7 +134,7 @@ def proc2(args_ret):
             platform = args_ret.satellite.lower()
         else:
             logger.info("WRONG SATELLITE NAME!")
-            exit(0)
+            sys.exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
@@ -273,17 +273,25 @@ def l2tol3(args_l3):
 
     global platform, id_number
     try:
-        if args_l3.satellite.upper() == "TERRA":
-            platform = "MOD"
-        elif args_l3.satellite.upper() == "AQUA":
-            platform = "MYD"
-        elif args_l3.satellite.upper().startswith("NOAA"):
-            platform = args_l3.satellite.upper()
-        elif args_l3.satellite.upper().startswith("METOP"):
-            platform = args_l3.satellite.upper()
-        else:
-            logger.info("WRONG SATELLITE NAME!")
-            exit(0)
+        # L3U: sensor und platform, monthly averages per satellite
+        if args_l3.prodtype == "l3a":
+            if args_l3.satellite:
+                if args_l3.satellite.upper() == "TERRA":
+                    platform = "MOD"
+                elif args_l3.satellite.upper() == "AQUA":
+                    platform = "MYD"
+                elif args_l3.satellite.upper().startswith("NOAA"):
+                    platform = args_l3.satellite.upper()
+                elif args_l3.satellite.upper().startswith("METOP"):
+                    platform = args_l3.satellite.upper()
+                else:
+                    logger.info("WRONG SATELLITE NAME!")
+                    sys.exit(0)
+            else:
+                logger.info("You chose prodtype={0}, "
+                            "so tell me which platform!".
+                            format(args_l3.prodtype))
+                sys.exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
@@ -301,11 +309,21 @@ def l2tol3(args_l3):
         if len(alldirs) > 0:
             getdirs = list()
             for ad in alldirs:
-                if datestr in ad \
-                        and args_l3.instrument.upper() in ad \
-                        and args_l3.satellite.lower() in ad \
-                        and 'retrieval' in ad:
-                    getdirs.append(ad)
+                # L3S: no platform, sensor fam. monthly averages
+                if args_l3.prodtype.lower() == "l3s":
+                    if datestr in ad \
+                            and args_l3.instrument.upper() in ad \
+                            and args_l3.prodtype.upper() in ad \
+                            and 'retrieval' in ad:
+                        getdirs.append(ad)
+                # L3C: sensor and platform in subdirectory_name
+                else:
+                    if datestr in ad \
+                            and args_l3.instrument.upper() in ad \
+                            and args_l3.satellite.lower() in ad \
+                            and args_l3.prodtype.upper() in ad \
+                            and 'retrieval' in ad:
+                        getdirs.append(ad)
 
             # sort list
             getdirs.sort()
@@ -329,7 +347,8 @@ def l2tol3(args_l3):
         f.write("\n")
         f.write("# define sensor and platform\n")
         f.write("sensor={0}\n".format(args_l3.instrument.upper()))
-        f.write("platform={0}\n".format(platform))
+        if args_l3.prodtype.lower() == "l3u" and args_l3.satellite:
+            f.write("platform={0}\n".format(platform))
         f.write("\n")
         f.write("# define product type\n")
         f.write("prodtype={0}\n".format(args_l3.prodtype))
@@ -435,15 +454,18 @@ if __name__ == '__main__':
     # -> create config file for l2 to l3 processing
     l2tol3_parser = subparsers.add_parser('l2tol3',
                                           description="Make config file for l2tol3, "
-                                                      "i.e. generate L2B or L3A output.")
-    l2tol3_parser.add_argument('-sat', '--satellite', required=True, type=str,
+                                                      "i.e. generate L3U or L3S output.")
+    # L3S: no satellite, sensor family monthly averages
+    l2tol3_parser.add_argument('-sat', '--satellite', type=str,
                                help="String, e.g. noaa18, terra")
+    #l2tol3_parser.add_argument('-sat', '--satellite', required=True, type=str,
+    #                           help="String, e.g. noaa18, terra")
     l2tol3_parser.add_argument('-ins', '--instrument', required=True, type=str,
                                help="String, e.g. avhrr, modis")
     l2tol3_parser.add_argument('-inp', '--inpdir', required=True, type=str,
                                help="String, /path/to/input/files")
     l2tol3_parser.add_argument('-typ', '--prodtype', type=str,
-                               help="Choices: \'l2b\' or \'l2b_sum\' or \'l3a\'")
+                               help="Choices: \'l3a\' = L3U or \'l3b\' = L3S")
     l2tol3_parser.set_defaults(func=l2tol3)
 
     # Parse arguments

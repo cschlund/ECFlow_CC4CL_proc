@@ -40,9 +40,13 @@ else
     # -- write MPMD task list
     echo "Write MPMD Taskfile for "${prodtype}" in SUITE/FAMILY: "%SUITE%/%FAMILY%
 
-    Rscript %WRITE_MPMD_TASKFILE% --vanilla ${jid} %NDAYS_OF_MONTH% ${log_dir} \
+    taskfile="%ESA_CONFIGDIR%/MPMD_tasks_${cfg_base}${jid}.txt"
+
+    Rscript %WRITE_MPMD_TASKFILE% --vanilla \
+            ${jid} %NDAYS_OF_MONTH% ${log_dir} \
             %ESA_CONFIGDIR% %CFG_PREFIX% %CFG_SUFFIX% ${cfg_base} \
-            %RUN_L2TOL3_KSH% %CFG_ATTRI_FILE% %CFG_PATHS_FILE%
+            %RUN_L2TOL3_KSH% %CFG_ATTRI_FILE% %CFG_PATHS_FILE% \
+            ${taskfile}
 
 
     # -- write L2B (L3U) daily config files
@@ -56,10 +60,10 @@ else
             %ESA_OUTPUTDIR%
 
 
-    # -- if R script was executed successfully, start MPMD job
-    echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${task_file}
+    # -- call aprun using the MPMD submitter
+    echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${taskfile}
 
-    aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% $task_file
+    aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% ${taskfile}
 
 fi
 

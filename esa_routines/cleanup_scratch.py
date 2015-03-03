@@ -173,28 +173,34 @@ def clear_l3(args_l3):
     """
     # find platform
     if args_l3.prodtype.lower() != "l3s":
+        if args_l3.satellite:
 
-        if args_l3.satellite.upper() == "TERRA" or \
-                args_l3.satellite.upper() == "MOD":
-            platform = "TERRA"
+            if args_l3.satellite.upper() == "TERRA" or \
+                    args_l3.satellite.upper() == "MOD":
+                platform = "TERRA"
 
-        elif args_l3.satellite.upper() == "AQUA" or \
-                args_l3.satellite.upper() == "MYD":
-            platform = "AQUA"
+            elif args_l3.satellite.upper() == "AQUA" or \
+                    args_l3.satellite.upper() == "MYD":
+                platform = "AQUA"
 
-        elif args_l3.satellite.upper().startswith("NOAA"):
-            platform = args_l3.satellite.upper()
+            elif args_l3.satellite.upper().startswith("NOAA"):
+                platform = args_l3.satellite.upper()
 
-        elif args_l3.satellite.upper().startswith("METOP"):
-            platform = args_l3.satellite.upper()
+            elif args_l3.satellite.upper().startswith("METOP"):
+                platform = args_l3.satellite.upper()
+
+            else:
+                logger.info("WRONG SATELLITE NAME!")
+                sys.exit(0)
 
         else:
-            logger.info("WRONG SATELLITE NAME!")
+            logger.info("You chose prodtype={0}, "
+                        "so tell me which platform!".
+                        format(args_l3.prodtype))
             sys.exit(0)
 
     # find sensor
     sensor = args_l3.instrument.upper()
-
 
     # delete corr. config file
     cfg_file_list = list()
@@ -218,8 +224,8 @@ def clear_l3(args_l3):
         cfg_file_list.append(cfgfile)
 
     # -- daily config files
-    # config_proc_3_make_l3u_2008_01_01_NOAA18.file
-    # config_proc_3_make_l3u_2008_01_31_TERRA.file
+    # config_proc_3_make_l3u_NOAA18_2008_01_01.file
+    # config_proc_3_make_l3u_TERRA_2008_01_31.file
     elif args_l3.prodtype.lower() == "l3u": 
         # calendar.monthrange
         # Returns weekday of first day of the month and 
@@ -228,20 +234,22 @@ def clear_l3(args_l3):
         for iday in range(last_day_of_month):
             iday += 1
             cfgfile = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
+                      platform.upper() + '_' + \
                       str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
-                      str('%02d' % iday) + '_' + platform.upper() + cfg_suffix 
+                      str('%02d' % iday) + cfg_suffix 
             cfg_file_list.append(cfgfile)
 
     # -- daily config files
-    # config_proc_3_make_l2b_sum_2008_01_01_NOAA18.file
-    # config_proc_3_make_l2b_sum_2008_01_31_NOAA18.file
+    # config_proc_3_make_l2b_sum_NOAA18_2008_01_01.file
+    # config_proc_3_make_l2b_sum_NOAA18_2008_01_31.file
     elif args_l3.prodtype.lower() == "l2b_sum": 
         last_day_of_month = calendar.monthrange(args_l3.year, args_l3.month)[1]
         for iday in range(last_day_of_month):
             iday += 1
             cfgfile = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
+                      platform.upper() + '_' + \
                       str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
-                      str('%02d' % iday) + '_' + platform.upper() + cfg_suffix 
+                      str('%02d' % iday) + cfg_suffix 
             cfg_file_list.append(cfgfile)
 
     # now remove all config files in the list

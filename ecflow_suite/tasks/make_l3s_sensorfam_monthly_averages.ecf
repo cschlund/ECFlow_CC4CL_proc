@@ -19,11 +19,11 @@ else
 
     python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
 
-    #date_sat_base="%START_YEAR%_%START_MONTH%_%SENSOR_FAM%"
+    #date_ins_base="%START_YEAR%_%START_MONTH%_%SENSOR_FAM%"
 
     ## -- config file
     #cfg_typ="3_make_l3s_"
-    #cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    #cfg_bas="%CFG_PREFIX%${cfg_typ}${date_ins_base}%CFG_SUFFIX%"
     #cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
     ## -- working directory: write core file here

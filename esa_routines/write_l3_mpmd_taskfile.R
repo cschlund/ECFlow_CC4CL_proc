@@ -6,7 +6,7 @@ individual_logs = T
 # read command arguments
 args = commandArgs(trailingOnly = T)
 
-# define jobID and ndays from argument list
+# define argument list
 jobID      = args[2]
 ndays      = args[3]
 log_dir    = args[4]
@@ -17,6 +17,7 @@ cfg_base   = args[8]
 ksh_script = args[9]
 cfg_attri  = args[10]
 cfg_paths  = args[11]
+out_name   = args[12]
 
 # create vector containing MPMD task calls
 tasks = 1:ndays

@@ -11,7 +11,9 @@ if [ %DUMMYRUN% == 1 ]; then
 else
 
     python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+    echo "Currently L2 data are not archived into ECFS!"
 
+    # -- enable the following lines if you wish to archive L2 data of cloud_cci
     #python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
     #    --year %START_YEAR% --month %START_MONTH% \
     #    l2 --inpdir %ESA_OUTPUTDIR% --ecfsdir %ECFS_L2_DIR% \
