@@ -86,6 +86,7 @@ ld_lib_path = "/perm/ms/de/sf7/esa_cci_c_proc/software/" \
               "/perm/us/usc/hdfeos/2.19-d/CRAY/82/lib:$LD_LIBRARY_PATH"
 
 # server settings @ ecgate
+mpmd_submitter = os.path.join(pycmsaf_bin, "mpmd.py")
 ecflow_submit = os.path.join(pycmsaf_bin, "ecf_submit.py")
 ecf_files_dir = os.path.join(perm_base, "ecflow_suite/tasks")
 ecf_include_dir = os.path.join(perm_base, "ecflow_suite/include")

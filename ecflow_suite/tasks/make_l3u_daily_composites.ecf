@@ -19,26 +19,47 @@ else
 
     # -- settings
     prodtype=l2b
+    sat_date_base="%SATELLITE%_%START_YEAR%_%START_MONTH%"
+    cfg_base="3_make_l3u_${sat_date_base}_"
 
     # -- log directory for daily jobs
     log_dir=%ESA_ECF_LOG_DIR%/%SUITE%/%FAMILY%
 
+
     # -- working directory: write core file here
     cd %ESA_ROUTINE%
     
+
     # -- create job id number
     primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
     id=`date +%%s`
     sleep 3
     jid=ID${primary_id}_US${id}
     
+
     # -- write MPMD task list
-    # Rscript write_taskfile.R --vanilla ${jid} %NDAYS_OF_MONTH%
-    Rscript %WRITE_MPMD_TASKFILE% --vanilla ${jid} %NDAYS_OF_MONTH%
+    echo "Write MPMD Taskfile for "${prodtype}" in SUITE/FAMILY: "%SUITE%/%FAMILY%
+
+    Rscript %WRITE_MPMD_TASKFILE% --vanilla ${jid} %NDAYS_OF_MONTH% ${log_dir} \
+            %ESA_CONFIGDIR% %CFG_PREFIX% %CFG_SUFFIX% ${cfg_base} \
+            %RUN_L2TOL3_KSH% %CFG_ATTRI_FILE% %CFG_PATHS_FILE%
+
 
     # -- write L2B (L3U) daily config files
-    #Rscript write_L3_config_file.R --vanilla ${year} ${month} ${prodtype} ${sensor} ${platform} ${jid} ${ndays}
-    Rscript %WRITE_MPMD_CFGFILES% --vanilla %START_YEAR% %START_MONTH% ${prodtype} %SENSOR% %SATELLITE% ${jid} %NDAYS_OF_MONTH%
+    echo "Write MPMD "%NDAYS_OF_MONTH%" daily config files for "${prodtype}": "\
+         %START_YEAR%/%START_MONTH%" and "%SENSOR%/%SATELLITE%
+
+    Rscript %WRITE_MPMD_CFGFILES% --vanilla \
+            %START_YEAR% %START_MONTH% ${prodtype} \
+            %SENSOR% %SATELLITE% ${jid} %NDAYS_OF_MONTH% ${log_dir} \
+            %ESA_CONFIGDIR% %CFG_PREFIX% %CFG_SUFFIX% ${cfg_base} \
+            %ESA_OUTPUTDIR%
+
+
+    # -- if R script was executed successfully, start MPMD job
+    echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${task_file}
+
+    aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% $task_file
 
 fi
 

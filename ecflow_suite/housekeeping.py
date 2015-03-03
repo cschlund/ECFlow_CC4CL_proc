@@ -263,6 +263,7 @@ def set_vars(suite, procday, dummycase, testcase):
     suite.add_variable("DUMMYRUN", dummycase)
     suite.add_variable("WRITE_MPMD_TASKFILE", write_mpmd_taskfile)
     suite.add_variable("WRITE_MPMD_CFGFILES", write_mpmd_cfgfiles)
+    suite.add_variable("MPMD_SUBMITTER", mpmd_submitter)
 
     # some processing directories
     suite.add_variable("ESA_ROUTINE", esa_routine)

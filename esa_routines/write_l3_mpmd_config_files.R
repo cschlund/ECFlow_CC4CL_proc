@@ -3,16 +3,22 @@
 # read command arguments
 args = commandArgs( trailingOnly = T )
 
-year     = args[2]
-month	 = args[3]
-prodtype = args[4]
-sensor 	 = args[5]
-platform = args[6]
-jobID    = args[7]
-ndays    = args[8]
+year       = args[2]
+month	   = args[3]
+prodtype   = args[4]
+sensor 	   = args[5]
+platform   = args[6]
+jobID      = args[7]
+ndays      = args[8]
+log_dir    = args[9]
+cfg_dir    = args[10]
+cfg_prefix = args[11]
+cfg_suffix = args[12]
+cfg_base   = args[13]
+base_path  = args[14]
 
-# base path of L2 output data
-base_path ="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/output"
+## base path of L2 output data
+#base_path ="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/output"
 
 # convert single digit months to double digits
 month_mm = ifelse( nchar( month ) == 1, paste( "0", month, sep="" ), month )
@@ -37,8 +43,11 @@ for (i in 1:ndays) {
     i_dd = as.character(i)
     i_dd = ifelse(nchar(i_dd) == 1, paste("0", i_dd, sep=""), i_dd)
 
+    # build config file name (consistent with write MPMD taskfile!)
+    config_file = paste(cfg_dir, "/", cfg_prefix, cfg_base, i_dd, cfg_suffix, sep="")
+
     # open config file connection
-    fileConn = file( paste( "config_L3_day", i_dd, "_", jobID, ".file", sep="" ) )
+    fileConn = file( config_file )
 
     # write data to config file
     writeLines( c(

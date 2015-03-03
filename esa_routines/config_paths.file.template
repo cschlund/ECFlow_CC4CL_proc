@@ -118,4 +118,3 @@ l3outputpath=$OUTPUTDIR/level3
 era_comp=/scratch/ms/de/sf7/esa_cci_c_proc/era_interim
 # free path
 free_path=/usr/bin
-
