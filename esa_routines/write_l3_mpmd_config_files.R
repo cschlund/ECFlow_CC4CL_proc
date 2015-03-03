@@ -1,0 +1,70 @@
+# write config files for L3 production
+
+# read command arguments
+args = commandArgs( trailingOnly = T )
+
+year     = args[2]
+month	 = args[3]
+prodtype = args[4]
+sensor 	 = args[5]
+platform = args[6]
+jobID    = args[7]
+ndays    = args[8]
+
+# base path of L2 output data
+base_path ="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/output"
+
+# convert single digit months to double digits
+month_mm = ifelse( nchar( month ) == 1, paste( "0", month, sep="" ), month )
+
+# list L2 output folder matching filter criteria
+L2_folder = list.files( base_path, pattern = paste( year, month_mm, "01_", sensor,
+	            "_", platform, "_retrieval_*", sep="" ), ignore.case=T )
+
+# if more than one matching output folder available, sort these as a function
+# of creation time and select most recently created folder
+if ( length( L2_folder ) > 1 ) {
+   creation_time = file.info( paste( base_path, L2_folder, sep="/" ) )
+   L2_folder = L2_folder[ order( creation_time$ctime, decreasing = T )[1] ]
+}
+
+# ectract ID from L2 output folder
+L2_id = paste( "ID", unlist( strsplit( L2_folder, "_ID" ) )[2], sep="" )
+
+for (i in 1:ndays) {
+
+    # convert single digit days to double digits
+    i_dd = as.character(i)
+    i_dd = ifelse(nchar(i_dd) == 1, paste("0", i_dd, sep=""), i_dd)
+
+    # open config file connection
+    fileConn = file( paste( "config_L3_day", i_dd, "_", jobID, ".file", sep="" ) )
+
+    # write data to config file
+    writeLines( c(
+
+	paste("YEAR=", year, sep=""),
+	paste("MONTH=", month, sep=""),
+	paste("DAY=", i, sep=""),
+	paste("prodtype=", prodtype, sep=""),
+	paste("sensor=", sensor, sep=""),
+	paste("platform=", platform, sep=""),
+	"local=F",
+	"slon=0",
+	"elon=18",
+	"slat=42",
+	"elat=53",
+	"gridxloc=10",
+	"gridyloc=10",
+	"gridxl3=2",
+	"gridyl3=2",
+	"gridxl2b=10",
+	"gridyl2b=10",
+	paste("id=", L2_id, sep="")
+
+	), fileConn)
+
+    # close config file connection
+    close(fileConn)
+
+}

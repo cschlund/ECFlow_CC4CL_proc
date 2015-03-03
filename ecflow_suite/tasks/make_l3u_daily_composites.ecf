@@ -1,12 +1,15 @@
-%include <pbs_serial_l2tol3.h>
+%include <pbs_parallel_l2tol3.h>
 %include <head.h>
 %include <export.h>
 
-export ATP_ENABLED=0
-ulimit -c unlimited
+# enable next 2 lines if you wish a core file
+#export ATP_ENABLED=1
+#ulimit -c unlimited
+
+# stacksize (keep it always that way)
 ulimit -s unlimited
 
-echo "I am task %TASK% in family %FAMILY% responsible for L3u processing, i. e. daily composites (L2b)"
+echo "I am task %TASK% in family %FAMILY% responsible for L3U processing, i. e. daily composites (L2b)"
 
 if [ %DUMMYRUN% == 1 ]; then 
 
@@ -14,12 +17,11 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+    # -- settings
+    prodtype=l2b
 
-    # -- config file
-    cfg_typ="3_make_l3u_"
-    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
-    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+    # -- log directory for daily jobs
+    log_dir=%ESA_ECF_LOG_DIR%/%SUITE%/%FAMILY%
 
     # -- working directory: write core file here
     cd %ESA_ROUTINE%
@@ -30,8 +32,13 @@ else
     sleep 3
     jid=ID${primary_id}_US${id}
     
-    # -- execute ksh script
-    %RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% ${cfg_fil}
+    # -- write MPMD task list
+    # Rscript write_taskfile.R --vanilla ${jid} %NDAYS_OF_MONTH%
+    Rscript %WRITE_MPMD_TASKFILE% --vanilla ${jid} %NDAYS_OF_MONTH%
+
+    # -- write L2B (L3U) daily config files
+    #Rscript write_L3_config_file.R --vanilla ${year} ${month} ${prodtype} ${sensor} ${platform} ${jid} ${ndays}
+    Rscript %WRITE_MPMD_CFGFILES% --vanilla %START_YEAR% %START_MONTH% ${prodtype} %SENSOR% %SATELLITE% ${jid} %NDAYS_OF_MONTH%
 
 fi
 

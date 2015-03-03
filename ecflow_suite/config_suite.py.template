@@ -50,12 +50,15 @@ esa_outputdir = os.path.join(scratch_base, "output")
 esa_level3dir = os.path.join(scratch_base, "output/level3")
 esa_logdir = os.path.join(scratch_base, "logs/processing")
 esa_configdir = os.path.join(scratch_base, "temp_cfg_files")
+esa_ecflogdir = os.path.join(scratch_base, "log")
 
 # new programs
 make_cfg_files = os.path.join(esa_routine, "create_config_files.py")
 count_orbit_files = os.path.join(esa_routine, "count_orbit_files.sh")
 cleanup_scratch = os.path.join(esa_routine, "cleanup_scratch.py")
 archive_data = os.path.join(esa_routine, "proc_4_archive_data.py")
+write_mpmd_taskfile = os.path.join(esa_routine, "write_l3_mpmd_taskfile.R")
+write_mpmd_cfgfiles = os.path.join(esa_routine, "write_l3_mpmd_config_files.R")
 
 # config files
 cfg_paths_file = os.path.join(esa_routine, "config_paths.file")

@@ -3,6 +3,7 @@
 import sys
 import ecflow
 import datetime
+import calendar
 import logging
 from config_suite import *
 from dateutil.rrule import rrule, MONTHLY
@@ -260,6 +261,8 @@ def set_vars(suite, procday, dummycase, testcase):
     suite.add_variable("PROCDAY", procday)
     suite.add_variable("TESTRUN", testcase)
     suite.add_variable("DUMMYRUN", dummycase)
+    suite.add_variable("WRITE_MPMD_TASKFILE", write_mpmd_taskfile)
+    suite.add_variable("WRITE_MPMD_CFGFILES", write_mpmd_cfgfiles)
 
     # some processing directories
     suite.add_variable("ESA_ROUTINE", esa_routine)
@@ -268,6 +271,7 @@ def set_vars(suite, procday, dummycase, testcase):
     suite.add_variable("ESA_INPUTDIR", esa_inputdir)
     suite.add_variable("ESA_LOGDIR", esa_logdir)
     suite.add_variable("ESA_CONFIGDIR", esa_configdir)
+    suite.add_variable("ESA_ECF_LOG_DIR", esa_ecflogdir)
 
     # Config files
     suite.add_variable("CFG_PATHS_FILE", cfg_paths_file)
@@ -302,15 +306,22 @@ def add_task(family, taskname):
     return task
 
 
-def add_cleanup_aux_task(family, prefamily):
+def add_final_cleanup_task(family, prefamily):
     """
-    Adds task for cleanup aux data on.
+    Adds task for final cleanup of month.
     :rtype : dictionary
     """
+    cleanup_l2_data = add_task(family, 'cleanup_l2_data')
+    cleanup_l2bsum_files = add_task(family, 'cleanup_l2bsum_files')
     cleanup_aux_data = add_task(family, 'cleanup_aux_data')
+
+    add_trigger(cleanup_l2_data, prefamily)
+    add_trigger(cleanup_l2bsum_files, prefamily)
     add_trigger(cleanup_aux_data, prefamily)
 
-    return {'cleanup_aux_data': cleanup_aux_data}
+    return {'cleanup_l2_data': cleanup_l2_data,
+            'cleanup_l2bsum_files': cleanup_l2bsum_files,
+            'cleanup_aux_data': cleanup_aux_data}
 
 
 def add_aux_tasks(family):
@@ -330,6 +341,24 @@ def add_aux_tasks(family):
             'get_mars_data': get_mars_data}
 
 
+def add_l3s_product_tasks(family, prefamily):
+    """
+    Adds tasks regarding L3S creation, final archiving,
+    and cleanup l2 and l3 data.
+    """
+    make_l3s_data = add_task(family, 'make_l3s_sensorfam_monthly_averages')
+    archive_l3s_data = add_task(family, 'archive_l3s_data')
+    cleanup_l3s_data = add_task(family, 'cleanup_l3s_data')
+
+    add_trigger(make_l3s_data, prefamily)
+    add_trigger(archive_l3s_data, make_l3s_data)
+    add_trigger(cleanup_l3s_data, archive_l3s_data)
+
+    return {'make_l3s_data': make_l3s_data,
+            'archive_l3s_data': archive_l3s_data,
+            'cleanup_l3s_data': cleanup_l3s_data}
+
+
 def add_main_proc_tasks(family, prefamily):
     """
     Adds main processing specific tasks to the given family.
@@ -340,34 +369,42 @@ def add_main_proc_tasks(family, prefamily):
     set_cpu_number = add_task(family, 'set_cpu_number')
     retrieval = add_task(family, 'retrieval')
     cleanup_l1_data = add_task(family, 'cleanup_l1_data')
+    archive_l2_data = add_task(family, 'archive_l2_data')
+    prepare_l2b_sum = add_task(family, 'prepare_l2b_sum_files')
     make_l3u_data = add_task(family, 'make_l3u_daily_composites')
+    archive_l3u_data = add_task(family, 'archive_l3u_data')
+    cleanup_l3u_data = add_task(family, 'cleanup_l3u_data')
     make_l3c_data = add_task(family, 'make_l3c_monthly_averages')
-    archive_data_into_ecfs = add_task(family, 'archive_data')
-    cleanup_l2_data = add_task(family, 'cleanup_l2_data')
-    cleanup_l3_data = add_task(family, 'cleanup_l3_data')
+    archive_l3c_data = add_task(family, 'archive_l3c_data')
+    cleanup_l3c_data = add_task(family, 'cleanup_l3c_data')
 
     add_trigger(wrt_main_cfgs, prefamily)
     add_trigger(get_sat_data, wrt_main_cfgs)
     add_trigger(set_cpu_number, get_sat_data)
     add_trigger(retrieval, set_cpu_number)
     add_trigger(cleanup_l1_data, retrieval)
+    add_trigger(archive_l2_data, retrieval)
+    add_trigger(prepare_l2b_sum, cleanup_l1_data)
     add_trigger(make_l3u_data, cleanup_l1_data)
-    add_trigger(make_l3c_data, cleanup_l1_data)
-    add_trigger_expr(archive_data_into_ecfs,
-                     make_l3u_data, make_l3c_data)
-    add_trigger(cleanup_l2_data, archive_data_into_ecfs)
-    add_trigger(cleanup_l3_data, archive_data_into_ecfs)
+    add_trigger(archive_l3u_data, make_l3u_data)
+    add_trigger(cleanup_l3u_data, archive_l3u_data)
+    add_trigger(make_l3c_data, prepare_l2b_sum)
+    add_trigger(archive_l3c_data, make_l3c_data)
+    add_trigger(cleanup_l3c_data, archive_l3c_data)
 
     return {'wrt_main_cfgs': wrt_main_cfgs,
             'get_sat_data': get_sat_data,
             'set_cpu_number': set_cpu_number,
             'retrieval': retrieval,
             'cleanup_l1_data': cleanup_l1_data,
+            'archive_l2_data': archive_l2_data,
+            'prepare_l2b_sum': prepare_l2b_sum,
             'make_l3u_data': make_l3u_data,
+            'archive_l3u_data': archive_l3u_data,
+            'cleanup_l3u_data': cleanup_l3u_data,
             'make_l3c_data': make_l3c_data,
-            'archive_data': archive_data_into_ecfs,
-            'cleanup_l2_data': cleanup_l2_data,
-            'cleanup_l3_data': cleanup_l3_data}
+            'archive_l3c_data': archive_l3c_data,
+            'cleanup_l3c_data': cleanup_l3c_data}
 
 
 def add_trigger_expr(node, trigger1, trigger2):
@@ -564,6 +601,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # DEFINE DYNAMIC FAMILIES & TASKS
     # ================================
 
+    # memorize satellites for each month
+    satellites_within_current_month = list()
+
     # month counter
     month_cnt = 0
 
@@ -574,8 +614,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
         yearstr = mm.strftime("%Y")
         monthstr = mm.strftime("%m")
-        act_date = datetime.date(int(yearstr),
-                                 int(monthstr), 1)
+        act_date = datetime.date(int(yearstr), int(monthstr), 1)
+        ndays_of_month = calendar.monthrange(int(yearstr), 
+                                             int(monthstr))[1]
 
         # check for avhrr primes
         if useprimes:
@@ -615,6 +656,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         fam_month = add_fam(fam_year, monthstr)
         fam_month.add_variable("START_MONTH", monthstr)
         fam_month.add_variable("END_MONTH", monthstr)
+        fam_month.add_variable("NDAYS_OF_MONTH", ndays_of_month)
 
         # add get aux/era family
         fam_aux = add_fam(fam_month, "GET_AUX_DATA")
@@ -627,15 +669,24 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         # add fam. main processing
         fam_main = add_fam(fam_month, "MAIN_PROC")
 
+        # add fam. post processing
+        fam_post = add_fam(fam_month, "POST_PROC")
+
         # if avhrr data available for current month
         if avhrr_flag:
             fam_avhrr = add_fam(fam_main, "AVHRR")
             fam_avhrr.add_variable("SENSOR", "AVHRR")
+            fam_avhrr_post = add_fam(fam_post, "AVHRR_L3S")
+            fam_avhrr_post.add_variable("SENSOR_FAM", "AVHRR")
+            add_l3s_product_tasks(fam_avhrr_post, fam_main)
 
         # if modis data available for current month
         if modis_flag:
             fam_modis = add_fam(fam_main, "MODIS")
             fam_modis.add_variable("SENSOR", "MODIS")
+            fam_modis_post = add_fam(fam_post, "MODIS_L3S")
+            fam_modis_post.add_variable("SENSOR_FAM", "MODIS")
+            add_l3s_product_tasks(fam_modis_post, fam_main)
 
         # process avail. satellites for current month
         for counter, satellite in enumerate(sat_list):
@@ -651,6 +702,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 fam_sat = add_fam(fam_avhrr, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
                 add_main_proc_tasks(fam_sat, fam_aux)
+                satellites_within_current_month.append(satellite)
 
             else:
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
@@ -662,6 +714,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
                 fam_sat = add_fam(fam_modis, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
+                satellites_within_current_month.append(satellite)
 
                 if avhrr_flag:
                     add_main_proc_tasks(fam_sat, fam_avhrr)
@@ -670,13 +723,24 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                     add_main_proc_tasks(fam_sat, fam_aux)
                     fam_aux = fam_sat
 
-        # add cleanup aux/era family
-        fam_cleanup_aux = add_fam(fam_month, "CLEANUP_AUX_DATA")
-        add_cleanup_aux_task(fam_cleanup_aux, fam_main)
+        # -- end of satellite loop
+
+        # satellites within current month
+        logger.info("satellites_within_current_month:{0}".
+                format(satellites_within_current_month))
+
+        # add cleanup aux/era, l2, l2_sum files
+        fam_final_cleanup = add_fam(fam_month, "FINAL_CLEANUP")
+        fam_final_cleanup.add_variable('CURRENT_SATELLITE_LIST',
+                ' '.join(satellites_within_current_month))
+        add_final_cleanup_task(fam_final_cleanup, fam_post)
 
         # remember fam_month
         fam_month_previous = fam_month
         month_cnt += 1
+
+        # reset list of satellites_within_current_month
+        satellites_within_current_month = []
 
     # ----------------------------------------------------
     # end of loop over months

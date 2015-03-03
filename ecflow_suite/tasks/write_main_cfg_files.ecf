@@ -1,4 +1,4 @@
-%include <pbs_serial.h>
+%include <pbs_serial_cleanup.h>
 %include <head.h>
 %include <export.h>
 
@@ -13,6 +13,7 @@ else
     mkdir -p %ESA_CONFIGDIR%
 
     date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
+    date_ins_base="%START_YEAR%_%START_MONTH%_%SENSOR%"
 
     # -- write config file for get_sat_data
 
@@ -66,7 +67,7 @@ else
     fi
 
 
-    # -- write config file for l3a
+    # -- write config file for l3a = L3C
 
     cfg_typ="3_make_l3c_"
     cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
@@ -77,20 +78,21 @@ else
         -sm %START_MONTH% -em %END_MONTH% \
         l2tol3 -sat %SATELLITE% -ins %SENSOR% \
         -inp %ESA_OUTPUTDIR% -typ l3a
-    
 
-    # -- write config file for l2b
 
-    cfg_typ="3_make_l3u_"
-    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
-    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+    # TO BE DONE
+    ## -- write config file for l3b = L3S
 
-    python %MAKE_CFG_FILE% -cf ${cfg_fil} \
-        -sy %START_YEAR% -ey %END_YEAR% \
-        -sm %START_MONTH% -em %END_MONTH% \
-        l2tol3 -sat %SATELLITE% -ins %SENSOR% \
-        -inp %ESA_OUTPUTDIR% -typ l2b
-    
+    #cfg_typ="3_make_l3s_"
+    #cfg_bas="%CFG_PREFIX%${cfg_typ}${date_ins_base}%CFG_SUFFIX%"
+    #cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
+    #python %MAKE_CFG_FILE% -cf ${cfg_fil} \
+    #    -sy %START_YEAR% -ey %END_YEAR% \
+    #    -sm %START_MONTH% -em %END_MONTH% \
+    #    l2tol3 -ins %SENSOR% \
+    #    -inp %ESA_OUTPUTDIR% -typ l3b
+
 fi
 
 %include <tail.h>

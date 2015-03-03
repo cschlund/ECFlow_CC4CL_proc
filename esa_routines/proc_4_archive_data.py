@@ -96,73 +96,75 @@ def l3(args_l3):
     # -- list everything in input directory
     alldirs = os.listdir(args_l3.inpdir)
 
-    # -- list of files to be archived
-    tarfile_list = list()
-
     # *** L3C archiving ***
+    if args_l3.prodtype.upper() == "L3C":
 
-    # -- find latest job via ID-US number
-    if len(alldirs) > 0:
-        getdirs = list()
-        # collect right subfolders
-        for ad in alldirs:
-            if datestring in ad \
-                    and args_l3.instrument.upper() in ad \
-                    and args_l3.satellite.upper() in ad \
-                    and 'monthly_means' in ad:
-                getdirs.append(ad)
-        # sort list
-        getdirs.sort()
-        # get last element from list, should be last job
-        lastdir = getdirs.pop()
-        # get ID number from the last job
-        idnumber = get_id(lastdir)
+        # -- find latest job via ID-US number
+        if len(alldirs) > 0:
+            getdirs = list()
+            # collect right subfolders
+            for ad in alldirs:
+                if datestring in ad \
+                        and args_l3.instrument.upper() in ad \
+                        and args_l3.satellite.upper() in ad \
+                        and 'monthly_means' in ad: 
+                            getdirs.append(ad)
+            # sort list
+            getdirs.sort()
+            # get last element from list, should be last job
+            lastdir = getdirs.pop()
+            # get ID number from the last job
+            idnumber = get_id(lastdir)
+            # make tarfile
+            (tlist_l3c, tempdir_l3c) = tar_results(args_l3.prodtype.upper(), args_l3.inpdir, 
+                                                   datestring, sensor, platform, idnumber)
+            logger.info("Copy2ECFS: {0}".format(tlist_l3c))
+            copy_into_ecfs(datestring, tlist_l3c, args_l3.ecfsdir)
+            logger.info("Delete \'{0}\'".format(tempdir_l3c))
+            delete_dir(tempdir_l3c)
 
-        # archive data
-        (tlist_l3c, tempdir_l3c) = tar_results("L3C", args_l3.inpdir,
-                                               datestring, sensor,
-                                               platform, idnumber)
-    else:
-        logger.info("Check your input directory, maybe it is empty ?")
+        else:
+            logger.info("Check your input directory, maybe it is empty ?")
 
     # *** L3U archiving ***
+    elif args_l3.prodtype.upper() == "L3U":
 
-    # -- find latest job via ID-US number
-    if len(alldirs) > 0:
-        getdirs = list()
-        # collect right subfolders
-        for ad in alldirs:
-            if datestring in ad \
-                    and args_l3.instrument.upper() in ad \
-                    and args_l3.satellite.upper() in ad \
-                    and 'daily_samples' in ad:
-                getdirs.append(ad)
-        # sort list
-        getdirs.sort()
-        # get last element from list, should be last job
-        lastdir = getdirs.pop()
-        # get ID number from the last job
-        idnumber = get_id(lastdir)
+        # find latest job via ID-US number
+        if len(alldirs) > 0:
+            getdirs = list()
+            # collect right subfolders
+            for ad in alldirs:
+                if datestring in ad \
+                        and args_l3.instrument.upper() in ad \
+                        and args_l3.satellite.upper() in ad \
+                        and 'daily_samples' in ad: 
+                            getdirs.append(ad)
+            # sort list
+            getdirs.sort()
+            # get last element from list, should be last job
+            lastdir = getdirs.pop()
+            # get ID number from the last job
+            idnumber = get_id(lastdir)
+            # make tarfile
+            (tlist_l3u, tempdir_l3u) = tar_results(args_l3.prodtype.upper(), args_l3.inpdir, 
+                                                   datestring, sensor, platform, idnumber)
+            logger.info("Copy2ECFS: {0}".format(tlist_l3u))
+            copy_into_ecfs(datestring, tlist_l3u, args_l3.ecfsdir)
+            logger.info("Delete \'{0:s}\'".format(tempdir_l3u))
+            delete_dir(tempdir_l3u)
 
-        # archive data
-        (tlist_l3u, tempdir_l3u) = tar_results("L3U", args_l3.inpdir,
-                                               datestring, sensor,
-                                               platform, idnumber)
+        else:
+            logger.info("Check your input directory, maybe it is empty ?")
+
+    # *** L3S archiving ***
+    elif args_l3.prodtype.upper() == "L3S":
+        logger.info("L3S archiving not yet coded!")
+
     else:
-        logger.info("Check your input directory, maybe it is empty ?")
-
-    # list
-    tarfile_list = tlist_l3c + tlist_l3u
-
-    # copy tarfile into ECFS
-    logger.info("Copy2ECFS: tarfile_list")
-    copy_into_ecfs(datestring, tarfile_list, args_l3.ecfsdir)
-
-    # delete tempdir
-    logger.info("Delete \'{0:s}\'".format(tempdir_l3u))
-    delete_dir(tempdir_l3u)
-    logger.info("Delete \'{0:s}\'".format(tempdir_l3c))
-    delete_dir(tempdir_l3c)
+        logger.info("Nothing was archived for l3 parameters passed:")
+        logger.info(" * INPDIR  :{0} ".format(args_l3.inpdir))
+        logger.info(" * ECFSDIR :{0} ".format(args_l3.ecfsdir))
+        logger.info(" * PRODTYPE:{0} ".format(args_l3.prodtype))
 
 
 if __name__ == '__main__':
@@ -195,11 +197,13 @@ if __name__ == '__main__':
     l2_parser.set_defaults(func=l2)
 
     # archive L3C and L3U data
-    l3_parser = subparsers.add_parser('l3', description="Archive L3C and L3U data.")
+    l3_parser = subparsers.add_parser('l3', description="Archive L3C, L3U, L3S data.")
     l3_parser.add_argument('--inpdir', type=str, required=True,
                            help='String, e.g. /path/to/output/level3')
     l3_parser.add_argument('--ecfsdir', type=str, required=True,
                            help='String, e.g. /ecfs/path/to/L3/data')
+    l3_parser.add_argument('--prodtype', type=str, required=True,
+                            help="Choices: \'L3U\', \'L3C\', \'L3S\'")
     l3_parser.set_defaults(func=l3)
 
     # Parse arguments

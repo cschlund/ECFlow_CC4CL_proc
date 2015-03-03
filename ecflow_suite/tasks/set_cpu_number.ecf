@@ -1,10 +1,6 @@
-%include <pbs_serial.h>
+%include <pbs_serial_cleanup.h>
 %include <head.h>
 %include <export.h>
-
-export ATP_ENABLED=0
-ulimit -c unlimited
-ulimit -s unlimited
 
 echo "I am task %TASK% in family %FAMILY% responsible for computing number of CPUs used for the retrieval"
 

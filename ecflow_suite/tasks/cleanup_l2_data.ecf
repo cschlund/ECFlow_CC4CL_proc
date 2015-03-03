@@ -1,4 +1,4 @@
-%include <pbs_serial.h>
+%include <pbs_serial_cleanup.h>
 %include <head.h>
 %include <export.h>
 
@@ -10,13 +10,25 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    python %CLEANUP_SCRATCH% --inpdir %ESA_OUTPUTDIR% \
-        --year %START_YEAR% --month %START_MONTH% \
-        clear_l2 --satellite %SATELLITE% --instrument %SENSOR%
-    
-    python %CLEANUP_SCRATCH% --inpdir %ESA_LOGDIR% \
-        --year %START_YEAR% --month %START_MONTH% \
-        clear_l2 --satellite %SATELLITE% --instrument %SENSOR%
+    for sat in %CURRENT_SATELLITE_LIST%; do
+
+        if [ "${sat}" ==  "TERRA" ] || [ "${sat}" == "AQUA" ]; then
+            sensor="MODIS"
+        else
+            sensor="AVHRR"
+        fi
+
+        # -- output directory
+        python %CLEANUP_SCRATCH% --inpdir %ESA_OUTPUTDIR% \
+            --year %START_YEAR% --month %START_MONTH% \
+            clear_l2 --satellite ${sat} --instrument ${sensor}
+        
+        # -- logs/processing directory
+        python %CLEANUP_SCRATCH% --inpdir %ESA_LOGDIR% \
+            --year %START_YEAR% --month %START_MONTH% \
+            clear_l2 --satellite ${sat} --instrument ${sensor}
+
+    done
 
 fi
 
