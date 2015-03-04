@@ -56,9 +56,10 @@ def clear_l1(args_l1):
     # delete corr. config file
     # config_proc_1_getdata_avhrr_2008_01_NOAA15.file
     # config_proc_1_getdata_modis_2008_01_AQUA.file
-    cfgfile = cfg_prefix + "1_getdata_" + sensor.lower() + '_' + \
+    cfgbase = cfg_prefix + "1_getdata_" + sensor.lower() + '_' + \
               str(args_l1.year) + '_' + str('%02d' % args_l1.month) + \
               '_' + platform.upper() + cfg_suffix 
+    cfgfile = os.path.join(args_l1.cfgdir, cfgbase)
 
     if os.path.isfile(cfgfile):
         logger.info("Delete: \'{0}\'".format(cfgfile))
@@ -107,9 +108,10 @@ def clear_l2(args_l2):
     # config_proc_2_process_2008_06_AQUA.file
     if "output" in args_l2.inpdir:
 
-        cfgfile = cfg_prefix + "2_process_" + str(args_l2.year) + \
+        cfgbase = cfg_prefix + "2_process_" + str(args_l2.year) + \
                   '_' + str('%02d' % args_l2.month) + \
                   '_' + platform.upper() + cfg_suffix 
+        cfgfile = os.path.join(args_l2.cfgdir, cfgbase)
 
         if os.path.isfile(cfgfile):
             logger.info("Delete: \'{0}\' ".format(cfgfile))
@@ -209,18 +211,20 @@ def clear_l3(args_l3):
     # config_proc_3_make_l3c_2008_01_NOAA18.file
     # config_proc_3_make_l3c_2008_01_AQUA.file
     if args_l3.prodtype.lower() == "l3c": 
-        cfgfile = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + \
+        cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + \
                   '_' + str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
                   platform.upper() + cfg_suffix 
+        cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
         cfg_file_list.append(cfgfile)
 
     # -- monthly config files
     # config_proc_3_make_l3s_2008_01_AVHRR.file
     # config_proc_3_make_l3s_2008_01_MODIS.file
     elif args_l3.prodtype.lower() == "l3s": 
-        cfgfile = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + \
+        cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + \
                   '_' + str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
                   sensor.upper() + cfg_suffix 
+        cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
         cfg_file_list.append(cfgfile)
 
     # -- daily config files
@@ -233,10 +237,11 @@ def clear_l3(args_l3):
         last_day_of_month = calendar.monthrange(args_l3.year, args_l3.month)[1]
         for iday in range(last_day_of_month):
             iday += 1
-            cfgfile = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
+            cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
                       platform.upper() + '_' + \
                       str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
                       str('%02d' % iday) + cfg_suffix 
+            cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
             cfg_file_list.append(cfgfile)
 
     # -- daily config files
@@ -246,10 +251,11 @@ def clear_l3(args_l3):
         last_day_of_month = calendar.monthrange(args_l3.year, args_l3.month)[1]
         for iday in range(last_day_of_month):
             iday += 1
-            cfgfile = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
+            cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
                       platform.upper() + '_' + \
                       str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
                       str('%02d' % iday) + cfg_suffix 
+            cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
             cfg_file_list.append(cfgfile)
 
     # now remove all config files in the list
@@ -345,9 +351,10 @@ def clear_aux(args_aux):
     elif args_aux.auxdata.lower().startswith("era"):
         auxkey = "era"
 
-    cfgfile = cfg_prefix + "1_getdata_" + auxkey + '_' + \
+    cfgbase = cfg_prefix + "1_getdata_" + auxkey + '_' + \
               str(args_aux.year) + '_' + str('%02d' % args_aux.month) + \
               cfg_suffix 
+    cfgfile = os.path.join(args_aux.cfgdir, cfgbase)
 
     if os.path.isfile(cfgfile):
         logger.info("Delete: \'{0}\' ".format(cfgfile))
@@ -386,7 +393,10 @@ if __name__ == '__main__':
 
     # add main arguments
     parser.add_argument('--inpdir', type=str, required=True,
-                        help="String: /path/where/to/search")
+                        help="String: /path/to/data/on/scratch")
+
+    parser.add_argument('--cfgdir', type=str, required=True,
+                        help="String: /path/to/cfg/files")
 
     parser.add_argument('--year', type=int, required=True,
                         help="Integer: yyyy, e.g. 2008")
