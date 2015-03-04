@@ -10,8 +10,12 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    python %CLEANUP_SCRATCH% --inpdir %ESA_LEVEL3DIR% --year %START_YEAR% --month %START_MONTH% \
-        clear_l3 --prodtype L3U --satellite %SATELLITE% --instrument %SENSOR%
+    echo "For testing: no cleanup of L3U data"
+    echo "python %CLEANUP_SCRATCH% --inpdir %ESA_LEVEL3DIR% --year %START_YEAR% --month %START_MONTH%" \
+         "clear_l3 --prodtype L3U --satellite %SATELLITE% --instrument %SENSOR%"
+
+    #python %CLEANUP_SCRATCH% --inpdir %ESA_LEVEL3DIR% --year %START_YEAR% --month %START_MONTH% \
+    #    clear_l3 --prodtype L3U --satellite %SATELLITE% --instrument %SENSOR%
 
 fi
 
