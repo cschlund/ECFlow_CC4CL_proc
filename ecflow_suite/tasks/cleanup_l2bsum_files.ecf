@@ -10,18 +10,28 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    echo "For testing: no cleanup of L2B_SUM data"
-    echo "python %CLEANUP_SCRATCH% " \
-         "--inpdir %ESA_LEVEL3DIR% " \
-         "--cfgdir %ESA_CONFIGDIR% " \
-         "--year %START_YEAR% --month %START_MONTH% " \
-         "clear_l3 --prodtype L2B_SUM --satellite %SATELLITE% --instrument %SENSOR% "
+    for sat in %CURRENT_SATELLITE_LIST%; do
 
-    #python %CLEANUP_SCRATCH% \
-    #    --inpdir %ESA_LEVEL3DIR% \
-    #    --cfgdir %ESA_CONFIGDIR% \
-    #    --year %START_YEAR% --month %START_MONTH% \
-    #    clear_l3 --prodtype L2B_SUM --satellite %SATELLITE% --instrument %SENSOR%
+        if [ "${sat}" ==  "TERRA" ] || [ "${sat}" == "AQUA" ]; then
+            sensor="MODIS"
+        else
+            sensor="AVHRR"
+        fi
+
+        echo "For testing: no cleanup of L2B_SUM data"
+        echo "python %CLEANUP_SCRATCH% " \
+             "--inpdir %ESA_LEVEL3DIR% " \
+             "--cfgdir %ESA_CONFIGDIR% " \
+             "--year %START_YEAR% --month %START_MONTH% " \
+             "clear_l3 --prodtype L2B_SUM --satellite ${sat} --instrument ${sensor} "
+
+        #python %CLEANUP_SCRATCH% \
+        #    --inpdir %ESA_LEVEL3DIR% \
+        #    --cfgdir %ESA_CONFIGDIR% \
+        #    --year %START_YEAR% --month %START_MONTH% \
+        #    clear_l3 --prodtype L2B_SUM --satellite ${sat} --instrument ${sensor}
+
+    done
 
 fi
 
