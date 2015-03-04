@@ -10,7 +10,9 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+    echo "python %ARCHIVE_DATA% --instrument %SENSOR_FAM% " \
+         "--year %START_YEAR% --month %START_MONTH% " \
+         "l3 --prodtype L3S --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR% "
 
     ## -- archive L3 data
     #python %ARCHIVE_DATA% --instrument %SENSOR_FAM% \

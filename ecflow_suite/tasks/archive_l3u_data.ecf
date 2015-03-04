@@ -10,10 +10,14 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    # -- archive L3 data
-    python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
-        --year %START_YEAR% --month %START_MONTH% \
-        l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR%
+    echo "python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% " \
+         "--year %START_YEAR% --month %START_MONTH% " \
+         "l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR% "
+
+    ## -- archive L3 data
+    #python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
+    #    --year %START_YEAR% --month %START_MONTH% \
+    #    l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR%
 
 fi
 
