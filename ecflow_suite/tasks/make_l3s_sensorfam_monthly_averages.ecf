@@ -2,11 +2,12 @@
 %include <head.h>
 %include <export.h>
 
-# enable next 2 lines if you wish a core file
+# -- no core file
+export ATP_ENABLED=0
+# -- core file
 #export ATP_ENABLED=1
 #ulimit -c unlimited
-
-# stacksize (keep it always that way)
+# -- stacksize (keep it always that way)
 ulimit -s unlimited
 
 echo "I am task %TASK% in family %FAMILY% responsible for L3S processing, i. e. sensor family monthly averages (AVHRR or MODIS)"
