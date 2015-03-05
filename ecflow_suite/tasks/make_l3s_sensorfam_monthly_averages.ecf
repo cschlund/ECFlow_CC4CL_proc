@@ -22,13 +22,18 @@ else
 
     #date_ins_base="%START_YEAR%_%START_MONTH%_%SENSOR_FAM%"
 
-    ## -- config file
+    ## -- write config file for l3b = L3S (based on L2B_SUM)
     #cfg_typ="3_make_l3s_"
     #cfg_bas="%CFG_PREFIX%${cfg_typ}${date_ins_base}%CFG_SUFFIX%"
     #cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
+    #python %MAKE_CFG_FILE% -cf ${cfg_fil} \
+    #    -sy %START_YEAR% -ey %END_YEAR% \
+    #    -sm %START_MONTH% -em %END_MONTH% \
+    #    l2tol3 -ins %SENSOR% \
+    #    -inp %ESA_LEVEL3DIR% -typ l3b
+
     ## -- working directory: write core file here
-    ##cd %ESA_ROUTINE%
     #cd %ESA_ECF_LOG_DIR%
     #
     ## -- create job id number

@@ -20,13 +20,18 @@ else
 
     date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
 
-    # -- config file
+    # -- write config file for l3a = L3C (based on L2B_SUM)
     cfg_typ="3_make_l3c_"
     cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
     cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
+    python %MAKE_CFG_FILE% -cf ${cfg_fil} \
+        -sy %START_YEAR% -ey %END_YEAR% \
+        -sm %START_MONTH% -em %END_MONTH% \
+        l2tol3 -sat %SATELLITE% -ins %SENSOR% \
+        -inp %ESA_LEVEL3DIR% -typ l3a
+
     # -- working directory: write core file here
-    #cd %ESA_ROUTINE%
     cd %ESA_ECF_LOG_DIR%
     
     # -- create job id number
