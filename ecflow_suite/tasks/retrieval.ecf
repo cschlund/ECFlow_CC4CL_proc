@@ -26,7 +26,8 @@ else
     cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
     # -- working directory: write core file here
-    cd %ESA_ROUTINE%
+    #cd %ESA_ROUTINE%
+    cd %ESA_ECF_LOG_DIR%
     
 
     # -- some more export statements

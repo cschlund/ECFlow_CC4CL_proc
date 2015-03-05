@@ -28,7 +28,8 @@ else
 
 
     # -- working directory: write core file here
-    cd %ESA_ROUTINE%
+    #cd %ESA_ROUTINE%
+    cd %ESA_ECF_LOG_DIR%
     
 
     # -- create job id number

@@ -26,7 +26,8 @@ else
     cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
     # -- working directory: write core file here
-    cd %ESA_ROUTINE%
+    #cd %ESA_ROUTINE%
+    cd %ESA_ECF_LOG_DIR%
     
     # -- create job id number
     primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
