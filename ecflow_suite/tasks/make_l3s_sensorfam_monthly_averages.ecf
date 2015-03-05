@@ -30,7 +30,7 @@ else
     #python %MAKE_CFG_FILE% -cf ${cfg_fil} \
     #    -sy %START_YEAR% -ey %END_YEAR% \
     #    -sm %START_MONTH% -em %END_MONTH% \
-    #    l2tol3 -ins %SENSOR% \
+    #    l2tol3 -ins %SENSOR_FAM% \
     #    -inp %ESA_LEVEL3DIR% -typ l3b
 
     ## -- working directory: write core file here
