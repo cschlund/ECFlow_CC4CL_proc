@@ -3,19 +3,19 @@
 # read command arguments
 args = commandArgs( trailingOnly = T )
 
-year       = args[2]
-month	   = args[3]
-prodtype   = args[4]
-sensor 	   = args[5]
-platform   = args[6]
-jobID      = args[7]
-ndays      = args[8]
-log_dir    = args[9]
-cfg_dir    = args[10]
-cfg_prefix = args[11]
-cfg_suffix = args[12]
-cfg_base   = args[13]
-base_path  = args[14]
+year         = args[2]
+month        = args[3]
+prodtype     = args[4]
+sensor       = args[5]
+platform     = args[6]
+jobID        = args[7]
+ndays        = args[8]
+cfg_dir      = args[9]
+cfg_prefix   = args[10]
+cfg_suffix   = args[11]
+cfg_base     = args[12]
+base_path    = args[13]
+flist_l2_out = args[14]
 
 ## base path of L2 output data
 #base_path ="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/output"
@@ -58,6 +58,7 @@ for (i in 1:ndays) {
 	paste("prodtype=", prodtype, sep=""),
 	paste("sensor=", sensor, sep=""),
 	paste("platform=", platform, sep=""),
+	paste("filelist_level2_output=", flist_l2_out, sep=""),
 	"local=F",
 	"slon=0",
 	"elon=18",

@@ -272,6 +272,7 @@ def set_vars(suite, procday, dummycase, testcase):
     suite.add_variable("ESA_INPUTDIR", esa_inputdir)
     suite.add_variable("ESA_LOGDIR", esa_logdir)
     suite.add_variable("ESA_CONFIGDIR", esa_configdir)
+    suite.add_variable("ESA_LIST_L2FILES", esa_listl2files)
     suite.add_variable("ESA_ECF_LOG_DIR", esa_ecflogdir)
 
     # Config files

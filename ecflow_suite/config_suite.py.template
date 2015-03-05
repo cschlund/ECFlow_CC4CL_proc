@@ -50,6 +50,7 @@ esa_outputdir = os.path.join(scratch_base, "output")
 esa_level3dir = os.path.join(scratch_base, "output/level3")
 esa_logdir = os.path.join(scratch_base, "logs/processing")
 esa_configdir = os.path.join(scratch_base, "temp_cfg_files")
+esa_listl2files = os.path.join(scratch_base, "temp_list_l2files")
 esa_ecflogdir = os.path.join(scratch_base, "log")
 
 # new programs

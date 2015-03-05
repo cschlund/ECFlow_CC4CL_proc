@@ -10,7 +10,11 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
+    # -- create temp folder for config files
     mkdir -p %ESA_CONFIGDIR%
+
+    # -- create temp folder for l2files listing
+    mkdir -p %ESA_LIST_L2FILES%
 
     date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
     date_ins_base="%START_YEAR%_%START_MONTH%_%SENSOR%"

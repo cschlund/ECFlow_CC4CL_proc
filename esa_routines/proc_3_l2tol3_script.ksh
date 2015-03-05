@@ -49,9 +49,8 @@
 	    loop_start=${DAY}
 	    loop_count=${DAY}
      fi
-     log_file_retrieval=${LOGDIR_CCFLOW}${YEAR}/${MONTH}/'MAIN_PROC/'${sensor}/${platform}/retrieval.1
-     l2info_dum=${l2inputpath}/L2_output_list/L2_output_list_${id}.txt
-     sed -n -e "s/^.*\(L2 output file path = \)/\1/p" ${log_file_retrieval} | cut -f2- -d"=" | sed "s/*/\"*\"/g;s/^/\"/;s/$/\"/" > ${l2info_dum}
+     # stored in daily config file: see "write_l3_mpmd_config_files.R"
+     l2info_dum=${filelist_level2_output}
  else
      gridx=${gridxl3}
      gridy=${gridyl3}
