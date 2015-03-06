@@ -323,8 +323,7 @@ def l2tol3(args_l3):
                 else:
                     if datestr in ad \
                             and args_l3.instrument.upper() in ad \
-                            and args_l3.satellite.lower() in ad \
-                            and 'ORAC' in ad \
+                            and platform in ad and 'ORAC' in ad \
                             and 'L2B_SUM_monthly_means' in ad:
                         getdirs.append(ad)
 
