@@ -316,16 +316,16 @@ def l2tol3(args_l3):
                 if args_l3.prodtype.lower() == "l3b":
                     if datestr in ad \
                             and args_l3.instrument.upper() in ad \
-                            and args_l3.prodtype.upper() in ad \
-                            and 'L2B_SUM' in ad:
+                            and 'ORAC' in ad \
+                            and 'L2B_SUM_monthly_means' in ad:
                         getdirs.append(ad)
                 # L3C: sensor and platform in subdirectory_name
                 else:
                     if datestr in ad \
                             and args_l3.instrument.upper() in ad \
                             and args_l3.satellite.lower() in ad \
-                            and args_l3.prodtype.upper() in ad \
-                            and 'L2B_SUM' in ad:
+                            and 'ORAC' in ad \
+                            and 'L2B_SUM_monthly_means' in ad:
                         getdirs.append(ad)
 
             # sort list
