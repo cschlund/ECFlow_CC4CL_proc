@@ -27,7 +27,8 @@ else
     #cfg_bas="%CFG_PREFIX%${cfg_typ}${date_ins_base}%CFG_SUFFIX%"
     #cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
-    #python %MAKE_CFG_FILE% -cf ${cfg_fil} \
+    #python %MAKE_CFG_FILE% \
+    #    -cf ${cfg_fil} \
     #    -sy %START_YEAR% -ey %END_YEAR% \
     #    -sm %START_MONTH% -em %END_MONTH% \
     #    l2tol3 -ins %SENSOR_FAM% \
@@ -43,7 +44,10 @@ else
     #jid=ID${primary_id}_US${id}
     #
     ## -- execute ksh script
-    #%RUN_L2TOL3_KSH% $jid %CFG_ATTRI_FILE% %CFG_PATHS_FILE% ${cfg_fil}
+    #%RUN_L2TOL3_KSH% $jid \
+    #    %CFG_ATTRI_FILE% \
+    #    %CFG_PATHS_FILE% \
+    #    ${cfg_fil}
 
 fi
 
