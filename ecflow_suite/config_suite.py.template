@@ -19,6 +19,12 @@ itype = "cloud_cci_master"
 
 # suite name
 mysuite = itype + "_proc"
+# family names
+big_fam = "PROC"
+get_aux_fam = "GET_AUX_DATA"
+mainproc_fam = "MAIN_PROC"
+postproc_fam = "POST_PROC"
+final_fam = "FINAL_CLEANUP"
 
 # ECFS path: final level3, level2 data
 ecfs_l3_dir = "ec:/sf7/ESA_Cloud_cci_data/L3"

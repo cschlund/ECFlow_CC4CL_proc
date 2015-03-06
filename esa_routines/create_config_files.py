@@ -272,73 +272,12 @@ def l2tol3(args_l3):
     l3b = L3S
     @param args_l3: command line arguments
     """
-
-    global platform, id_number
     try:
-        # L3U: sensor und platform, monthly averages per satellite
-        if args_l3.prodtype == "l3a":
-            if args_l3.satellite:
-                if args_l3.satellite.upper() == "TERRA":
-                    platform = "MOD"
-                elif args_l3.satellite.upper() == "AQUA":
-                    platform = "MYD"
-                elif args_l3.satellite.upper().startswith("NOAA"):
-                    platform = args_l3.satellite.upper()
-                elif args_l3.satellite.upper().startswith("METOP"):
-                    platform = args_l3.satellite.upper()
-                else:
-                    logger.info("WRONG SATELLITE NAME!")
-                    sys.exit(0)
-            else:
-                logger.info("You chose prodtype={0}, "
-                            "so tell me which platform!".
-                            format(args_l3.prodtype))
-                sys.exit(0)
-
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
 
-        # -- search for current ID number --
-
-        # date string
-        datestr = str(args_l3.start_year) + \
-                  str('%02d' % args_l3.start_month)
-
-        # get dirs list containing all subdirs of given path
-        alldirs = os.listdir(args_l3.inpdir)
-
-        # get dirs list matching the arguments
-        if len(alldirs) > 0:
-            getdirs = list()
-            for ad in alldirs:
-                # L3S: no platform, sensor fam. monthly averages
-                # WARNING: ID numbers of different satellites are not equal
-                if args_l3.prodtype.lower() == "l3b":
-                    if datestr in ad \
-                            and args_l3.instrument.upper() in ad \
-                            and 'ORAC' in ad \
-                            and 'L2B_SUM_monthly_means' in ad:
-                        getdirs.append(ad)
-                # L3C: sensor and platform in subdirectory_name
-                else:
-                    if datestr in ad \
-                            and args_l3.instrument.upper() in ad \
-                            and platform in ad and 'ORAC' in ad \
-                            and 'L2B_SUM_monthly_means' in ad:
-                        getdirs.append(ad)
-
-            # sort list
-            getdirs.sort()
-
-            # get last element from list, should be last job
-            lastdir = getdirs.pop()
-
-            # get ID number from the last job
-            id_number = get_id(lastdir)
-
-        # -- end of search for current ID number --
-
         f = open(args_l3.cfile, mode="w")
+
         f.write("# Config file for level3 processing\n")
         f.write("# Created: {0}\n".format(timestamp))
         f.write("\n")
@@ -349,8 +288,11 @@ def l2tol3(args_l3):
         f.write("\n")
         f.write("# define sensor and platform\n")
         f.write("sensor={0}\n".format(args_l3.instrument.upper()))
+
+        # for L3C/l3a yes, but not for L3S/l3b (super-collated)
         if args_l3.prodtype.lower() == "l3a" and args_l3.satellite:
-            f.write("platform={0}\n".format(platform))
+            f.write("platform={0}\n".format(args_l3.satellite.upper()))
+
         f.write("\n")
         f.write("# define product type\n")
         f.write("prodtype={0}\n".format(args_l3.prodtype))
@@ -383,10 +325,10 @@ def l2tol3(args_l3):
         f.write("# inverse spacing of local grid in deg.\n")
         f.write("gridxloc=10\n")
         f.write("gridyloc=10\n")
-        f.write("# set id string explicitly in order to avoid\n")
-        f.write("# confusion when averaging\n")
-        f.write("id={0}\n".format(id_number))
+        f.write("# filelist containing input files for product generation\n")
+        f.write("filelist_l2b_sum_output={0}\n".format(args_l3.l2bsum_filelist))
         f.write("\n")
+
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
@@ -468,6 +410,8 @@ if __name__ == '__main__':
                                help="String, /path/to/input/files")
     l2tol3_parser.add_argument('-typ', '--prodtype', type=str,
                                help="Choices: \'l3a\' = L3U or \'l3b\' = L3S")
+    l2tol3_parser.add_argument('-lfl', '--l2bsum_filelist', type=str,
+                               help="String, /path/to/filelist/of/l2bsum/files")
     l2tol3_parser.set_defaults(func=l2tol3)
 
     # Parse arguments

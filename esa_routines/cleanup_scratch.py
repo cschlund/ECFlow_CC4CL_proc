@@ -208,22 +208,22 @@ def clear_l3(args_l3):
     cfg_file_list = list()
 
     # -- monthly config files
-    # config_proc_3_make_l3c_2008_01_NOAA18.file
-    # config_proc_3_make_l3c_2008_01_AQUA.file
+    # config_proc_3_make_l3c_NOAA18_2008_01.file
+    # config_proc_3_make_l3c_AQUA_2008_01.file
     if args_l3.prodtype.lower() == "l3c": 
         cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + \
-                  '_' + str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
-                  platform.upper() + cfg_suffix 
+                  '_' + platform.upper() + '_' + str(args_l3.year) + \
+                  '_' + str('%02d' % args_l3.month) + '_' + cfg_suffix 
         cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
         cfg_file_list.append(cfgfile)
 
     # -- monthly config files
-    # config_proc_3_make_l3s_2008_01_AVHRR.file
-    # config_proc_3_make_l3s_2008_01_MODIS.file
+    # config_proc_3_make_l3s_AVHRR_2008_01.file
+    # config_proc_3_make_l3s_MODIS_2008_01.file
     elif args_l3.prodtype.lower() == "l3s": 
         cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + \
-                  '_' + str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
-                  sensor.upper() + cfg_suffix 
+                  '_' + sensor.upper() + '_' + str(args_l3.year) + \
+                  '_' + str('%02d' % args_l3.month) + '_' + cfg_suffix 
         cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
         cfg_file_list.append(cfgfile)
 

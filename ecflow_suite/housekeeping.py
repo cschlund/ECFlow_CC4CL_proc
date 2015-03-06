@@ -571,7 +571,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # ========================
     # DEFINE TOP LEVEL FAMILY
     # ========================
-    fam_proc = add_fam(suite, 'proc')
+    fam_proc = add_fam(suite, big_fam)
 
     # Activate thread limits
     # fam_proc.add_inlimit('serial_threads')
@@ -605,6 +605,14 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
     # memorize satellites for each month
     satellites_within_current_month = list()
+
+    # relevant for post_proc: L3S
+    avhrr_cnt = 0
+    modis_cnt = 0
+    avhrr_logdirs = list()
+    modis_logdirs = list()
+    l2bsum_logdirs_within_current_month = list()
+
 
     # month counter
     month_cnt = 0
@@ -661,7 +669,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         fam_month.add_variable("NDAYS_OF_MONTH", ndays_of_month)
 
         # add get aux/era family
-        fam_aux = add_fam(fam_month, "GET_AUX_DATA")
+        fam_aux = add_fam(fam_month, get_aux_fam)
         add_aux_tasks(fam_aux)
 
         # trigger for next month node
@@ -669,26 +677,20 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
             add_trigger(fam_aux, fam_month_previous)
 
         # add fam. main processing
-        fam_main = add_fam(fam_month, "MAIN_PROC")
+        fam_main = add_fam(fam_month, mainproc_fam)
 
         # add fam. post processing
-        fam_post = add_fam(fam_month, "POST_PROC")
+        fam_post = add_fam(fam_month, postproc_fam)
 
         # if avhrr data available for current month
         if avhrr_flag:
             fam_avhrr = add_fam(fam_main, "AVHRR")
             fam_avhrr.add_variable("SENSOR", "AVHRR")
-            fam_avhrr_post = add_fam(fam_post, "AVHRR_L3S")
-            fam_avhrr_post.add_variable("SENSOR_FAM", "AVHRR")
-            add_l3s_product_tasks(fam_avhrr_post, fam_main)
 
         # if modis data available for current month
         if modis_flag:
             fam_modis = add_fam(fam_main, "MODIS")
             fam_modis.add_variable("SENSOR", "MODIS")
-            fam_modis_post = add_fam(fam_post, "MODIS_L3S")
-            fam_modis_post.add_variable("SENSOR_FAM", "MODIS")
-            add_l3s_product_tasks(fam_modis_post, fam_main)
 
         # process avail. satellites for current month
         for counter, satellite in enumerate(sat_list):
@@ -705,7 +707,10 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 fam_sat.add_variable("SATELLITE", satellite)
                 add_main_proc_tasks(fam_sat, fam_aux)
                 satellites_within_current_month.append(satellite)
-
+                l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
+                                             big_fam, yearstr, monthstr, 
+                                             isensor, satellite)
+                l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
             else:
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
                 medate = enddate_of_month(int(yearstr), int(monthstr))
@@ -717,6 +722,10 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 fam_sat = add_fam(fam_modis, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
                 satellites_within_current_month.append(satellite)
+                l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
+                                             big_fam, yearstr, monthstr, 
+                                             isensor, satellite)
+                l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
 
                 if avhrr_flag:
                     add_main_proc_tasks(fam_sat, fam_avhrr)
@@ -731,8 +740,43 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         logger.info("satellites_within_current_month:{0}".
                 format(satellites_within_current_month))
 
+        # check if enough satellites are available for L3S product
+        for ldirs in l2bsum_logdirs_within_current_month:
+            if "AVHRR" in ldirs:
+                avhrr_cnt += 1
+                avhrr_logdirs.append(ldirs)
+            if "MODIS" in ldirs:
+                modis_cnt += 1
+                modis_logdirs.append(ldirs)
+
+        if avhrr_cnt > 1:
+            fam_avhrr_post = add_fam(fam_post, "AVHRR_L3S")
+            fam_avhrr_post.add_variable("SENSOR_FAM", "AVHRR")
+            add_l3s_product_tasks(fam_avhrr_post, fam_main)
+            fam_avhrr_post.add_variable('L2B_SUM_LOGDIRS', ' '.join(avhrr_logdirs))
+            logger.info("L3S: {0} AVHRR(s) in {1} for {2}/{3}".
+                        format(avhrr_cnt, mainproc_fam, yearstr, monthstr))
+            logger.info("Use {0} for L3S production".format(avhrr_logdirs))
+        else:
+            logger.info("No L3S production due to "
+                        "{0} AVHRR in {1} for {2}/{3}".
+                        format(avhrr_cnt, mainproc_fam, yearstr, monthstr))
+
+        if modis_cnt > 1:
+            fam_modis_post = add_fam(fam_post, "MODIS_L3S")
+            fam_modis_post.add_variable("SENSOR_FAM", "MODIS")
+            add_l3s_product_tasks(fam_modis_post, fam_main)
+            fam_modis_post.add_variable('L2B_SUM_LOGDIRS', ' '.join(modis_logdirs))
+            logger.info("L3S: {0} MODIS(s) in {1} for {2}/{3}".
+                        format(modis_cnt, mainproc_fam, yearstr, monthstr))
+            logger.info("Use {0} for L3S production".format(modis_logdirs))
+        else:
+            logger.info("No L3S production due to "
+                        "{0} MODIS in {1} for {2}/{3}".
+                        format(modis_cnt, mainproc_fam, yearstr, monthstr))
+
         # add cleanup aux/era, l2, l2_sum files
-        fam_final_cleanup = add_fam(fam_month, "FINAL_CLEANUP")
+        fam_final_cleanup = add_fam(fam_month, final_fam)
         fam_final_cleanup.add_variable('CURRENT_SATELLITE_LIST',
                 ' '.join(satellites_within_current_month))
         add_final_cleanup_task(fam_final_cleanup, fam_post)
@@ -741,8 +785,11 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         fam_month_previous = fam_month
         month_cnt += 1
 
-        # reset list of satellites_within_current_month
+        # reset lists
         satellites_within_current_month = []
+        l2bsum_logdirs_within_current_month = []
+        avhrr_logdirs = []
+        modis_logdirs = []
 
     # ----------------------------------------------------
     # end of loop over months

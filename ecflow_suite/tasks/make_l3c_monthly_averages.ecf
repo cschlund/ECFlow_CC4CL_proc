@@ -18,19 +18,16 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
-
-    # -- write config file for l3a = L3C (based on L2B_SUM)
+    # -- settings for L3C based on L2B_SUM
+    prodtype=l3a
+    sat_date_base="%SATELLITE%_%START_YEAR%_%START_MONTH%"
     cfg_typ="3_make_l3c_"
-    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${sat_date_base}%CFG_SUFFIX%"
     cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
-    python %MAKE_CFG_FILE% \
-        -cf ${cfg_fil} \
-        -sy %START_YEAR% -ey %END_YEAR% \
-        -sm %START_MONTH% -em %END_MONTH% \
-        l2tol3 -sat %SATELLITE% -ins %SENSOR% \
-        -inp %ESA_LEVEL3DIR% -typ l3a
+    # -- log file of prepare_l2b_sum_files ecflow script
+    log_dir="%ESA_ECF_LOG_DIR%/%SUITE%/%FAMILY%"
+    log_fil="${log_dir}/prepare_l2b_sum_files.1"
 
     # -- working directory: write core file here
     cd %ESA_ECF_LOG_DIR%
@@ -41,6 +38,21 @@ else
     sleep 3
     jid=ID${primary_id}_US${id}
     
+    # -- create l2b sum output file list for L3C production
+    sstr="done L2->L3 finished, results written to:"
+    fbasen="L2B_SUM_ncfile_list_${prodtype}_%SENSOR%_${sat_date_base}_${jid}.txt"
+    ofilelist="%ESA_LIST_L2FILES%/${fbasen}"
+    sed -n -e "s/^.*\(${sstr}\)/\1/p" ${log_fil} | cut -f2- -d"'" | sed "s/*/\"*\"/g;s/^/\"/;s/$/\"/" > ${ofilelist}
+
+    # -- create L3C config file
+    python %MAKE_CFG_FILE% \
+        --cfile ${cfg_fil} \
+        --start_year %START_YEAR% --end_year %END_YEAR% \
+        --start_month %START_MONTH% --end_month %END_MONTH% \
+        l2tol3 --satellite %SATELLITE% --instrument %SENSOR% \
+        --inpdir %ESA_LEVEL3DIR% --prodtype ${prodtype} \
+        --l2bsum_filelist ${ofilelist}
+
     # -- execute ksh script
     %RUN_L2TOL3_KSH% $jid \
         %CFG_ATTRI_FILE% \

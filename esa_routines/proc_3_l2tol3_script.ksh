@@ -20,15 +20,6 @@
 
  algo=${l2processor}
 
- if [ "${sensor}" = MODIS ] ; then
-    if [ "${platform}" = MYD ] ; then
-       platform=AQUA
-    fi
-    if [ "${platform}" = MOD ] ; then
-       platform=TERRA
-    fi
- fi
-
  DOM=`cal ${MONTH} ${YEAR}  |tr -s " " "\n"|tail -1`
 
  MONTH=$(printf %02d $MONTH)
@@ -56,8 +47,9 @@
      gridy=${gridyl3}
      loop_start=1
      loop_count=1
-     # use this path along with find to make file_list (max 31 files should be fast enough)
-     l2info_dum=${l3outputpath}/${YEAR}${MONTH}*${sensor}*${platform}_L2B_SUM_*${id}/
+     # stored in config file: see "ecflow_suite/tasks/make_l3c_monthly_averages.ecf"
+     # stored in config file: see "ecflow_suite/tasks/make_l3s_sensorfam_monthly_averages.ecf"
+     l2info_dum=${filelist_l2b_sum_output}
  fi
 
  #present date and time for output file name
@@ -253,11 +245,12 @@ mkdir -p ${outputdir}
 l2info=${outputdir}/l2files_${exec_time}.tmp
 
 #write file list
-if [[ "${prodtype}" = l2b || "${prodtype}" = l2b_sum ]] ; then
-   cat ${l2info_dum} | grep ${datum} > ${l2info}
-else
-   find ${l2info_dum} -type f -name "*.nc"  -exec ${ESA_ROUT}/add_dq.ksh '{}' \; > ${l2info}
-fi
+cat ${l2info_dum} | grep ${datum} > ${l2info}
+#if [[ "${prodtype}" = l2b || "${prodtype}" = l2b_sum ]] ; then
+#   cat ${l2info_dum} | grep ${datum} > ${l2info}
+#else
+#   find ${l2info_dum} -type f -name "*.nc"  -exec ${ESA_ROUT}/add_dq.ksh '{}' \; > ${l2info}
+#fi
 
 #olduuid_tag=`/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/uuid_gen -t`
 uuid_tag=`/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/ossp_uuid-1.6.2/bin/uuid -v 4`
