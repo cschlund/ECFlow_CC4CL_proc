@@ -11,7 +11,7 @@ ${cotthres}
 ${cotthres1}
 ${cotthres2}
 ${proc_flag}
-${cprocessing_inst}
+${INSTRUMENT}
 ${lsec}
 ${lstrict}
 #END">${postproc_driver}
