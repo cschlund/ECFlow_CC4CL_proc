@@ -540,7 +540,25 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
                     idx = sat_list.index(ml)
                     del sat_list[idx]
 
-    return sat_list
+
+    # -- sort satellite list, MODIS last
+    sort_avhrr_list = list()
+    sort_modis_list = list()
+
+    for s in sat_list:
+        if s == "TERRA" or s == "AQUA":
+            sort_modis_list.append(s)
+        else:
+            sort_avhrr_list.append(s)
+
+    if len(sort_avhrr_list) > 0: 
+        sort_avhrr_list.sort()
+    if len(sort_modis_list) > 0: 
+        sort_modis_list.sort()
+
+    sorted_sat_list = sort_avhrr_list + sort_modis_list
+
+    return sorted_sat_list
 
 
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
