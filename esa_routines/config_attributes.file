@@ -1,22 +1,20 @@
-# ---------------------------------------------------
-# -- Config file for ESA Cloud CCI ORAC processing
-# ---------------------------------------------------
-# This specific file sets attributes and supporting 
-# information used in the processing later on.
-#
-# Set general processing variables
+#Config file for ESA Cloud CCI ORAC processing
+#This specific file sets attributes and supporting information used in the processing later on.
+#File is empty at the moment
+#20120626 MJ created first version and sets standard paths based on previous work by SteSta and AK.
+#set general processing variables
 
 ncdf_version='4.1.3 (classic format)'
 cf_convention='CF-1.5'
 processing_inst='Deutscher Wetterdienst'
 l2processor='ORAC'
-l2proc_version='1.0'
-l3processor='CCCIL3'
-l3proc_version='1.0'
+l2proc_version='1.2'
+#l3processor='CCCIL3'
+#l3proc_version='1.0'
 contact_email='contact.cloudcci@dwd.de'
 contact_website='www.esa-cloud-cci.info'
 reference='www.esa-cloud-cci.info'
-history='Dataset produced by DWDs ORAC prototype retrieval system installed at ECMWF in first phase of ESA Cloud CCI.'
+history='Dataset produced by DWDs CC4CL retrieval system installed at ECMWF in second phase of ESA Cloud CCI.'
 summary='This dataset contains Level-2 cloud products from satellite observations. Level-2 data are raw satellite observations processed to geophysical quantities but in the original satellite orbit.'
 keywords='satellite,observation,cloud'
 comment='These data were produced at ESACCI as part of the ESA Cloud CCI project.'
@@ -26,13 +24,13 @@ sensor_version_modis='Collection 6'
 sensor_version_avhrr='GAC'
 standard_name_voc='NetCDF Climate Forecast (CF) Metadata Convention version 18'
 prod_name='L2 final output'
-file_version='1.0'
+file_version='1.2'
 prod_type='L2'
 
-# Level3 related
+#Level3 related
 grid_type='equal_angle'
 l3processor='CCCIL3'
-l3proc_version='1.0'
+l3proc_version='1.1'
 summary_L3="This dataset contains monthly Level-3 global cloud property products from satellite observations. Averaged onto a regular grid."
 summary_L2b="This dataset contains daily Level-3 global cloud property products from satellite observations. Sampled onto a regular grid."
 
