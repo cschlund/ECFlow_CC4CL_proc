@@ -562,7 +562,8 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
 
 
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
-                useprimes, modisonly, procday, dummycase, testcase):
+                ignoremonths_list, useprimes, modisonly, 
+                procday, dummycase, testcase):
     """
     Build the ecflow suite.
     """
@@ -642,6 +643,11 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         act_date = datetime.date(int(yearstr), int(monthstr), 1)
         ndays_of_month = calendar.monthrange(int(yearstr), 
                                              int(monthstr))[1]
+
+        # check if month should be skipped, if given
+        if ignoremonths_list:
+            if act_date in ignoremonths_list:
+                continue
 
         # check for avhrr primes
         if useprimes:
