@@ -625,12 +625,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     satellites_within_current_month = list()
 
     # relevant for post_proc: L3S
-    avhrr_cnt = 0
-    modis_cnt = 0
     avhrr_logdirs = list()
     modis_logdirs = list()
     l2bsum_logdirs_within_current_month = list()
-
 
     # month counter
     month_cnt = 0
@@ -697,9 +694,6 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         # add fam. main processing
         fam_main = add_fam(fam_month, mainproc_fam)
 
-        # add fam. post processing
-        fam_post = add_fam(fam_month, postproc_fam)
-
         # if avhrr data available for current month
         if avhrr_flag:
             fam_avhrr = add_fam(fam_main, "AVHRR")
@@ -759,6 +753,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 format(satellites_within_current_month))
 
         # check if enough satellites are available for L3S product
+        avhrr_cnt = 0
+        modis_cnt = 0
+
         for ldirs in l2bsum_logdirs_within_current_month:
             if "AVHRR" in ldirs:
                 avhrr_cnt += 1
@@ -766,6 +763,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
             if "MODIS" in ldirs:
                 modis_cnt += 1
                 modis_logdirs.append(ldirs)
+
+        # add fam. post processing
+        if avhrr_cnt > 1 or modis_cnt > 1: 
+            fam_post = add_fam(fam_month, postproc_fam)
+            last_fam_trigger = fam_post
+        else:
+            last_fam_trigger = fam_main
 
         if avhrr_cnt > 1:
             fam_avhrr_post = add_fam(fam_post, "AVHRR_L3S")
@@ -797,7 +801,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         fam_final_cleanup = add_fam(fam_month, final_fam)
         fam_final_cleanup.add_variable('CURRENT_SATELLITE_LIST',
                 ' '.join(satellites_within_current_month))
-        add_final_cleanup_task(fam_final_cleanup, fam_post)
+        add_final_cleanup_task(fam_final_cleanup, last_fam_trigger)
 
         # remember fam_month
         fam_month_previous = fam_month
