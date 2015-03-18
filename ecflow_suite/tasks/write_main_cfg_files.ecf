@@ -1,4 +1,4 @@
-%include <pbs_serial_cleanup.h>
+%include <pbs_serial.h>
 %include <head.h>
 %include <export.h>
 
@@ -13,11 +13,7 @@ else
     # -- create temp folder for config files
     mkdir -p %ESA_CONFIGDIR%
 
-    # -- create temp folder for l2files listing
-    mkdir -p %ESA_LIST_L2FILES%
-
     date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
-    date_ins_base="%START_YEAR%_%START_MONTH%_%SENSOR%"
 
     # -- write config file for get_sat_data
 
@@ -42,31 +38,6 @@ else
             -sy %START_YEAR% -ey %END_YEAR% \
             -sm %START_MONTH% -em %END_MONTH% \
             getsat -sat %SATELLITE% -ins %SENSOR%
-    
-    fi
-
-
-    # -- write config file for retrieval
-
-    cfg_typ="2_process_"
-    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
-    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
-
-    if [ %TESTRUN% == 1 ]; then
-    
-        python %MAKE_CFG_FILE% -cf ${cfg_fil} \
-            -sy %START_YEAR% -ey %END_YEAR% \
-            -sm %START_MONTH% -em %END_MONTH% \
-            proc2 -sat %SATELLITE% -ins %SENSOR% \
-            --procday %PROCDAY% --testrun
-    
-    else
-    
-        python %MAKE_CFG_FILE% -cf ${cfg_fil} \
-            -sy %START_YEAR% -ey %END_YEAR% \
-            -sm %START_MONTH% -em %END_MONTH% \
-            proc2 -sat %SATELLITE% -ins %SENSOR% \
-            --procday %PROCDAY%
     
     fi
 

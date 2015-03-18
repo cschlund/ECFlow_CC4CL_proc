@@ -308,24 +308,6 @@ def add_task(family, taskname):
     return task
 
 
-def add_final_cleanup_task(family, prefamily):
-    """
-    Adds task for final cleanup of month.
-    :rtype : dictionary
-    """
-    cleanup_l2_data = add_task(family, 'cleanup_l2_data')
-    cleanup_l2bsum_files = add_task(family, 'cleanup_l2bsum_files')
-    cleanup_aux_data = add_task(family, 'cleanup_aux_data')
-
-    add_trigger(cleanup_l2_data, prefamily)
-    add_trigger(cleanup_l2bsum_files, prefamily)
-    add_trigger(cleanup_aux_data, prefamily)
-
-    return {'cleanup_l2_data': cleanup_l2_data,
-            'cleanup_l2bsum_files': cleanup_l2bsum_files,
-            'cleanup_aux_data': cleanup_aux_data}
-
-
 def add_aux_tasks(family):
     """
     Adds aux specific tasks to the given family.
@@ -343,24 +325,6 @@ def add_aux_tasks(family):
             'get_mars_data': get_mars_data}
 
 
-def add_l3s_product_tasks(family, prefamily):
-    """
-    Adds tasks regarding L3S creation, final archiving,
-    and cleanup l2 and l3 data.
-    """
-    make_l3s_data = add_task(family, 'make_l3s_sensorfam_monthly_averages')
-    archive_l3s_data = add_task(family, 'archive_l3s_data')
-    cleanup_l3s_data = add_task(family, 'cleanup_l3s_data')
-
-    add_trigger(make_l3s_data, prefamily)
-    add_trigger(archive_l3s_data, make_l3s_data)
-    add_trigger(cleanup_l3s_data, archive_l3s_data)
-
-    return {'make_l3s_data': make_l3s_data,
-            'archive_l3s_data': archive_l3s_data,
-            'cleanup_l3s_data': cleanup_l3s_data}
-
-
 def add_main_proc_tasks(family, prefamily):
     """
     Adds main processing specific tasks to the given family.
@@ -368,45 +332,12 @@ def add_main_proc_tasks(family, prefamily):
     """
     wrt_main_cfgs = add_task(family, 'write_main_cfg_files')
     get_sat_data = add_task(family, 'get_sat_data')
-    set_cpu_number = add_task(family, 'set_cpu_number')
-    retrieval = add_task(family, 'retrieval')
-    cleanup_l1_data = add_task(family, 'cleanup_l1_data')
-    archive_l2_data = add_task(family, 'archive_l2_data')
-    prepare_l2b_sum = add_task(family, 'prepare_l2b_sum_files')
-    make_l3u_data = add_task(family, 'make_l3u_daily_composites')
-    archive_l3u_data = add_task(family, 'archive_l3u_data')
-    cleanup_l3u_data = add_task(family, 'cleanup_l3u_data')
-    make_l3c_data = add_task(family, 'make_l3c_monthly_averages')
-    archive_l3c_data = add_task(family, 'archive_l3c_data')
-    cleanup_l3c_data = add_task(family, 'cleanup_l3c_data')
 
     add_trigger(wrt_main_cfgs, prefamily)
     add_trigger(get_sat_data, wrt_main_cfgs)
-    add_trigger(set_cpu_number, get_sat_data)
-    add_trigger(retrieval, set_cpu_number)
-    add_trigger(cleanup_l1_data, retrieval)
-    add_trigger(archive_l2_data, retrieval)
-    add_trigger(prepare_l2b_sum, cleanup_l1_data)
-    add_trigger(make_l3u_data, cleanup_l1_data)
-    add_trigger(archive_l3u_data, make_l3u_data)
-    add_trigger(cleanup_l3u_data, archive_l3u_data)
-    add_trigger(make_l3c_data, prepare_l2b_sum)
-    add_trigger(archive_l3c_data, make_l3c_data)
-    add_trigger(cleanup_l3c_data, archive_l3c_data)
 
     return {'wrt_main_cfgs': wrt_main_cfgs,
-            'get_sat_data': get_sat_data,
-            'set_cpu_number': set_cpu_number,
-            'retrieval': retrieval,
-            'cleanup_l1_data': cleanup_l1_data,
-            'archive_l2_data': archive_l2_data,
-            'prepare_l2b_sum': prepare_l2b_sum,
-            'make_l3u_data': make_l3u_data,
-            'archive_l3u_data': archive_l3u_data,
-            'cleanup_l3u_data': cleanup_l3u_data,
-            'make_l3c_data': make_l3c_data,
-            'archive_l3c_data': archive_l3c_data,
-            'cleanup_l3c_data': cleanup_l3c_data}
+            'get_sat_data': get_sat_data}
 
 
 def add_trigger_expr(node, trigger1, trigger2):
@@ -622,14 +553,6 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # DEFINE DYNAMIC FAMILIES & TASKS
     # ================================
 
-    # memorize satellites for each month
-    satellites_within_current_month = list()
-
-    # relevant for post_proc: L3S
-    avhrr_logdirs = list()
-    modis_logdirs = list()
-    l2bsum_logdirs_within_current_month = list()
-
     # month counter
     month_cnt = 0
 
@@ -724,11 +647,8 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 fam_sat = add_fam(fam_avhrr, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
                 add_main_proc_tasks(fam_sat, fam_aux)
-                satellites_within_current_month.append(satellite)
-                l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
-                                             big_fam, yearstr, monthstr, 
-                                             isensor, satellite)
-                l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
+                fam_aux = fam_sat
+
             else:
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
                 medate = enddate_of_month(int(yearstr), int(monthstr))
@@ -739,11 +659,6 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
                 fam_sat = add_fam(fam_modis, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
-                satellites_within_current_month.append(satellite)
-                l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
-                                             big_fam, yearstr, monthstr, 
-                                             isensor, satellite)
-                l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
 
                 if avhrr_flag:
                     add_main_proc_tasks(fam_sat, fam_avhrr)
@@ -754,70 +669,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
         # -- end of satellite loop
 
-        # satellites within current month
-        logger.info("satellites_within_current_month:{0}".
-                format(satellites_within_current_month))
-
-        # check if enough satellites are available for L3S product
-        avhrr_cnt = 0
-        modis_cnt = 0
-
-        for ldirs in l2bsum_logdirs_within_current_month:
-            if "AVHRR" in ldirs:
-                avhrr_cnt += 1
-                avhrr_logdirs.append(ldirs)
-            if "MODIS" in ldirs:
-                modis_cnt += 1
-                modis_logdirs.append(ldirs)
-
-        # add fam. post processing
-        if avhrr_cnt > 1 or modis_cnt > 1: 
-            fam_post = add_fam(fam_month, postproc_fam)
-            last_fam_trigger = fam_post
-        else:
-            last_fam_trigger = fam_main
-
-        if avhrr_cnt > 1:
-            fam_avhrr_post = add_fam(fam_post, "AVHRR_L3S")
-            fam_avhrr_post.add_variable("SENSOR_FAM", "AVHRR")
-            add_l3s_product_tasks(fam_avhrr_post, fam_main)
-            fam_avhrr_post.add_variable('L2B_SUM_LOGDIRS', ' '.join(avhrr_logdirs))
-            logger.info("L3S: {0} AVHRR(s) in {1} for {2}/{3}".
-                        format(avhrr_cnt, mainproc_fam, yearstr, monthstr))
-            logger.info("Use {0} for L3S production".format(avhrr_logdirs))
-        else:
-            logger.info("No L3S production due to "
-                        "{0} AVHRR in {1} for {2}/{3}".
-                        format(avhrr_cnt, mainproc_fam, yearstr, monthstr))
-
-        if modis_cnt > 1:
-            fam_modis_post = add_fam(fam_post, "MODIS_L3S")
-            fam_modis_post.add_variable("SENSOR_FAM", "MODIS")
-            add_l3s_product_tasks(fam_modis_post, fam_main)
-            fam_modis_post.add_variable('L2B_SUM_LOGDIRS', ' '.join(modis_logdirs))
-            logger.info("L3S: {0} MODIS(s) in {1} for {2}/{3}".
-                        format(modis_cnt, mainproc_fam, yearstr, monthstr))
-            logger.info("Use {0} for L3S production".format(modis_logdirs))
-        else:
-            logger.info("No L3S production due to "
-                        "{0} MODIS in {1} for {2}/{3}".
-                        format(modis_cnt, mainproc_fam, yearstr, monthstr))
-
-        # add cleanup aux/era, l2, l2_sum files
-        fam_final_cleanup = add_fam(fam_month, final_fam)
-        fam_final_cleanup.add_variable('CURRENT_SATELLITE_LIST',
-                ' '.join(satellites_within_current_month))
-        add_final_cleanup_task(fam_final_cleanup, last_fam_trigger)
-
         # remember fam_month
         fam_month_previous = fam_month
         month_cnt += 1
-
-        # reset lists
-        satellites_within_current_month = []
-        l2bsum_logdirs_within_current_month = []
-        avhrr_logdirs = []
-        modis_logdirs = []
 
     # ----------------------------------------------------
     # end of loop over months
