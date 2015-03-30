@@ -10,7 +10,7 @@ export ATP_ENABLED=0
 # -- stacksize (keep it always that way)
 ulimit -s unlimited
 
-echo "I am task %TASK% in family %FAMILY% responsible for L3U processing, i. e. daily composites (L2b)"
+echo "I am task %TASK% in family %FAMILY% responsible for L2B_SUM processing, i. e. daily sums required for L3C and L3S"
 
 if [ %DUMMYRUN% == 1 ]; then 
 
@@ -19,9 +19,9 @@ if [ %DUMMYRUN% == 1 ]; then
 else
 
     # -- settings
-    prodtype=l2b
+    prodtype=l2b_sum
     sat_date_base="%SATELLITE%_%START_YEAR%_%START_MONTH%"
-    cfg_base="3_make_l3u_${sat_date_base}_"
+    cfg_base="3_make_l2b_sum_${sat_date_base}_"
 
     # -- log directory for daily jobs
     log_dir="%ESA_ECF_LOG_DIR%/%SUITE%/%FAMILY%"

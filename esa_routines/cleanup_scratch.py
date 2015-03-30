@@ -9,6 +9,7 @@
 import argparse
 import os
 import sys
+import calendar
 
 from pycmsaf.logger import setup_root_logger
 
@@ -17,6 +18,10 @@ from housekeeping import get_config_file_dict
 from housekeeping import delete_file
 
 logger = setup_root_logger(name='sissi')
+
+# must be equal to definitions in ./ecflow_suite/config_suite.py
+cfg_prefix = "config_proc_"
+cfg_suffix = ".file"
 
 
 def clear_l1(args_l1):
@@ -47,26 +52,14 @@ def clear_l1(args_l1):
         logger.info("WRONG SATELLITE NAME!")
         sys.exit(0)
 
-    # find corr. config file and delete it
-    cfgdict = get_config_file_dict()
-    strlist = list()
 
-    for key in cfgdict:
-        if "1" in key and sensor.lower() in key:
-            strlist.append(key)
-            for key2 in cfgdict[key]:
-                strlist.append(cfgdict[key][key2])
-
-    if len(strlist) != 4:
-        logger.info("No information for cfg filename found in dictionary!")
-        logger.info("Thus, config file cannot be deleted!")
-
-    fname = strlist[1] + strlist[0] + '_' + \
-            str(args_l1.year) + '_' + str('%02d' % args_l1.month) + \
-            '_' + args_l1.satellite.upper() + strlist[2]
-
-    splitpath = os.path.split(args_l1.inpdir)
-    cfgfile = os.path.join(splitpath[0], strlist[3], fname)
+    # delete corr. config file
+    # config_proc_1_getdata_avhrr_2008_01_NOAA15.file
+    # config_proc_1_getdata_modis_2008_01_AQUA.file
+    cfgbase = cfg_prefix + "1_getdata_" + sensor.lower() + '_' + \
+              str(args_l1.year) + '_' + str('%02d' % args_l1.month) + \
+              '_' + platform.upper() + cfg_suffix 
+    cfgfile = os.path.join(args_l1.cfgdir, cfgbase)
 
     if os.path.isfile(cfgfile):
         logger.info("Delete: \'{0}\'".format(cfgfile))
@@ -109,27 +102,16 @@ def clear_l2(args_l2):
         logger.info("WRONG SATELLITE NAME!")
         sys.exit(0)
 
-    # find corr. config file and delete it
+
+    # delete corr. config file
+    # config_proc_2_process_2008_06_NOAA15.file
+    # config_proc_2_process_2008_06_AQUA.file
     if "output" in args_l2.inpdir:
-        cfgdict = get_config_file_dict()
-        strlist = list()
 
-        for key in cfgdict:
-            if "2" in key:
-                strlist.append(key)
-                for key2 in cfgdict[key]:
-                    strlist.append(cfgdict[key][key2])
-
-        if len(strlist) != 4:
-            logger.info("No information for cfg filename found in dictionary!")
-            logger.info("Thus, config file cannot be deleted!")
-
-        fname = strlist[1] + strlist[0] + '_' + \
-                str(args_l2.year) + '_' + str('%02d' % args_l2.month) + \
-                '_' + args_l2.satellite.upper() + strlist[2]
-
-        splitpath = os.path.split(args_l2.inpdir)
-        cfgfile = os.path.join(splitpath[0], strlist[3], fname)
+        cfgbase = cfg_prefix + "2_process_" + str(args_l2.year) + \
+                  '_' + str('%02d' % args_l2.month) + \
+                  '_' + platform.upper() + cfg_suffix 
+        cfgfile = os.path.join(args_l2.cfgdir, cfgbase)
 
         if os.path.isfile(cfgfile):
             logger.info("Delete: \'{0}\' ".format(cfgfile))
@@ -191,65 +173,100 @@ def clear_l3(args_l3):
     """
     Remove L3 results if archiving was successful.
     """
-
     # find platform
-    if args_l3.satellite.upper() == "TERRA" or \
+    if args_l3.prodtype.lower() != "l3s":
+        if args_l3.satellite:
+
+            if args_l3.satellite.upper() == "TERRA" or \
                     args_l3.satellite.upper() == "MOD":
-        platform = "TERRA"
-        sensor = "MODIS"
+                platform = "TERRA"
 
-    elif args_l3.satellite.upper() == "AQUA" or \
+            elif args_l3.satellite.upper() == "AQUA" or \
                     args_l3.satellite.upper() == "MYD":
-        platform = "AQUA"
-        sensor = "MODIS"
+                platform = "AQUA"
 
-    elif args_l3.satellite.upper().startswith("NOAA"):
-        platform = args_l3.satellite.upper()
-        sensor = "AVHRR"
+            elif args_l3.satellite.upper().startswith("NOAA"):
+                platform = args_l3.satellite.upper()
 
-    elif args_l3.satellite.upper().startswith("METOP"):
-        platform = args_l3.satellite.upper()
-        sensor = "AVHRR"
+            elif args_l3.satellite.upper().startswith("METOP"):
+                platform = args_l3.satellite.upper()
 
-    else:
-        logger.info("WRONG SATELLITE NAME!")
-        sys.exit(0)
+            else:
+                logger.info("WRONG SATELLITE NAME!")
+                sys.exit(0)
 
-    # find corr. config files and delete them (l3u, l3c)
-    numcfgs = 2
-    cfgdict = get_config_file_dict()
-    strlist = list()
+        else:
+            logger.info("You chose prodtype={0}, "
+                        "so tell me which platform!".
+                        format(args_l3.prodtype))
+            sys.exit(0)
 
-    for key in cfgdict:
-        if "3" in key:
-            strlist.append(key)
-            for key2 in cfgdict[key]:
-                strlist.append(cfgdict[key][key2])
+    # find sensor
+    sensor = args_l3.instrument.upper()
 
-    if len(strlist) != 4 * numcfgs:
-        logger.info("No information for cfg filename found in dictionary!")
-        logger.info("Thus, config file cannot be deleted!")
+    # delete corr. config file
+    cfg_file_list = list()
 
-    nc = 0
-    while nc < numcfgs:
+    # -- monthly config files
+    # config_proc_3_make_l3c_NOAA18_2008_01.file
+    # config_proc_3_make_l3c_AQUA_2008_01.file
+    if args_l3.prodtype.lower() == "l3c": 
+        cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + \
+                  '_' + platform.upper() + '_' + str(args_l3.year) + \
+                  '_' + str('%02d' % args_l3.month) + '_' + cfg_suffix 
+        cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
+        cfg_file_list.append(cfgfile)
 
-        cnt = nc * (len(strlist) / numcfgs)
+    # -- monthly config files
+    # config_proc_3_make_l3s_AVHRR_2008_01.file
+    # config_proc_3_make_l3s_MODIS_2008_01.file
+    elif args_l3.prodtype.lower() == "l3s": 
+        cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + \
+                  '_' + sensor.upper() + '_' + str(args_l3.year) + \
+                  '_' + str('%02d' % args_l3.month) + '_' + cfg_suffix 
+        cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
+        cfg_file_list.append(cfgfile)
 
-        fname = strlist[1 + cnt] + strlist[0 + cnt] + '_' + \
-                str(args_l3.year) + '_' + str('%02d' % args_l3.month) + \
-                '_' + args_l3.satellite.upper() + strlist[2 + cnt]
+    # -- daily config files
+    # config_proc_3_make_l3u_NOAA18_2008_01_01.file
+    # config_proc_3_make_l3u_TERRA_2008_01_31.file
+    elif args_l3.prodtype.lower() == "l3u": 
+        # calendar.monthrange
+        # Returns weekday of first day of the month and 
+        # number of days in month, for the specified year and month.
+        last_day_of_month = calendar.monthrange(args_l3.year, args_l3.month)[1]
+        for iday in range(last_day_of_month):
+            iday += 1
+            cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
+                      platform.upper() + '_' + \
+                      str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
+                      str('%02d' % iday) + cfg_suffix 
+            cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
+            cfg_file_list.append(cfgfile)
 
-        splitpath = os.path.split(os.path.split(args_l3.inpdir)[0])
-        cfgfile = os.path.join(splitpath[0], strlist[3 + cnt], fname)
+    # -- daily config files
+    # config_proc_3_make_l2b_sum_NOAA18_2008_01_01.file
+    # config_proc_3_make_l2b_sum_NOAA18_2008_01_31.file
+    elif args_l3.prodtype.lower() == "l2b_sum": 
+        last_day_of_month = calendar.monthrange(args_l3.year, args_l3.month)[1]
+        for iday in range(last_day_of_month):
+            iday += 1
+            cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
+                      platform.upper() + '_' + \
+                      str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
+                      str('%02d' % iday) + cfg_suffix 
+            cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
+            cfg_file_list.append(cfgfile)
 
-        if os.path.isfile(cfgfile):
-            logger.info("Delete: \'{0}\' ".format(cfgfile))
-            delete_file(cfgfile)
+    # now remove all config files in the list
+    for cfile in cfg_file_list:
+        if os.path.isfile(cfile):
+            logger.info("Delete: \'{0}\' ".format(cfile))
+            delete_file(cfile)
         else:
             logger.info("Nothing to delete: \'{0}\' doesn't exist!".
-                    format(cfgfile))
+                    format(cfile))
 
-        nc += 1
 
     # date string
     datestr = str(args_l3.year) + str('%02d' % args_l3.month)
@@ -261,14 +278,24 @@ def clear_l3(args_l3):
         # get dirs list matching the arguments
         getdirs = list()
         for ad in alldirs:
-            if datestr in ad and sensor in ad \
-                    and 'ORAC' in ad and platform in ad:
-                getdirs.append( os.path.join(args_l3.inpdir, ad) )
+            # L3S: no platform, sensor fam. monthly averages
+            if args_l3.prodtype.lower() == "l3s":
+                if datestr in ad and sensor in ad \
+                        and args_l3.prodtype.upper() in ad \
+                        and 'ORAC' in ad:
+                    getdirs.append( os.path.join(args_l3.inpdir, ad) )
+            # L3C, L3U, L2B_SUM: sensor and platform in subdirectory_name
+            else:
+                if datestr in ad and sensor in ad \
+                        and args_l3.prodtype.upper() in ad \
+                        and 'ORAC' in ad and platform in ad:
+                    getdirs.append( os.path.join(args_l3.inpdir, ad) )
 
         # check if getdirs list is empty
         if len(getdirs) == 0:
-            logger.info("Nothing to delete in {0} for {1} {2} {3}".
-                    format(args_l3.inpdir, sensor, platform, datestr))
+            logger.info("Nothing to delete in {0} for {1} {2} {3} {4}".
+                    format(args_l3.inpdir, sensor, platform, datestr,
+                           args_l3.prodtype.upper()))
         else:
             # sort list
             getdirs.sort()
@@ -286,15 +313,21 @@ def clear_l3(args_l3):
                     delete_dir(gdir)
 
             # pattern
-            pattern = datestr + '*' + sensor + '_ORAC*' + \
-                      platform + '*' + id_num
+            # L3S: sensor fam. monthly averages
+            if args_l3.prodtype.lower() == "l3s":
+                pattern = datestr + '*' + sensor + '_ORAC*' + \
+                          '*' + args_l3.prodtype.upper() + '*' + id_num
+            else:
+                pattern = datestr + '*' + sensor + '_ORAC*' + platform + \
+                          '*' + args_l3.prodtype.upper() + '*' + id_num
 
             # remove all dirs matching pattern
             logger.info("Delete: \'{0}\' -> L2toL3 was successful!".
                     format(pattern))
     else:
-        logger.info("Nothing to delete in {0} for {1} {2} {3}".
-                format(args_l3.inpdir, sensor, platform, datestr))
+        logger.info("Nothing to delete in {0} for {1} {2} {3} {4}".
+                format(args_l3.inpdir, sensor, platform, datestr,
+                       args_l3.prodtype))
 
 
 def clear_aux(args_aux):
@@ -309,32 +342,19 @@ def clear_aux(args_aux):
             "to the name of the subfolder you want to clean up.")
         sys.exit(0)
 
-    # find corr. config file and delete it
-    cfgdict = get_config_file_dict()
-    strlist = list()
 
+    # delete corr. config file
+    # config_proc_1_getdata_aux_2008_01.file
+    # config_proc_1_getdata_era_2008_01.file
     if args_aux.auxdata.lower().startswith("aux"):
         auxkey = "aux"
     elif args_aux.auxdata.lower().startswith("era"):
         auxkey = "era"
 
-    for key in cfgdict:
-        # noinspection PyUnboundLocalVariable
-        if "1" in key and auxkey in key:
-            strlist.append(key)
-            for key2 in cfgdict[key]:
-                strlist.append(cfgdict[key][key2])
-
-    if len(strlist) != 4:
-        logger.info("No information for cfg filename found in dictionary!")
-        logger.info("Thus, config file cannot be deleted!")
-
-    fname = strlist[1] + strlist[0] + '_' + \
-            str(args_aux.year) + '_' + \
-            str('%02d' % args_aux.month) + strlist[2]
-
-    splitpath = os.path.split(args_aux.inpdir)
-    cfgfile = os.path.join(splitpath[0], strlist[3], fname)
+    cfgbase = cfg_prefix + "1_getdata_" + auxkey + '_' + \
+              str(args_aux.year) + '_' + str('%02d' % args_aux.month) + \
+              cfg_suffix 
+    cfgfile = os.path.join(args_aux.cfgdir, cfgbase)
 
     if os.path.isfile(cfgfile):
         logger.info("Delete: \'{0}\' ".format(cfgfile))
@@ -348,10 +368,12 @@ def clear_aux(args_aux):
 
         if not i.isdigit():
             # aux
+            # BRDF_dir # albedo_dir # emissivity_dir # ice_snow_dir
             ispath = os.path.join(ipath, i, str(args_aux.year),
                                   str('%02d' % args_aux.month))
         else:
             # ERAinterim
+            # 2008
             ispath = os.path.join(ipath, str(args_aux.year),
                                   str('%02d' % args_aux.month))
 
@@ -371,7 +393,10 @@ if __name__ == '__main__':
 
     # add main arguments
     parser.add_argument('--inpdir', type=str, required=True,
-                        help="String: /path/where/to/search")
+                        help="String: /path/to/data/on/scratch")
+
+    parser.add_argument('--cfgdir', type=str, required=True,
+                        help="String: /path/to/cfg/files")
 
     parser.add_argument('--year', type=int, required=True,
                         help="Integer: yyyy, e.g. 2008")
@@ -406,10 +431,15 @@ if __name__ == '__main__':
     clear_l3_parser = subparsers.add_parser('clear_l3',
                                             description="Clean up if l2tol3 "
                                                         "failed or was successful.")
-    clear_l3_parser.add_argument('--satellite', type=str, required=True,
+    # L3S: no satellite, sensor family monthly averages
+    clear_l3_parser.add_argument('--satellite', type=str,
                                  help="String, e.g. noaa18, TERRA, MYD")
+    #clear_l3_parser.add_argument('--satellite', type=str, required=True,
+    #                             help="String, e.g. noaa18, TERRA, MYD")
     clear_l3_parser.add_argument('--instrument', type=str, required=True,
                                  help="String, e.g. AVHRR, MODIS")
+    clear_l3_parser.add_argument('--prodtype', type=str, required=True,
+                                 help="Choices: \'L2B_SUM\', \'L3U\', \'L3C\', \'L3S\'")
     clear_l3_parser.set_defaults(func=clear_l3)
 
     # -> remove auxiliary dataset if month was successful

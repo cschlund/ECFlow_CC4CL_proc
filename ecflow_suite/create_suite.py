@@ -33,6 +33,37 @@ def help():
     sys.exit(0)
     
 
+def datestring(dstr):
+    """
+    Convert date string containing '-' or '_' or '/'
+    into date string without any character.
+    """
+    if '-' in dstr:
+        correct_date_string = string.replace(dstr, '-', '')
+    elif '_' in dstr:
+        correct_date_string = string.replace(dstr, '_', '')
+    elif '/' in dstr:
+        correct_date_string = string.replace(dstr, '/', '')
+    else:
+        correct_date_string = dstr
+
+    return correct_date_string
+
+
+def str2mydate(dstring): 
+    """
+    Return datetime object.
+    """
+    dstr = datestring(dstring)
+    if len(dstr) == 6:
+        year = int(dstr[:-2])
+        month = int(dstr[4:])
+        return datetime.date(year, month, 1)
+    else:
+        logger.info("Possible formats: 2008-01, 2008/01, 2008_01, 200801")
+        sys.exit(0)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
@@ -50,6 +81,10 @@ if __name__ == '__main__':
 
     parser.add_argument('--ignore_sats', type=str2upper, nargs='*',
                         help="List of satellites which should be ignored.")
+
+    parser.add_argument('--ignore_months', type=str2mydate, nargs='*',
+                        help="Ignore given yearmonth's, <yyyymm>" 
+                              " e.g. 200201, 2002/03, 2002-04, 2002_09.")
 
     parser.add_argument('--use_avhrr_primes', action="store_true",
                         help="Process only PRIME AVHRRs "
@@ -120,23 +155,24 @@ if __name__ == '__main__':
 
     # -- some screen output
     logger.info("SCRIPT \'{0}\' started\n".format(os.path.basename(__file__)))
-    logger.info("START DATE  : {0}".format(args.start_date))
-    logger.info("END DATE    : {0}".format(args.end_date))
+    logger.info("START DATE    : {0}".format(args.start_date))
+    logger.info("END DATE      : {0}".format(args.end_date))
     if args.satellites:
-        logger.info("SATELLITES  : {0} will be processed".format(args.satellites))
+        logger.info("SATELLITES    : {0} will be processed".format(args.satellites))
     else:
-        logger.info("SATELLITES  : take all (archive based)")
-    logger.info("AVHRR PRIMES: {0}".format(args.use_avhrr_primes))
-    logger.info("MODIS ONLY  : {0}".format(args.use_modis_only))
-    logger.info("IGNORE SATS : {0}".format(args.ignore_sats))
-    logger.info("PROC STATUS : {0}".format(proc_day_message))
+        logger.info("SATELLITES    : take all (archive based)")
+    logger.info("AVHRR PRIMES  : {0}".format(args.use_avhrr_primes))
+    logger.info("MODIS ONLY    : {0}".format(args.use_modis_only))
+    logger.info("IGNORE SATS   : {0}".format(args.ignore_sats))
+    logger.info("IGNORE MONTHS : {0}".format(args.ignore_months))
+    logger.info("PROC STATUS   : {0}".format(proc_day_message))
     if args.dummy_run: 
-        logger.info("DUMMY RUN   : {0} ({1})\n".format(dummycase, dummymess))
+        logger.info("DUMMY RUN     : {0} ({1})\n".format(dummycase, dummymess))
     else: 
-        logger.info("TESTCASE RUN: {0} ({1})\n".format(testcase, message))
+        logger.info("TESTCASE RUN  : {0} ({1})\n".format(testcase, message))
 
     build_suite(args.start_date, args.end_date,
-                args.satellites, args.ignore_sats,
+                args.satellites, args.ignore_sats, args.ignore_months,
                 args.use_avhrr_primes, args.use_modis_only,
                 args.proc_day, dummycase, testcase)
 

@@ -48,6 +48,7 @@ LOGDIR=$SCRATCH_BASE/logs
 INPUTDIR=$SCRATCH_BASE/input
 OUTPUTDIR=$SCRATCH_BASE/output
 TEMP_CONFIG_DIR=$SCRATCH_BASE/temp_cfg_files
+TEMP_LIST_L2FILES=$SCRATCH_BASE/temp_list_l2files
 
 # ---------------------------------------------------------------
 # new python/bash tools, C. Schlundt 2014/2015
@@ -118,4 +119,3 @@ l3outputpath=$OUTPUTDIR/level3
 era_comp=/scratch/ms/de/sf7/esa_cci_c_proc/era_interim
 # free path
 free_path=/usr/bin
-

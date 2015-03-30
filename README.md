@@ -11,6 +11,9 @@ Dependencies: You need also to install
     original database must be located in your pycmsat install.dir.
     e.g. "/perm/ms/de/sf7/cschlund/pycmsaf/AVHRR_GAC_archive.sqlite3"
 
+    "AVHRR_GAC_archive_incl_overlap.sqlite3"
+    has to be located in ./sql/ on the remote machine
+    since it contains the necessary overlap information
     
     additionally you need the main CC4CL source code, which is not
     included in this repository, e.g. "/path/to/cschlund/mainsrc"

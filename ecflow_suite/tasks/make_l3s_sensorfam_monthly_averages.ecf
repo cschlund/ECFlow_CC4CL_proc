@@ -1,0 +1,68 @@
+%include <pbs_serial_l2tol3.h>
+%include <head.h>
+%include <export.h>
+
+# -- no core file
+export ATP_ENABLED=0
+# -- core file
+#export ATP_ENABLED=1
+#ulimit -c unlimited
+# -- stacksize (keep it always that way)
+ulimit -s unlimited
+
+echo "I am task %TASK% in family %FAMILY% responsible for L3S processing, i. e. sensor family monthly averages (AVHRR or MODIS)"
+
+if [ %DUMMYRUN% == 1 ]; then 
+
+    python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+
+else
+
+    # -- working directory: write core file here
+    cd %ESA_ECF_LOG_DIR%
+    
+    # -- settings for L3S based on L2B_SUM
+    prodtype=l3b
+    sat_date_base="%SENSOR_FAM%_%START_YEAR%_%START_MONTH%"
+    cfg_typ="3_make_l3s_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${sat_date_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
+    # loop over all logfiles required for L3S production!
+    for log_dir in %L2B_SUM_LOGDIRS%; do 
+
+        # -- log file of prepare_l2b_sum_files ecflow script
+        log_fil="${log_dir}/prepare_l2b_sum_files.1"
+
+        # -- create job id number
+        primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
+        id=`date +%%s`
+        sleep 3
+        jid=ID${primary_id}_US${id}
+        
+        # -- create l2b sum output file list for L3C production
+        sstr="done L2->L3 finished, results written to:"
+        fbasen="L2B_SUM_ncfile_list_${prodtype}_${sat_date_base}_${jid}.txt"
+        ofilelist="%ESA_LIST_L2FILES%/${fbasen}"
+        sed -n -e "s/^.*\(${sstr}\)/\1/p" ${log_fil} | cut -f2- -d"'" | sed "s/*/\"*\"/g;s/^/\"/;s/$/\"/" >> ${ofilelist}
+
+    done
+
+    # -- create L3C config file
+    python %MAKE_CFG_FILE% \
+        --cfile ${cfg_fil} \
+        --start_year %START_YEAR% --end_year %END_YEAR% \
+        --start_month %START_MONTH% --end_month %END_MONTH% \
+        l2tol3 --instrument %SENSOR_FAM% \
+        --inpdir %ESA_LEVEL3DIR% --prodtype ${prodtype} \
+        --l2bsum_filelist ${ofilelist}
+
+    # -- execute ksh script
+    %RUN_L2TOL3_KSH% $jid \
+        %CFG_ATTRI_FILE% \
+        %CFG_PATHS_FILE% \
+        ${cfg_fil}
+
+fi
+
+%include <tail.h>

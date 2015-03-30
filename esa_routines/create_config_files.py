@@ -35,7 +35,7 @@ def getsat(args_sat):
             platform = args_sat.satellite.lower()
         else:
             logger.info("WRONG SATELLITE NAME!")
-            exit(0)
+            sys.exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
@@ -134,7 +134,7 @@ def proc2(args_ret):
             platform = args_ret.satellite.lower()
         else:
             logger.info("WRONG SATELLITE NAME!")
-            exit(0)
+            sys.exit(0)
 
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
@@ -267,58 +267,17 @@ def proc2(args_ret):
 # -------------------------------------------------------------------
 def l2tol3(args_l3):
     """
-    Writes config file for the l2 to l3 processing.
+    Writes config file for the l2 to l3 processing:
+    l3a = L3C
+    l3b = L3S
     @param args_l3: command line arguments
     """
-
-    global platform, id_number
     try:
-        if args_l3.satellite.upper() == "TERRA":
-            platform = "MOD"
-        elif args_l3.satellite.upper() == "AQUA":
-            platform = "MYD"
-        elif args_l3.satellite.upper().startswith("NOAA"):
-            platform = args_l3.satellite.upper()
-        elif args_l3.satellite.upper().startswith("METOP"):
-            platform = args_l3.satellite.upper()
-        else:
-            logger.info("WRONG SATELLITE NAME!")
-            exit(0)
-
         ts = datetime.datetime.fromtimestamp(time.time())
         timestamp = ts.strftime("%Y-%m-%d %H:%M:%S")
 
-        # -- search for current ID number --
-
-        # date string
-        datestr = str(args_l3.start_year) + \
-                  str('%02d' % args_l3.start_month)
-
-        # get dirs list containing all subdirs of given path
-        alldirs = os.listdir(args_l3.inpdir)
-
-        # get dirs list matching the arguments
-        if len(alldirs) > 0:
-            getdirs = list()
-            for ad in alldirs:
-                if datestr in ad \
-                        and args_l3.instrument.upper() in ad \
-                        and args_l3.satellite.lower() in ad \
-                        and 'retrieval' in ad:
-                    getdirs.append(ad)
-
-            # sort list
-            getdirs.sort()
-
-            # get last element from list, should be last job
-            lastdir = getdirs.pop()
-
-            # get ID number from the last job
-            id_number = get_id(lastdir)
-
-        # -- end of search for current ID number --
-
         f = open(args_l3.cfile, mode="w")
+
         f.write("# Config file for level3 processing\n")
         f.write("# Created: {0}\n".format(timestamp))
         f.write("\n")
@@ -329,13 +288,14 @@ def l2tol3(args_l3):
         f.write("\n")
         f.write("# define sensor and platform\n")
         f.write("sensor={0}\n".format(args_l3.instrument.upper()))
-        f.write("platform={0}\n".format(platform))
+
+        # for L3C/l3a yes, but not for L3S/l3b (super-collated)
+        if args_l3.prodtype.lower() == "l3a" and args_l3.satellite:
+            f.write("platform={0}\n".format(args_l3.satellite.upper()))
+
         f.write("\n")
         f.write("# define product type\n")
-        if args_l3.prodtype == "l2b":
-            f.write("prodtype=l2b\n")
-        if args_l3.prodtype == "l3a":
-            f.write("prodtype=l3a\n")
+        f.write("prodtype={0}\n".format(args_l3.prodtype))
         f.write("\n")
         f.write("# set here some details about the grid:\n")
         f.write("# produce global grid (F) or local grid (T)\n")
@@ -356,22 +316,19 @@ def l2tol3(args_l3):
         f.write("#elat=48\n")
         f.write("\n")
         f.write("# inverse spacing of l3 and l2b grid in deg. for local grid\n")
-        f.write("gridxl3=10\n")
-        f.write("gridyl3=10\n")
+        f.write("gridxl3=2\n")
+        f.write("gridyl3=2\n")
         f.write("\n")
-        f.write("gridxl2b=50\n")
-        f.write("gridyl2b=50\n")
+        f.write("gridxl2b=10\n")
+        f.write("gridyl2b=10\n")
         f.write("\n")
-        f.write("fastl3=0\n")
+        f.write("# inverse spacing of local grid in deg.\n")
+        f.write("gridxloc=10\n")
+        f.write("gridyloc=10\n")
+        f.write("# filelist containing input files for product generation\n")
+        f.write("filelist_l2b_sum_output={0}\n".format(args_l3.l2bsum_filelist))
         f.write("\n")
-        f.write("# obsolete:\n")
-        f.write("l1closure=F\n")
-        f.write("\n")
-        f.write("# set id string explicitly in order to avoid\n")
-        f.write("# confusion when averaging\n")
-        # f.write("id=ID9314213_US1416834943\n")
-        f.write("id={0}\n".format(id_number))
-        f.write("\n")
+
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
@@ -441,16 +398,20 @@ if __name__ == '__main__':
     # -> create config file for l2 to l3 processing
     l2tol3_parser = subparsers.add_parser('l2tol3',
                                           description="Make config file for l2tol3, "
-                                                      "i.e. generate L2B or L3A output.")
-    l2tol3_parser.add_argument('-sat', '--satellite', required=True, type=str,
+                                                      "i.e. generate L3U or L3S output.")
+    # L3S: no satellite, sensor family monthly averages
+    l2tol3_parser.add_argument('-sat', '--satellite', type=str,
                                help="String, e.g. noaa18, terra")
+    #l2tol3_parser.add_argument('-sat', '--satellite', required=True, type=str,
+    #                           help="String, e.g. noaa18, terra")
     l2tol3_parser.add_argument('-ins', '--instrument', required=True, type=str,
                                help="String, e.g. avhrr, modis")
     l2tol3_parser.add_argument('-inp', '--inpdir', required=True, type=str,
                                help="String, /path/to/input/files")
     l2tol3_parser.add_argument('-typ', '--prodtype', type=str,
-                               help="Choices: \'l2b\' == \'L3U\' or "
-                                    "\'l3a\' == \'L3C\' ")
+                               help="Choices: \'l3a\' = L3U or \'l3b\' = L3S")
+    l2tol3_parser.add_argument('-lfl', '--l2bsum_filelist', type=str,
+                               help="String, /path/to/filelist/of/l2bsum/files")
     l2tol3_parser.set_defaults(func=l2tol3)
 
     # Parse arguments
