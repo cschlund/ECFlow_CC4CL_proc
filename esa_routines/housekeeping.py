@@ -238,11 +238,11 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
         nclist = ncbase.split("-")[1:]
         ncstr = "-".join(nclist)
         tarbas = idate + '-' + ncstr
-        daily_l2_tarfile = os.path.join(tempdir, tarbas + ".tar.gz")
+        daily_l2_tarfile = os.path.join(tempdir, tarbas + ".tar")
 
         # create daily tarfile containing all orbits
         # print (" * Create \'%s\'" % daily_l2_tarfile)
-        tar = tarfile.open(daily_l2_tarfile, "w:gz")
+        tar = tarfile.open(daily_l2_tarfile, "w:")
         for tfile in files:
             # filedir = os.path.dirname(tfile)
             filenam = os.path.basename(tfile)
@@ -339,10 +339,10 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
 
         # create daily tarfile
         # noinspection PyUnboundLocalVariable
-        daily_l3_tarfile = os.path.join(tempdir, ncbase + ".tar.bz2")
+        daily_l3_tarfile = os.path.join(tempdir, ncbase + ".tar")
         # print (" * Create \'%s\'" % daily_l3_tarfile)
 
-        tar = tarfile.open(daily_l3_tarfile, "w:bz2")
+        tar = tarfile.open(daily_l3_tarfile, "w:")
         for tfile in daily_tar_files:
             # filedir = os.path.dirname(tfile)
             filenam = os.path.basename(tfile)
@@ -356,7 +356,7 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
         delete_dir(daily_tempdir)
 
     # -- make monthly tarballs containing all daily tarballs
-    tar = tarfile.open(l3_tarfile, "w:gz")
+    tar = tarfile.open(l3_tarfile, "w:")
     for tfile in tar_files:
         # filedir = os.path.dirname(tfile)
         filenam = os.path.basename(tfile)
@@ -423,7 +423,7 @@ def create_l3c_tarball(inpdir, idnumber, tempdir, l3_tarfile):
 
     # -- create final tarfile to be copied into ECFS
     # print (" * Create \'%s\'" % l3_tarfile)
-    tar = tarfile.open(l3_tarfile, "w:gz")
+    tar = tarfile.open(l3_tarfile, "w:")
     for tfile in tar_files:
         # filedir = os.path.dirname(tfile)
         filenam = os.path.basename(tfile)
@@ -455,7 +455,7 @@ def create_tarname(ctype, datestring, sensor, platform):
     """
     esacci = "ESACCI"
     cloudp = "CLOUD-CLD_PRODUCTS"
-    suffix = "fv1.0.tar.gz"
+    suffix = "fv1.0.tar"
 
     tarname = datestring + '-' + esacci + '-' + ctype + \
               '_' + cloudp + '-' + sensor + '_' + \
