@@ -361,13 +361,26 @@ def add_l3s_product_tasks(family, prefamily):
             'cleanup_l3s_data': cleanup_l3s_data}
 
 
+def add_dearchiving_tasks(family, prefamily):
+    """
+    Adds sat. dearchiving specific tasks to the given family.
+    :rtype : dictionary
+    """
+    wrt_main_cfgs = add_task(family, 'write_main_cfg_files')
+    get_sat_data = add_task(family, 'get_sat_data')
+
+    add_trigger(wrt_main_cfgs, prefamily)
+    add_trigger(get_sat_data, wrt_main_cfgs)
+
+    return {'wrt_main_cfgs': wrt_main_cfgs,
+            'get_sat_data': get_sat_data }
+
+
 def add_main_proc_tasks(family, prefamily):
     """
     Adds main processing specific tasks to the given family.
     :rtype : dictionary
     """
-    wrt_main_cfgs = add_task(family, 'write_main_cfg_files')
-    get_sat_data = add_task(family, 'get_sat_data')
     set_cpu_number = add_task(family, 'set_cpu_number')
     retrieval = add_task(family, 'retrieval')
     cleanup_l1_data = add_task(family, 'cleanup_l1_data')
@@ -380,9 +393,13 @@ def add_main_proc_tasks(family, prefamily):
     archive_l3c_data = add_task(family, 'archive_l3c_data')
     cleanup_l3c_data = add_task(family, 'cleanup_l3c_data')
 
-    add_trigger(wrt_main_cfgs, prefamily)
-    add_trigger(get_sat_data, wrt_main_cfgs)
-    add_trigger(set_cpu_number, get_sat_data)
+    if len(prefamily) == 1: 
+        add_trigger(set_cpu_number, prefamily[0])
+    elif len(prefamily) == 2:
+        add_trigger_expr(set_cpu_number, prefamily[0], prefamily[1])
+    else:
+        logger.info("Max. trigger expression equals 2!")
+
     add_trigger(retrieval, set_cpu_number)
     add_trigger(cleanup_l1_data, retrieval)
     add_trigger(archive_l2_data, retrieval)
@@ -394,9 +411,7 @@ def add_main_proc_tasks(family, prefamily):
     add_trigger(archive_l3c_data, make_l3c_data)
     add_trigger(cleanup_l3c_data, archive_l3c_data)
 
-    return {'wrt_main_cfgs': wrt_main_cfgs,
-            'get_sat_data': get_sat_data,
-            'set_cpu_number': set_cpu_number,
+    return {'set_cpu_number': set_cpu_number,
             'retrieval': retrieval,
             'cleanup_l1_data': cleanup_l1_data,
             'archive_l2_data': archive_l2_data,
@@ -432,6 +447,11 @@ def add_trigger(node, trigger):
     @return: None
     """
     node.add_trigger('{0} == complete'.
+                     format(trigger.get_abs_node_path()))
+
+
+def add_trigger_dearch(node, trigger):
+    node.add_trigger('{0} == active'.
                      format(trigger.get_abs_node_path()))
 
 
@@ -591,10 +611,11 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # DEFINE TOP LEVEL FAMILY
     # ========================
     fam_proc = add_fam(suite, big_fam)
+    fam_dearch = add_fam(suite, dearchiving)
 
     # Activate thread limits
-    # fam_proc.add_inlimit('serial_threads')
     fam_proc.add_inlimit('parallel_threads')
+    fam_dearch.add_inlimit('serial_threads')
 
     # Define job commands
     fam_proc.add_variable('ECF_JOB_CMD', serial_job_cmd)
@@ -677,38 +698,56 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
         # there is data: add fam. year if not already existing
         try:
+            # PROC family
             fam_year = add_fam(fam_proc, yearstr)
             fam_year.add_variable("START_YEAR", yearstr)
             fam_year.add_variable("END_YEAR", yearstr)
+            # DEARCHIVING family
+            fam_year_dearch = add_fam(fam_dearch, yearstr)
+            fam_year_dearch.add_variable("START_YEAR", yearstr)
+            fam_year_dearch.add_variable("END_YEAR", yearstr)
         except RuntimeError:
             pass
 
-        # add fam. month
+        # PROC family: add fam. month
         fam_month = add_fam(fam_year, monthstr)
         fam_month.add_variable("START_MONTH", monthstr)
         fam_month.add_variable("END_MONTH", monthstr)
         fam_month.add_variable("NDAYS_OF_MONTH", ndays_of_month)
 
-        # add get aux/era family
-        fam_aux = add_fam(fam_month, get_aux_fam)
+        # DEARCHIVING family: add fam. month
+        fam_month_dearch = add_fam(fam_year_dearch, monthstr)
+        fam_month_dearch.add_variable("START_MONTH", monthstr)
+        fam_month_dearch.add_variable("END_MONTH", monthstr)
+        
+        # DEARCHIVING family: add get aux/era family
+        fam_aux = add_fam(fam_month_dearch, get_aux_fam)
         add_aux_tasks(fam_aux)
 
         # trigger for next month node
         if month_cnt > 0:
-            add_trigger(fam_aux, fam_month_previous)
+            add_trigger_dearch(fam_aux, fam_month_previous)
 
-        # add fam. main processing
+        # PROC family: add main processing
         fam_main = add_fam(fam_month, mainproc_fam)
 
         # if avhrr data available for current month
         if avhrr_flag:
+            # PROC
             fam_avhrr = add_fam(fam_main, "AVHRR")
             fam_avhrr.add_variable("SENSOR", "AVHRR")
+            # DEARCHIVING
+            fam_avhrr_dearch = add_fam(fam_month_dearch, "AVHRR")
+            fam_avhrr_dearch.add_variable("SENSOR", "AVHRR")
 
         # if modis data available for current month
         if modis_flag:
+            # PROC
             fam_modis = add_fam(fam_main, "MODIS")
             fam_modis.add_variable("SENSOR", "MODIS")
+            # DEARCHIVING
+            fam_modis_dearch = add_fam(fam_month_dearch, "MODIS")
+            fam_modis_dearch.add_variable("SENSOR", "MODIS")
 
         # process avail. satellites for current month
         for counter, satellite in enumerate(sat_list):
@@ -721,9 +760,15 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 if len(days) == 0:
                     continue
 
+                # DEARCHIVING
+                fam_sat_dearch = add_fam(fam_avhrr_dearch, satellite)
+                fam_sat_dearch.add_variable("SATELLITE", satellite)
+                add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                # PROC
                 fam_sat = add_fam(fam_avhrr, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
-                add_main_proc_tasks(fam_sat, fam_aux)
+                add_main_proc_tasks(fam_sat, [fam_sat_dearch])
+
                 satellites_within_current_month.append(satellite)
                 l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
                                              big_fam, yearstr, monthstr, 
@@ -737,8 +782,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 if not mcheck:
                     continue
 
+                # DEARCHIVING
+                fam_sat_dearch = add_fam(fam_modis_dearch, satellite)
+                fam_sat_dearch.add_variable("SATELLITE", satellite)
+                # PROC
                 fam_sat = add_fam(fam_modis, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
+
                 satellites_within_current_month.append(satellite)
                 l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
                                              big_fam, yearstr, monthstr, 
@@ -746,10 +796,14 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
 
                 if avhrr_flag:
-                    add_main_proc_tasks(fam_sat, fam_avhrr)
+                    add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                    #                  (family, prefamily (=trigger))
+                    add_main_proc_tasks(fam_sat, [fam_avhrr, fam_sat_dearch])
                     fam_avhrr = fam_sat
                 else:
-                    add_main_proc_tasks(fam_sat, fam_aux)
+                    add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                    #                  (family, prefamily (=trigger))
+                    add_main_proc_tasks(fam_sat, [fam_aux, fam_sat_dearch])
                     fam_aux = fam_sat
 
         # -- end of satellite loop
@@ -839,29 +893,29 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     logger.info('Saving suite definition to file: {0}'.format(suite_def_file))
     defs.save_as_defs(suite_def_file)
 
-    # ======================
-    # CREATE LOG DIRECTORIES
-    # ======================
-    logger.info('Creating log directories on both the '
-            'local and the remote machine.\n')
+    ## ======================
+    ## CREATE LOG DIRECTORIES
+    ## ======================
+    #logger.info('Creating log directories on both the '
+    #        'local and the remote machine.\n')
 
-    # Create a tree of all families in the suite 
-    # (i.e. families, subfamilies, subsubfamilies etc)
-    tree = familytree(suite)
+    ## Create a tree of all families in the suite 
+    ## (i.e. families, subfamilies, subsubfamilies etc)
+    #tree = familytree(suite)
 
-    # Create corresponding log-directory tree:
-    # 1.) Local machine
-    for node in tree:
-        dirname = os.path.join(ecf_out_dir, node)
-        if not os.path.isdir(dirname):
-            os.makedirs(dirname)
+    ## Create corresponding log-directory tree:
+    ## 1.) Local machine
+    #for node in tree:
+    #    dirname = os.path.join(ecf_out_dir, node)
+    #    if not os.path.isdir(dirname):
+    #        os.makedirs(dirname)
 
-    # 2.) Remote machine
-    ssh = SSHClient(user=remote_user_name, host=remote_host_name)
-    for node in tree:
-        remote_dir = os.path.join(remote_log_dir, node)
-        ssh.mkdir(remote_dir, batch=True)  # batch=True appends this mkdir
-        # call to the command batch.
+    ## 2.) Remote machine
+    #ssh = SSHClient(user=remote_user_name, host=remote_host_name)
+    #for node in tree:
+    #    remote_dir = os.path.join(remote_log_dir, node)
+    #    ssh.mkdir(remote_dir, batch=True)  # batch=True appends this mkdir
+    #    # call to the command batch.
 
-    # Create all remote directories in one step (is much faster)
-    ssh.execute_batch()
+    ## Create all remote directories in one step (is much faster)
+    #ssh.execute_batch()

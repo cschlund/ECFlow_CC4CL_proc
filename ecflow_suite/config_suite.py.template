@@ -21,7 +21,8 @@ itype = "cloud_cci_master"
 mysuite = itype + "_proc"
 # family names
 big_fam = "PROC"
-get_aux_fam = "GET_AUX_DATA"
+dearchiving = "DEARCHIVING"
+get_aux_fam = "AUX_DATA"
 mainproc_fam = "MAIN_PROC"
 postproc_fam = "POST_PROC"
 final_fam = "FINAL_CLEANUP"
@@ -32,7 +33,7 @@ ecfs_l2_dir = "ec:/sf7/ESA_Cloud_cci_data/L2"
 
 # serial and parallel threads
 serial_threads_number = 1
-parallel_threads_number = 2
+parallel_threads_number = 4
 
 # -------------------------------------------------------
 #   LINES BELOW SHOULD NOT BE MODIFIED BY USER
