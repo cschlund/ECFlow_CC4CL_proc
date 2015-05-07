@@ -18,7 +18,7 @@ def verify_aux_files(file_list):
     Check if files have the right length in order to
     split the filestring correctly.
     """
-    for idx, fil in enumerate(file_list):
+    for fil in file_list:
 
         (idir, ifil) = split_filename(fil)
         filebase = os.path.splitext(ifil)[0]
@@ -27,24 +27,24 @@ def verify_aux_files(file_list):
         # MCD43C3.A2008001.005.2008025111631
         if ifil.startswith('MCD'):
             if len(filebase) != 34:
-                file_list.pop(idx)
+                file_list.remove(fil)
 
         # global_emis_inf10_monthFilled_MYD11C3.A2008001.041
         # global_emis_inf10_monthFilled_MYD11C3.A2008001
         elif ifil.startswith('global'):
-            if len(filebase) != 46 or len(filebase) != 50:
-                file_list.pop(idx)
+            if len(filebase) != 46 and len(filebase) != 50:
+                file_list.remove(fil)
 
         # NISE_SSMIF13_20080101 (NISE002 until 20090910)
         # NISE_SSMISF17_20130101 (NISE004 from 20090817)
         elif ifil.startswith('NISE'):
-            if len(filebase) != 21 or len(filebase) !=22:
-                file_list.pop(idx)
+            if len(filebase) != 21 and len(filebase) !=22:
+                file_list.remove(fil)
 
         # ERA_Interim_an_20080101_00+00
         elif ifil.startswith('ERA_Interim'):
             if len(filebase) != 29:
-                file_list.pop(idx)
+                file_list.remove(fil)
 
     return file_list
 
