@@ -926,29 +926,29 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     logger.info('Saving suite definition to file: {0}'.format(suite_def_file))
     defs.save_as_defs(suite_def_file)
 
-    ## ======================
-    ## CREATE LOG DIRECTORIES
-    ## ======================
-    #logger.info('Creating log directories on both the '
-    #        'local and the remote machine.\n')
+    # ======================
+    # CREATE LOG DIRECTORIES
+    # ======================
+    logger.info('Creating log directories on both the '
+            'local and the remote machine.\n')
 
-    ## Create a tree of all families in the suite 
-    ## (i.e. families, subfamilies, subsubfamilies etc)
-    #tree = familytree(suite)
+    # Create a tree of all families in the suite 
+    # (i.e. families, subfamilies, subsubfamilies etc)
+    tree = familytree(suite)
 
-    ## Create corresponding log-directory tree:
-    ## 1.) Local machine
-    #for node in tree:
-    #    dirname = os.path.join(ecf_out_dir, node)
-    #    if not os.path.isdir(dirname):
-    #        os.makedirs(dirname)
+    # Create corresponding log-directory tree:
+    # 1.) Local machine
+    for node in tree:
+        dirname = os.path.join(ecf_out_dir, node)
+        if not os.path.isdir(dirname):
+            os.makedirs(dirname)
 
-    ## 2.) Remote machine
-    #ssh = SSHClient(user=remote_user_name, host=remote_host_name)
-    #for node in tree:
-    #    remote_dir = os.path.join(remote_log_dir, node)
-    #    ssh.mkdir(remote_dir, batch=True)  # batch=True appends this mkdir
-    #    # call to the command batch.
+    # 2.) Remote machine
+    ssh = SSHClient(user=remote_user_name, host=remote_host_name)
+    for node in tree:
+        remote_dir = os.path.join(remote_log_dir, node)
+        ssh.mkdir(remote_dir, batch=True)  # batch=True appends this mkdir
+        # call to the command batch.
 
-    ## Create all remote directories in one step (is much faster)
-    #ssh.execute_batch()
+    # Create all remote directories in one step (is much faster)
+    ssh.execute_batch()
