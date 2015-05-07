@@ -326,7 +326,7 @@ def add_final_cleanup_task(family, prefamily):
             'cleanup_aux_data': cleanup_aux_data}
 
 
-def add_aux_tasks(family):
+def add_aux_tasks(family, prefamily):
     """
     Adds aux specific tasks to the given family.
     :rtype : dictionary
@@ -335,6 +335,8 @@ def add_aux_tasks(family):
     get_aux_data = add_task(family, 'get_aux_data')
     get_mars_data = add_task(family, 'get_mars_data')
 
+    if prefamily: 
+        add_trigger_dearch(wrt_aux_cfgs, prefamily)
     add_trigger(get_aux_data, wrt_aux_cfgs)
     add_trigger(get_mars_data, wrt_aux_cfgs)
 
@@ -376,7 +378,7 @@ def add_dearchiving_tasks(family, prefamily):
             'get_sat_data': get_sat_data }
 
 
-def add_main_proc_tasks(family, prefamily):
+def add_main_proc_tasks(family, prefamily, month_trigger):
     """
     Adds main processing specific tasks to the given family.
     :rtype : dictionary
@@ -393,12 +395,16 @@ def add_main_proc_tasks(family, prefamily):
     archive_l3c_data = add_task(family, 'archive_l3c_data')
     cleanup_l3c_data = add_task(family, 'cleanup_l3c_data')
 
-    if len(prefamily) == 1: 
-        add_trigger(set_cpu_number, prefamily[0])
-    elif len(prefamily) == 2:
-        add_trigger_expr(set_cpu_number, prefamily[0], prefamily[1])
+    if month_trigger:
+        add_trigger_month(set_cpu_number, prefamily, month_trigger)
+
     else:
-        logger.info("Max. trigger expression equals 2!")
+        if len(prefamily) == 1: 
+            add_trigger(set_cpu_number, prefamily[0])
+        elif len(prefamily) == 2:
+            add_trigger_expr(set_cpu_number, prefamily[0], prefamily[1])
+        else:
+            logger.info("Max. trigger expression equals 2!")
 
     add_trigger(retrieval, set_cpu_number)
     add_trigger(cleanup_l1_data, retrieval)
@@ -434,6 +440,29 @@ def add_trigger_expr(node, trigger1, trigger2):
             trigger1.get_abs_node_path(),
             trigger2.get_abs_node_path())))
     node.add_trigger(big_expr)
+
+
+def add_trigger_month(node, trig1, trig2):
+    """
+    Make a given node wait for trigger nodes to complete/aborted.
+    :rtype : None
+    """
+
+    node.add_part_trigger(ecflow.PartExpression(
+        '{0} == complete or {1} == aborted'.format(trig2.get_abs_node_path(), trig2.get_abs_node_path())))
+
+    if len(trig1) == 1: 
+        node.add_part_trigger(ecflow.PartExpression(
+            '{0} == complete'.format(trig1[0].get_abs_node_path()), True))
+
+    elif len(trig1) == 2:
+        node.add_part_trigger(ecflow.PartExpression(
+            '{0} == complete'.format(trig1[0].get_abs_node_path()), True))
+        node.add_part_trigger(ecflow.PartExpression(
+            '{0} == complete'.format(trig1[1].get_abs_node_path()), True))
+
+    else:
+        logger.info("Max. trigger expression equals 2!")
 
 
 def add_trigger(node, trigger):
@@ -588,7 +617,8 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     Build the ecflow suite.
     """
 
-    global fam_month_previous, fam_avhrr, fam_modis, fam_year
+    global fam_avhrr, fam_modis, fam_year
+
     logger.info('Building suite.')
 
     # ========================
@@ -642,6 +672,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # ================================
     # DEFINE DYNAMIC FAMILIES & TASKS
     # ================================
+
+    # memorize previous month
+    fam_month_previous = False
 
     # memorize satellites for each month
     satellites_within_current_month = list()
@@ -722,11 +755,8 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         
         # DEARCHIVING family: add get aux/era family
         fam_aux = add_fam(fam_month_dearch, get_aux_fam)
-        add_aux_tasks(fam_aux)
+        add_aux_tasks(fam_aux, fam_month_previous)
 
-        # trigger for next month node
-        if month_cnt > 0:
-            add_trigger_dearch(fam_aux, fam_month_previous)
 
         # PROC family: add main processing
         fam_main = add_fam(fam_month, mainproc_fam)
@@ -767,7 +797,8 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 # PROC
                 fam_sat = add_fam(fam_avhrr, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
-                add_main_proc_tasks(fam_sat, [fam_sat_dearch])
+                add_main_proc_tasks(fam_sat, [fam_sat_dearch], 
+                                    fam_month_previous)
 
                 satellites_within_current_month.append(satellite)
                 l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
@@ -798,12 +829,14 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 if avhrr_flag:
                     add_dearchiving_tasks(fam_sat_dearch, fam_aux)
                     #                  (family, prefamily (=trigger))
-                    add_main_proc_tasks(fam_sat, [fam_avhrr, fam_sat_dearch])
+                    add_main_proc_tasks(fam_sat, [fam_avhrr, fam_sat_dearch], 
+                                        fam_month_previous)
                     fam_avhrr = fam_sat
                 else:
                     add_dearchiving_tasks(fam_sat_dearch, fam_aux)
                     #                  (family, prefamily (=trigger))
-                    add_main_proc_tasks(fam_sat, [fam_aux, fam_sat_dearch])
+                    add_main_proc_tasks(fam_sat, [fam_aux, fam_sat_dearch],
+                                        fam_month_previous)
                     fam_aux = fam_sat
 
         # -- end of satellite loop
