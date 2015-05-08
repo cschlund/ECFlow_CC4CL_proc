@@ -13,9 +13,14 @@ from housekeeping import get_id, delete_dir
 from housekeeping import split_platform_string
 from housekeeping import tar_results
 from housekeeping import copy_into_ecfs
+from housekeeping import move_files
+from housekeeping import create_dir
 
 from pycmsaf.logger import setup_root_logger
 logger = setup_root_logger(name='sissi')
+
+# temporary storage of L3 results
+tmp_data_storage = "/scratch/ms/de/sf7/temp_cloudcci_level3_data"
 
 
 def l2(args_l2):
@@ -146,6 +151,10 @@ def l3(args_l3):
 
             logger.info("Copy2ECFS: {0}".format(tlist))
             copy_into_ecfs(datestring, tlist, args_l3.ecfsdir)
+            
+            logger.info("Move files to {0}".format(tmp_data_storage))
+            create_dir(tmp_data_storage)
+            move_files(tlist, tmp_data_storage)
 
             logger.info("Delete \'{0}\'".format(tempdir))
             delete_dir(tempdir)

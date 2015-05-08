@@ -18,7 +18,7 @@ def verify_aux_files(file_list):
     Check if files have the right length in order to
     split the filestring correctly.
     """
-    for idx, fil in enumerate(file_list):
+    for fil in file_list:
 
         (idir, ifil) = split_filename(fil)
         filebase = os.path.splitext(ifil)[0]
@@ -27,24 +27,24 @@ def verify_aux_files(file_list):
         # MCD43C3.A2008001.005.2008025111631
         if ifil.startswith('MCD'):
             if len(filebase) != 34:
-                file_list.pop(idx)
+                file_list.remove(fil)
 
         # global_emis_inf10_monthFilled_MYD11C3.A2008001.041
         # global_emis_inf10_monthFilled_MYD11C3.A2008001
         elif ifil.startswith('global'):
-            if len(filebase) != 46 or len(filebase) != 50:
-                file_list.pop(idx)
+            if len(filebase) != 46 and len(filebase) != 50:
+                file_list.remove(fil)
 
         # NISE_SSMIF13_20080101 (NISE002 until 20090910)
         # NISE_SSMISF17_20130101 (NISE004 from 20090817)
         elif ifil.startswith('NISE'):
-            if len(filebase) != 21 or len(filebase) !=22:
-                file_list.pop(idx)
+            if len(filebase) != 21 and len(filebase) !=22:
+                file_list.remove(fil)
 
         # ERA_Interim_an_20080101_00+00
         elif ifil.startswith('ERA_Interim'):
             if len(filebase) != 29:
-                file_list.pop(idx)
+                file_list.remove(fil)
 
     return file_list
 
@@ -238,11 +238,11 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
         nclist = ncbase.split("-")[1:]
         ncstr = "-".join(nclist)
         tarbas = idate + '-' + ncstr
-        daily_l2_tarfile = os.path.join(tempdir, tarbas + ".tar.gz")
+        daily_l2_tarfile = os.path.join(tempdir, tarbas + ".tar")
 
         # create daily tarfile containing all orbits
         # print (" * Create \'%s\'" % daily_l2_tarfile)
-        tar = tarfile.open(daily_l2_tarfile, "w:gz")
+        tar = tarfile.open(daily_l2_tarfile, "w:")
         for tfile in files:
             # filedir = os.path.dirname(tfile)
             filenam = os.path.basename(tfile)
@@ -339,10 +339,10 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
 
         # create daily tarfile
         # noinspection PyUnboundLocalVariable
-        daily_l3_tarfile = os.path.join(tempdir, ncbase + ".tar.bz2")
+        daily_l3_tarfile = os.path.join(tempdir, ncbase + ".tar")
         # print (" * Create \'%s\'" % daily_l3_tarfile)
 
-        tar = tarfile.open(daily_l3_tarfile, "w:bz2")
+        tar = tarfile.open(daily_l3_tarfile, "w:")
         for tfile in daily_tar_files:
             # filedir = os.path.dirname(tfile)
             filenam = os.path.basename(tfile)
@@ -356,7 +356,7 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
         delete_dir(daily_tempdir)
 
     # -- make monthly tarballs containing all daily tarballs
-    tar = tarfile.open(l3_tarfile, "w:gz")
+    tar = tarfile.open(l3_tarfile, "w:")
     for tfile in tar_files:
         # filedir = os.path.dirname(tfile)
         filenam = os.path.basename(tfile)
@@ -423,7 +423,7 @@ def create_l3c_tarball(inpdir, idnumber, tempdir, l3_tarfile):
 
     # -- create final tarfile to be copied into ECFS
     # print (" * Create \'%s\'" % l3_tarfile)
-    tar = tarfile.open(l3_tarfile, "w:gz")
+    tar = tarfile.open(l3_tarfile, "w:")
     for tfile in tar_files:
         # filedir = os.path.dirname(tfile)
         filenam = os.path.basename(tfile)
@@ -455,7 +455,7 @@ def create_tarname(ctype, datestring, sensor, platform):
     """
     esacci = "ESACCI"
     cloudp = "CLOUD-CLD_PRODUCTS"
-    suffix = "fv1.0.tar.gz"
+    suffix = "fv1.0.tar"
 
     tarname = datestring + '-' + esacci + '-' + ctype + \
               '_' + cloudp + '-' + sensor + '_' + \
