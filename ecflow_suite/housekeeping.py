@@ -649,6 +649,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
     # Define job commands
     fam_proc.add_variable('ECF_JOB_CMD', serial_job_cmd)
+    fam_dearch.add_variable('ECF_JOB_CMD', serial_job_cmd)
 
     # connect to database and get_sats list
     db = AvhrrGacDatabase(dbfile=gacdb_file)
