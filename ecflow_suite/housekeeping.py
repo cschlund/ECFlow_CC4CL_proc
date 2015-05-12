@@ -646,7 +646,8 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
         # check if month should be skipped, if given
         if ignoremonths_list:
-            if act_date in ignoremonths_list:
+            # if act_date in ignoremonths_list:
+            if int(monthstr) in ignoremonths_list:
                 continue
 
         # check for avhrr primes
