@@ -230,7 +230,7 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
         idate = idate_folder.split("_")[0]
 
         # list all orbitfiles
-        files = get_file_list_via_filext(daily, "fv1.0.nc")
+        files = get_file_list_via_filext(daily, "fv1.3.nc")
 
         # create daily tarfilename
         ncfile = files.pop()
@@ -455,7 +455,7 @@ def create_tarname(ctype, datestring, sensor, platform):
     """
     esacci = "ESACCI"
     cloudp = "CLOUD-CLD_PRODUCTS"
-    suffix = "fv1.0.tar"
+    suffix = "fv1.3.tar"
 
     tarname = datestring + '-' + esacci + '-' + ctype + \
               '_' + cloudp + '-' + sensor + '_' + \
