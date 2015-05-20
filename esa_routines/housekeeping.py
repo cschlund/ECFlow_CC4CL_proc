@@ -13,6 +13,30 @@ import logging
 logger = logging.getLogger('sissi')
 
 
+def getScriptPath(): 
+    return os.path.dirname(os.path.realpath(sys.argv[0]))
+
+
+def get_file_version():
+    """
+    Get file_version from config_attributes.file
+    """
+    try:
+        pwd = getScriptPath()
+        cfg = os.path.join(pwd, "config_attributes.file")
+        fil = open(cfg, "r")
+        inp = fil.readlines()
+        fil.close()
+        for line in inp:
+            l = line.strip('\n')
+            if 'file_version=' in l:
+                splits = l.split("=")
+                # remove single quotes from '1.3' and return 1.3
+                return splits[1].replace("'", "", 2)
+    except IOError:
+        logger.info("Could not open file {0}".format(cfg))
+
+
 def verify_aux_files(file_list):
     """
     Check if files have the right length in order to
@@ -453,9 +477,10 @@ def create_tarname(ctype, datestring, sensor, platform):
            create_tarname( "L3C", 200806, AVHRR, NOAA18 )
            create_tarname( "L2", 200806, AVHRR, NOAA18 )
     """
+    filver = get_file_version()
     esacci = "ESACCI"
     cloudp = "CLOUD-CLD_PRODUCTS"
-    suffix = "fv1.3.tar"
+    suffix = "fv"+filver+".tar"
 
     tarname = datestring + '-' + esacci + '-' + ctype + \
               '_' + cloudp + '-' + sensor + '_' + \
