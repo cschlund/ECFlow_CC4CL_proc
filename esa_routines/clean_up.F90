@@ -61,10 +61,10 @@ end subroutine clean_up_main
 
  
  
-subroutine move_post(string,instrument,platform,year,month)
+subroutine move_post(string,instrument,platform,year,month,config_attributes)
 
   character(len=1024) :: string
-  character(len=15)   :: instrument,platform
+  character(len=15)   :: instrument,platform, file_version
   character(len=1024) :: finalprimary, finalsecondary, sourceprimary
   character(len=4)    :: year
   character(len=5)    :: month,day,hour,min
@@ -81,6 +81,7 @@ subroutine move_post(string,instrument,platform,year,month)
   integer :: estat,cstat,i,ic
   character(len=1024) :: cmsg
   character(len=256) :: to_upper
+  character(len=256) :: config_attributes
 
   dir='post'
   prefix_dummy='postproc_driver_'
@@ -89,6 +90,10 @@ subroutine move_post(string,instrument,platform,year,month)
   suffix_target='.nc'
 
   write(*,*) "in move_post"
+
+  write(*,*) "get_file_version"
+  call get_file_version(config_attributes, file_version)
+  write (*,*) 'file_version is: ', trim(file_version)
 
   if(trim(adjustl(instrument)) .eq. 'AVHRR' .or. trim(adjustl(instrument)) .eq. 'avhrr') then
 
@@ -125,7 +130,7 @@ subroutine move_post(string,instrument,platform,year,month)
      platform = to_upper(platform)
 
      ! TO DO: import file version
-     finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // '-fv1.0' // trim(suffix_target)
+     finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // trim(file_version) // trim(suffix_target)
 
      command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
      call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
@@ -166,9 +171,10 @@ subroutine move_post(string,instrument,platform,year,month)
      min=trim(adjustl(dri_file(cut_off+11:cut_off+12)))
      write(*,*) 'min',min
 
+     ! TO DO: import file version
      finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // & 
           '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // & 
-          trim(platform) // '-fv1.0' // trim(suffix_target)
+          trim(platform) // trim(file_version) // trim(suffix_target)
 
      command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
      call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
@@ -179,3 +185,46 @@ subroutine move_post(string,instrument,platform,year,month)
   
 end subroutine move_post
 
+! 2015-05-20: C. Schlundt
+subroutine get_file_version(config_attributes, file_version)
+
+implicit none
+integer :: i1, i2, n, io_error, nlines, whereis
+character(len=256)  :: config_attributes
+character(len=1024) :: string
+character(len=15)   :: file_version
+
+! Read number of lines in file
+nlines = 0
+open(unit=141, file=trim(adjustl(config_attributes)), & 
+     status='old', action='read', iostat=io_error)
+if ( io_error == 0 ) then
+    do
+      read(141,*,END=10)
+      nlines = nlines + 1
+    end do
+end if
+10 close(141)
+
+! Read file and get file_version variable
+open(unit=151, file=trim(adjustl(config_attributes)), & 
+     status='old', action='read', iostat=io_error)
+if ( io_error == 0 ) then
+    do n = 1, nlines
+      read(151,200) string
+      whereis = index(trim(string), 'file_version=')
+      if (whereis .ne. 0 ) then
+          write(*,*) whereis, trim(string)
+          i1 = scan(trim(string), "'")
+          i2 = scan(trim(string), "'", back=.true.)
+          !write(*,*) i1, i2, trim(string(i1+1:i2-1))
+          file_version = '-fv'//trim(string(i1+1:i2-1))
+          exit
+      end if
+    end do
+end if
+close(151)
+
+200 format(a2048)
+return
+end subroutine get_file_version
