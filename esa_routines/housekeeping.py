@@ -254,7 +254,9 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
         idate = idate_folder.split("_")[0]
 
         # list all orbitfiles
-        files = get_file_list_via_filext(daily, "fv1.3.nc")
+        filver = get_file_version()
+        suffix = "fv"+filver+".nc"
+        files = get_file_list_via_filext(daily, suffix)
 
         # create daily tarfilename
         ncfile = files.pop()
