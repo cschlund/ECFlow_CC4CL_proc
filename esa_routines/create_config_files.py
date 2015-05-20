@@ -255,7 +255,7 @@ def proc2(args_ret):
         f.write("cinclude_full_brdf='T'\n")
         f.write("RTTOV_version='11'\n")
         f.write("ECMWF_version='ERA-Interim'\n")
-        f.write("SVN_version='2896'\n")
+        f.write("SVN_version='"+args_ret.svn_version+"'\n")
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
@@ -393,6 +393,8 @@ if __name__ == '__main__':
                                    "i.e. across: 200-210, along: 200-210")
     proc2_parser.add_argument('-pday', '--procday', type=int,
                               help="-1: whole month otherwise this day")
+    proc2_parser.add_argument('-svn', '--svn_version', type=str, required=True,
+                              help="SVN version of orac repository")
     proc2_parser.set_defaults(func=proc2)
 
     # -> create config file for l2 to l3 processing
