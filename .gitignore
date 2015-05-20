@@ -22,3 +22,8 @@ esa_routines/*.o
 esa_routines/*.x
 esa_routines/core
 scratch
+test.F90
+test.exe
+test.f90
+test.py
+test.sh
