@@ -745,7 +745,7 @@ program mpi_wrapper
                     call clean_up_main(dummyfile2048)
                     dummyfile1024=adjustl(file_inventory_post(ifile))
                     write(*,*) "Calling move_post"
-                    call move_post(dummyfile1024,instrument,platform,year,month)
+                    call move_post(dummyfile1024,instrument,platform,year,month,config_attributes)
                  endif
 
 #ifdef DEBUG
