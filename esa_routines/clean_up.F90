@@ -91,9 +91,9 @@ subroutine move_post(string,instrument,platform,year,month,config_attributes)
 
   write(*,*) "in move_post"
 
-  write(*,*) "get_file_version"
+  write(*,*) "call get_file_version"
   call get_file_version(config_attributes, file_version)
-  write (*,*) 'file_version is: ', trim(file_version)
+  write (*,*) 'in move_post:  file_version is = ', trim(file_version)
 
   if(trim(adjustl(instrument)) .eq. 'AVHRR' .or. trim(adjustl(instrument)) .eq. 'avhrr') then
 
@@ -194,6 +194,11 @@ character(len=256)  :: config_attributes
 character(len=1024) :: string
 character(len=15)   :: file_version
 
+! dummy file_version
+file_version = '-fvX.Y'
+
+write(*,*) "in get_file_version reading ", trim(config_attributes)
+
 ! Read number of lines in file
 nlines = 0
 open(unit=141, file=trim(adjustl(config_attributes)), & 
@@ -211,14 +216,16 @@ open(unit=151, file=trim(adjustl(config_attributes)), &
      status='old', action='read', iostat=io_error)
 if ( io_error == 0 ) then
     do n = 1, nlines
-      read(151,200) string
+      read(151,*) string
+      !write(*, 200) trim(string)
       whereis = index(trim(string), 'file_version=')
       if (whereis .ne. 0 ) then
-          write(*,*) whereis, trim(string)
+          !write(*,*) 'WHEREIS', whereis, trim(string)
           i1 = scan(trim(string), "'")
           i2 = scan(trim(string), "'", back=.true.)
           !write(*,*) i1, i2, trim(string(i1+1:i2-1))
           file_version = '-fv'//trim(string(i1+1:i2-1))
+          write(*,*) 'in get_file_version:  file_version is = ', trim(file_version)
           exit
       end if
     end do
