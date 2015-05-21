@@ -511,6 +511,9 @@ def verify_avhrr_primes(sat_list, act_date):
         if pdict[s]["start_date"] <= act_date <= pdict[s]["end_date"]:
             plist.append(s)
 
+    logger.info("Original satellite list: {0}".format(sat_list))
+    logger.info("Satellite list for {0} is {1}".format(act_date, plist))
+
     return plist
 
 
@@ -656,6 +659,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # DEFINE DYNAMIC FAMILIES & TASKS
     # ================================
 
+    # original satellite list
+    orig_sat_list = sat_list
+
     # memorize satellites for each month
     satellites_within_current_month = list()
 
@@ -686,7 +692,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
         # check for avhrr primes
         if useprimes:
-            sat_list = verify_avhrr_primes(sat_list,
+            sat_list = verify_avhrr_primes(orig_sat_list,
                                            act_date)
 
         # check if any AVHRR or/and MODIS are avail.
