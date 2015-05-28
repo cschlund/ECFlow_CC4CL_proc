@@ -17,17 +17,17 @@ ERROR() { echo ERROR ; ecflow_client --abort=trap;
         echo " --- FAILED: retrieval for %SATELLITE%/%SENSOR% "\
              "%START_YEAR%/%START_MONTH% %END_YEAR%/%END_MONTH% ";
 
-        python %CLEANUP_SCRATCH% \
-            --inpdir %ESA_OUTPUTDIR% \
-            --cfgdir %ESA_CONFIGDIR% \
-            --year %START_YEAR% --month %START_MONTH% \
-            clear_l2 --satellite %SATELLITE% --instrument %SENSOR%;
+        /* python %CLEANUP_SCRATCH% \ */
+        /*     --inpdir %ESA_OUTPUTDIR% \ */
+        /*     --cfgdir %ESA_CONFIGDIR% \ */
+        /*     --year %START_YEAR% --month %START_MONTH% \ */
+        /*     clear_l2 --satellite %SATELLITE% --instrument %SENSOR%; */
     
-        python %CLEANUP_SCRATCH% \
-            --inpdir %ESA_LOGDIR% \
-            --cfgdir %ESA_CONFIGDIR% \
-            --year %START_YEAR% --month %START_MONTH% \
-            clear_l2 --satellite %SATELLITE% --instrument %SENSOR%;
+        /* python %CLEANUP_SCRATCH% \ */
+        /*     --inpdir %ESA_LOGDIR% \ */
+        /*     --cfgdir %ESA_CONFIGDIR% \ */
+        /*     --year %START_YEAR% --month %START_MONTH% \ */
+        /*     clear_l2 --satellite %SATELLITE% --instrument %SENSOR%; */
 
         exit 1 ; }
 

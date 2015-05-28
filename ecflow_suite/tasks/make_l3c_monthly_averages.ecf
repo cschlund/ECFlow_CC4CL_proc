@@ -40,9 +40,9 @@ else
     
     # -- create l2b sum output file list for L3C production
     sstr="done L2->L3 finished, results written to:"
-    fbasen="L2B_SUM_ncfile_list_${prodtype}_%SENSOR%_${sat_date_base}_${jid}.txt"
+    fbasen="L2B_SUM_ncfile_list_${prodtype}_%SENSOR%_${sat_date_base}.txt"
     ofilelist="%ESA_LIST_L2FILES%/${fbasen}"
-    sed -n -e "s/^.*\(${sstr}\)/\1/p" ${log_fil} | cut -f2- -d"'" | sed "s/*/\"*\"/g;s/^/\"/;s/$/\"/" > ${ofilelist}
+    #sed -n -e "s/^.*\(${sstr}\)/\1/p" ${log_fil} | cut -f2- -d"'" | sed "s/*/\"*\"/g;s/^/\"/;s/$/\"/" > ${ofilelist}
 
     # -- create L3C config file
     python %MAKE_CFG_FILE% \

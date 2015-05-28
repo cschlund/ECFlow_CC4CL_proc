@@ -26,6 +26,8 @@ else
     # -- log directory for daily jobs
     log_dir="%ESA_ECF_LOG_DIR%/%SUITE%/%FAMILY%"
 
+
+
     # -- log file of retrieval ecflow script
     log_file_retrieval="${log_dir}/retrieval.1"
 
@@ -39,9 +41,10 @@ else
     jid=ID${primary_id}_US${id}
     
     # -- create l2 output file list
-    filelist_basename="L2_ncfile_list_${prodtype}_%SENSOR%_${sat_date_base}_${jid}.txt"
+    #filelist_basename="L2_ncfile_list_${prodtype}_%SENSOR%_${sat_date_base}_${jid}.txt"
+    filelist_basename="L2_ncfile_list_${prodtype}_%SENSOR%_${sat_date_base}.txt"
     filelist_level2_output="%ESA_LIST_L2FILES%/${filelist_basename}"
-    sed -n -e "s/^.*\(L2 output file path = \)/\1/p" ${log_file_retrieval} | cut -f2- -d"=" | sed "s/*/\"*\"/g;s/^/\"/;s/$/\"/" > ${filelist_level2_output}
+    #sed -n -e "s/^.*\(L2 output file path = \)/\1/p" ${log_file_retrieval} | cut -f2- -d"=" | sed "s/*/\"*\"/g;s/^/\"/;s/$/\"/" > ${filelist_level2_output}
 
 
     # -- write MPMD task list
@@ -69,6 +72,11 @@ else
             %ESA_OUTPUTDIR% \
             ${filelist_level2_output}
 
+    # To avoid creation of cores in case of abort, which takes ages...
+    module unload atp
+
+    # For OpenMP tasks
+    export OMP_NUM_THREADS=$EC_threads_per_task
 
     # -- call aprun using the MPMD submitter
     echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${taskfile}

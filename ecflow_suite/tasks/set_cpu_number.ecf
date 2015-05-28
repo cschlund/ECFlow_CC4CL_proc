@@ -18,6 +18,12 @@ else
         cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
         cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
+	    #dbfile="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/sql/AVHRR_GAC_archive_filled_POD_KLM_overlap.sqlite3"
+	    #gacdb_client="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/sql/gacdb_client.py"
+	    #date=%START_YEAR%%START_MONTH%%PROCDAY%
+	    #python $gacdb_client --dbfile=$dbfile get_scanlines --date=$date --sat=%SATELLITE% --mode=l1c > orbit_list.txt
+	    #val=`Rscript format_orbit_list.R --vanilla orbit_list.txt`
+
         val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% ${cfg_fil} %PROCDAY%`
 
     else
@@ -29,7 +35,7 @@ else
         val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% ${cfg_fil} %PROCDAY%`
 
         # for MODIS we must set a maximum!
-        maxval=2400
+        maxval=2399
         if [ "$val" -gt "$maxval" ]; then val=$maxval; fi
 
     fi
