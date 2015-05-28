@@ -61,7 +61,7 @@ end subroutine clean_up_main
 
  
  
-subroutine move_post(string,instrument,platform,year,month)
+subroutine create_L2_list_or_file(string,instrument,platform,year,month,move_L2)
 
   character(len=1024) :: string
   character(len=15)   :: instrument,platform
@@ -78,9 +78,10 @@ subroutine move_post(string,instrument,platform,year,month)
   character(len=2560) :: command_line
   character(len=2304) :: directory
   character(len=256)  :: dir
-  integer :: estat,cstat,i,ic
+  integer             :: estat,cstat,i,ic
   character(len=1024) :: cmsg
-  character(len=256) :: to_upper
+  character(len=256)  :: to_upper
+  logical             :: move_L2 ! rename L2 output file?
 
   dir='post'
   prefix_dummy='postproc_driver_'
@@ -127,10 +128,19 @@ subroutine move_post(string,instrument,platform,year,month)
      ! TO DO: import file version
      finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // '-fv1.0' // trim(suffix_target)
 
-     command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
-     call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+     if (move_L2) then
 
-     write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+
+        write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+
+     else
+
+        write(12,*) """" // trim(directory) // trim(dir) // "/" // trim(finalprimary) // """"
+        write(13,*) """" // trim(directory) // trim(dir) // "/" // trim(finalprimary) // """"
+
+     endif
 
   endif
 
@@ -170,12 +180,21 @@ subroutine move_post(string,instrument,platform,year,month)
           '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // & 
           trim(platform) // '-fv1.0' // trim(suffix_target)
 
-     command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
-     call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+     if (move_L2) then
 
-     write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+
+        write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+
+     else
+
+        write(12,*) """" // trim(directory) // trim(dir) // "/" // trim(finalprimary) // """"
+        write(13,*) """" // trim(directory) // trim(dir) // "/" // trim(finalprimary) // """"
+
+     endif
 
   endif
-  
-end subroutine move_post
+
+end subroutine create_L2_list_or_file
 

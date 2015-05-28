@@ -1,7 +1,7 @@
 # write taskfile for l2tol3 prodtypes: l2b and l2b_sum
 
 # individual log file for each CPU?
-individual_logs = T
+individual_logs = F
 
 # read command arguments
 args = commandArgs(trailingOnly = T)

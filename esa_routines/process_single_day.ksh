@@ -517,6 +517,7 @@ while [ $ifile -lt $nl1b ]; do
 
     # -- set preprocessing basename
     preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
+    #preproc_base=${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
 
 
     # -- process first WATer phase
@@ -665,7 +666,7 @@ while [ $ifile -lt $nl1b ]; do
     fi     
        
 
-	echo  `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
+    echo  `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
     echo " " >> ${daily_log}
     echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _S_' >> ${checkfile}
 
