@@ -774,6 +774,7 @@ program mpi_wrapper
 
                     !run postprocessing
                     dummyfile1024=adjustl(file_inventory_post(ifile))
+
                     call post_process_level2(mytask,ntasks,lower_bound,upper_bound,dummyfile1024,rc_post)
 
 
@@ -794,7 +795,7 @@ program mpi_wrapper
                        dummyfile1024=adjustl(file_inventory_post(ifile))
                        write(*,*) "Calling create_L2_list_or_file"
                        call create_L2_list_or_file(dummyfile1024,instrument, &
-                            platform,year,month,.true.)
+                            platform,year,month,config_attributes,.true.)
                     endif
 
 #ifdef DEBUG

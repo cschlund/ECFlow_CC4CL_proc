@@ -5,12 +5,42 @@ import ecflow
 import datetime
 import calendar
 import logging
+import subprocess
 from config_suite import *
 from dateutil.rrule import rrule, MONTHLY
 from pycmsaf.avhrr_gac.database import AvhrrGacDatabase
 from pycmsaf.ssh_client import SSHClient
 
 logger = logging.getLogger('root')
+
+
+def subprocess_cmd(command): 
+    process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
+    proc_stdout = process.communicate()[0].strip()
+    return proc_stdout
+
+
+def get_svn_version(svndir):
+    """
+    Read SVN version from orac repository.
+    """
+    cmd = ('cd '+svndir+'; svn info; cd -')
+    res = subprocess_cmd(cmd)
+
+    stdout_lines = res.split("\n")
+    for line in stdout_lines:
+        if "Revision:" in line:
+            line_list = line.split()
+            if len(line_list) == 2: 
+                svn = line_list[1] 
+                break
+            else:
+                logger.info("Check stdout! snv info!")
+                sys.exit(0)
+
+    logger.info("Current SVN version = {0}".format(svn))
+    return svn
+
 
 def str2upper(string_object):
     """
@@ -215,7 +245,7 @@ def get_sensor(satellite):
     return sensor
 
 
-def set_vars(suite, procday, dummycase, testcase):
+def set_vars(suite, procday, dummycase, testcase, svn_version):
     """
     Set suite level variables
     :rtype: None
@@ -249,6 +279,7 @@ def set_vars(suite, procday, dummycase, testcase):
     suite.add_variable("EC_TOTAL_SLAVES", 1)
 
     # Miscellaneous:
+    suite.add_variable("SVN_VERSION", svn_version)
     suite.add_variable("ECF_TRIES", '1')
     suite.add_variable("ECF_SUBMIT", ecflow_submit)
     suite.add_variable("MAKE_CFG_FILE", make_cfg_files)
@@ -480,6 +511,9 @@ def verify_avhrr_primes(sat_list, act_date):
         if pdict[s]["start_date"] <= act_date <= pdict[s]["end_date"]:
             plist.append(s)
 
+    logger.info("Original satellite list: {0}".format(sat_list))
+    logger.info("Satellite list for {0} is {1}".format(act_date, plist))
+
     return plist
 
 
@@ -571,6 +605,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     global fam_month_previous, fam_avhrr, fam_modis, fam_year
     logger.info('Building suite.')
 
+    # get SVN version
+    svn_version = get_svn_version(svn_path)
+
     # ========================
     # GENERAL SUITE PROPERTIES
     # ========================
@@ -578,7 +615,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     suite = defs.add_suite(mysuite)
 
     # Set suite level variables
-    set_vars(suite, procday, dummycase, testcase)
+    set_vars(suite, procday, dummycase, testcase, svn_version)
 
     # Set default status
     suite.add_defstatus(ecflow.DState.suspended)
@@ -622,6 +659,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # DEFINE DYNAMIC FAMILIES & TASKS
     # ================================
 
+    # original satellite list
+    orig_sat_list = sat_list
+
     # memorize satellites for each month
     satellites_within_current_month = list()
 
@@ -646,12 +686,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
 
         # check if month should be skipped, if given
         if ignoremonths_list:
-            if act_date in ignoremonths_list:
+            # if act_date in ignoremonths_list:
+            if int(monthstr) in ignoremonths_list:
                 continue
 
         # check for avhrr primes
         if useprimes:
-            sat_list = verify_avhrr_primes(sat_list,
+            sat_list = verify_avhrr_primes(orig_sat_list,
                                            act_date)
 
         # check if any AVHRR or/and MODIS are avail.
