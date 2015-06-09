@@ -18,8 +18,9 @@ else
         cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
         cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
+	# temporarily disabled for running FBL3 test year
         # -- execute ksh script
-        %GET_AVHRR_KSH% %CFG_PATHS_FILE% ${cfg_fil}
+        # %GET_AVHRR_KSH% %CFG_PATHS_FILE% ${cfg_fil}
     
     else
     
@@ -27,8 +28,9 @@ else
         cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
         cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
+	# temporarily disabled for running FBL3 test year
         # -- execute ksh script
-        %GET_MODIS_KSH% %CFG_PATHS_FILE% ${cfg_fil}
+        # %GET_MODIS_KSH% %CFG_PATHS_FILE% ${cfg_fil}
     
     fi
 

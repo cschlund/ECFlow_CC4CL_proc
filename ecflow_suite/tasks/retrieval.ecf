@@ -104,7 +104,7 @@ else
         id=`date +%%s`
         jid=${jid}_US${id}
         echo ${jid} running
-    
+	
     
         # -- Convert month
         ACTMONTHS=$(printf %%02d $ACTMONTH)
@@ -125,7 +125,9 @@ else
         # -- define logfiles
         out_file=${logs_monthly}/${PBS_JOBNAME}_${jid}.log.out
         err_file=${logs_monthly}/${PBS_JOBNAME}_${jid}.log.err
-    
+
+	# -- get ESA temp_list_l2files path
+	l2_file_list_dir="%ESA_LIST_L2FILES%"
     
         # -- put list of daily config files together
         inventory_file_daily_config=${logs_monthly}/process_single_day_${ACTYEAR}${ACTMONTHS}_${instrument}_${platform}_${jid}.cdaily.lst
@@ -160,7 +162,8 @@ else
             ${instrument} ${platform} \
             ${ACTMONTHS} ${ACTYEAR} \
             ${wrapper_mode} ${jid} ${logs_monthly} \
-            ${OUTPUTDIR} %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
+            ${OUTPUTDIR} ${l2_file_list_dir} \
+	    %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
             %SINGLE_DAY_KSH%
     
         
