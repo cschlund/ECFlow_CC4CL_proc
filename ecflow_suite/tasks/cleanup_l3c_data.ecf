@@ -10,7 +10,6 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    echo "For testing: no cleanup of L3C data"
     echo "python %CLEANUP_SCRATCH% " \
          "--inpdir %ESA_LEVEL3DIR% " \
          "--cfgdir %ESA_CONFIGDIR% " \

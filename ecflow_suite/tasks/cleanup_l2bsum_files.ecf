@@ -18,7 +18,6 @@ else
             sensor="AVHRR"
         fi
 
-        echo "For testing: no cleanup of L2B_SUM data"
         echo "python %CLEANUP_SCRATCH% " \
              "--inpdir %ESA_LEVEL3DIR% " \
              "--cfgdir %ESA_CONFIGDIR% " \

@@ -82,9 +82,13 @@ if __name__ == '__main__':
     parser.add_argument('--ignore_sats', type=str2upper, nargs='*',
                         help="List of satellites which should be ignored.")
 
-    parser.add_argument('--ignore_months', type=str2mydate, nargs='*',
-                        help="Ignore given yearmonth's, <yyyymm>" 
-                              " e.g. 200201, 2002/03, 2002-04, 2002_09.")
+    #parser.add_argument('--ignore_months', type=str2mydate, nargs='*',
+    #                    help="Ignore given yearmonth's, <yyyymm>" 
+    #                          " e.g. 200201, 2002/03, 2002-04, 2002_09.")
+
+    parser.add_argument('--ignore_months', type=int, nargs='*',
+                        help="Ignore given month's, <mm>" 
+                              " e.g. 1 2 5 7 11 12")
 
     parser.add_argument('--use_avhrr_primes', action="store_true",
                         help="Process only PRIME AVHRRs "

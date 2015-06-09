@@ -25,6 +25,26 @@ else
     cfg_bas="%CFG_PREFIX%${cfg_typ}${date_sat_base}%CFG_SUFFIX%"
     cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
+    # -- write cfg file for retrieval if not existing
+    if [ ! -f "${cfg_fil}" ]; then
+
+        echo "File ${cfg_fil} does not exist -> write it now!"
+
+        if [ %TESTRUN% == 1 ]; then
+            python %MAKE_CFG_FILE% -cf ${cfg_fil} \
+                -sy %START_YEAR% -ey %END_YEAR% \
+                -sm %START_MONTH% -em %END_MONTH% \
+                proc2 -sat %SATELLITE% -ins %SENSOR% \
+                --procday %PROCDAY% --testrun
+        else
+            python %MAKE_CFG_FILE% -cf ${cfg_fil} \
+                -sy %START_YEAR% -ey %END_YEAR% \
+                -sm %START_MONTH% -em %END_MONTH% \
+                proc2 -sat %SATELLITE% -ins %SENSOR% \
+                --procday %PROCDAY%
+        fi
+    fi
+
     # -- working directory: write core file here
     #cd %ESA_ROUTINE%
     cd %ESA_ECF_LOG_DIR%

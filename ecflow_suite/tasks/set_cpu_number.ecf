@@ -22,10 +22,9 @@ else
 	gacdb_client="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/sql/gacdb_client.py"
 
 	count_script="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/sql/count_AVHRR_orbits.R"
-	daily_orbits="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/sql/orbit_list_day.txt"
-	monthly_orbits="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/sql/orbit_list_month.txt"
-	#val=`Rscript $count_script --vanilla $daily_orbits $monthly_orbits $gacdb_client $dbfile %START_YEAR% %START_MONTH% %SATELLITE%`
-	#val=`Rscript --vanilla -e "cat( length( scan( 'orbit_list_month.txt', what = 'character', quiet = T ) ) )"`
+	workdir="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/temp_list_l2files/"
+	monthly_orbits=$workdir"orbit_list_"$date_sat_base".txt"
+	#val=`Rscript $count_script --vanilla $workdir $monthly_orbits $gacdb_client $dbfile %START_YEAR% %START_MONTH% %SATELLITE%`
         val=`%COUNT_ORBIT_FILES% %CFG_PATHS_FILE% ${cfg_fil} %PROCDAY%`
 
     else

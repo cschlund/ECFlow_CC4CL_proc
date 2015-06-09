@@ -242,20 +242,20 @@ def proc2(args_ret):
         f.write("# some static info\n")
         f.write("# this is all related to AATSR, set these as dummies\n")
         f.write("# as DWD does not do AATSR processing:\n")
-        f.write("aatsr_calib_file=''\n")
+        f.write("aatsr_calib_file='n/a'\n")
         f.write("# flag=3, i.e. use single ERA interim netcdf file\n")
         f.write("badc=3\n")
-        f.write("ecmwf_path2=''\n")
-        f.write("ecmwf_path3=''\n")
+        f.write("ecmwf_path2='n/a'\n")
+        f.write("ecmwf_path3='n/a'\n")
         f.write("cchunkproc=0\n")
         f.write("day_nightc=0\n")
-        f.write("cverbose='F'\n")
+        f.write("cverbose='T'\n")
         f.write("cchunk='F'\n")
         f.write("cfullpath='T'\n")
         f.write("cinclude_full_brdf='T'\n")
         f.write("RTTOV_version='11'\n")
         f.write("ECMWF_version='ERA-Interim'\n")
-        f.write("SVN_version='2896'\n")
+        f.write("SVN_version='"+args_ret.svn_version+"'\n")
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
@@ -393,6 +393,8 @@ if __name__ == '__main__':
                                    "i.e. across: 200-210, along: 200-210")
     proc2_parser.add_argument('-pday', '--procday', type=int,
                               help="-1: whole month otherwise this day")
+    proc2_parser.add_argument('-svn', '--svn_version', type=str, required=True,
+                              help="SVN version of orac repository")
     proc2_parser.set_defaults(func=proc2)
 
     # -> create config file for l2 to l3 processing

@@ -10,13 +10,13 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    echo "For testing: no cleanup of L3S data"
     echo "python %CLEANUP_SCRATCH% " \
          "--inpdir %ESA_LEVEL3DIR% " \
          "--cfgdir %ESA_CONFIGDIR% " \
          "--year %START_YEAR% --month %START_MONTH% " \
          "clear_l3 --prodtype L3S --instrument %SENSOR_FAM% "
 
+    # archiving tasks not yet coded in proc_4_*.py - TBD!
     #python %CLEANUP_SCRATCH% \
     #    --inpdir %ESA_LEVEL3DIR% \
     #    --cfgdir %ESA_CONFIGDIR% \

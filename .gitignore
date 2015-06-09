@@ -3,6 +3,8 @@
 *.log
 *.txt
 *.sqlite3
+*.logfile
+*.log
 ecflow_suite/config_suite.py
 ecflow_suite/config.sh
 ecflow_suite/include/pbs_parallel_retrieval.h
@@ -20,3 +22,8 @@ esa_routines/*.o
 esa_routines/*.x
 esa_routines/core
 scratch
+test.F90
+test.exe
+test.f90
+test.py
+test.sh

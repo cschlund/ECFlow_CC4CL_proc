@@ -13,12 +13,36 @@ import logging
 logger = logging.getLogger('sissi')
 
 
+def getScriptPath(): 
+    return os.path.dirname(os.path.realpath(sys.argv[0]))
+
+
+def get_file_version():
+    """
+    Get file_version from config_attributes.file
+    """
+    try:
+        pwd = getScriptPath()
+        cfg = os.path.join(pwd, "config_attributes.file")
+        fil = open(cfg, "r")
+        inp = fil.readlines()
+        fil.close()
+        for line in inp:
+            l = line.strip('\n')
+            if 'file_version=' in l:
+                splits = l.split("=")
+                # remove single quotes from '1.3' and return 1.3
+                return splits[1].replace("'", "", 2)
+    except IOError:
+        logger.info("Could not open file {0}".format(cfg))
+
+
 def verify_aux_files(file_list):
     """
     Check if files have the right length in order to
     split the filestring correctly.
     """
-    for idx, fil in enumerate(file_list):
+    for fil in file_list:
 
         (idir, ifil) = split_filename(fil)
         filebase = os.path.splitext(ifil)[0]
@@ -27,24 +51,24 @@ def verify_aux_files(file_list):
         # MCD43C3.A2008001.005.2008025111631
         if ifil.startswith('MCD'):
             if len(filebase) != 34:
-                file_list.pop(idx)
+                file_list.remove(fil)
 
         # global_emis_inf10_monthFilled_MYD11C3.A2008001.041
         # global_emis_inf10_monthFilled_MYD11C3.A2008001
         elif ifil.startswith('global'):
-            if len(filebase) != 46 or len(filebase) != 50:
-                file_list.pop(idx)
+            if len(filebase) != 46 and len(filebase) != 50:
+                file_list.remove(fil)
 
         # NISE_SSMIF13_20080101 (NISE002 until 20090910)
         # NISE_SSMISF17_20130101 (NISE004 from 20090817)
         elif ifil.startswith('NISE'):
-            if len(filebase) != 21 or len(filebase) !=22:
-                file_list.pop(idx)
+            if len(filebase) != 21 and len(filebase) !=22:
+                file_list.remove(fil)
 
         # ERA_Interim_an_20080101_00+00
         elif ifil.startswith('ERA_Interim'):
             if len(filebase) != 29:
-                file_list.pop(idx)
+                file_list.remove(fil)
 
     return file_list
 
@@ -230,7 +254,9 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
         idate = idate_folder.split("_")[0]
 
         # list all orbitfiles
-        files = get_file_list_via_filext(daily, "fv1.0.nc")
+        filver = get_file_version()
+        suffix = "fv"+filver+".nc"
+        files = get_file_list_via_filext(daily, suffix)
 
         # create daily tarfilename
         ncfile = files.pop()
@@ -238,11 +264,11 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
         nclist = ncbase.split("-")[1:]
         ncstr = "-".join(nclist)
         tarbas = idate + '-' + ncstr
-        daily_l2_tarfile = os.path.join(tempdir, tarbas + ".tar.gz")
+        daily_l2_tarfile = os.path.join(tempdir, tarbas + ".tar")
 
         # create daily tarfile containing all orbits
         # print (" * Create \'%s\'" % daily_l2_tarfile)
-        tar = tarfile.open(daily_l2_tarfile, "w:gz")
+        tar = tarfile.open(daily_l2_tarfile, "w:")
         for tfile in files:
             # filedir = os.path.dirname(tfile)
             filenam = os.path.basename(tfile)
@@ -339,10 +365,10 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
 
         # create daily tarfile
         # noinspection PyUnboundLocalVariable
-        daily_l3_tarfile = os.path.join(tempdir, ncbase + ".tar.bz2")
+        daily_l3_tarfile = os.path.join(tempdir, ncbase + ".tar")
         # print (" * Create \'%s\'" % daily_l3_tarfile)
 
-        tar = tarfile.open(daily_l3_tarfile, "w:bz2")
+        tar = tarfile.open(daily_l3_tarfile, "w:")
         for tfile in daily_tar_files:
             # filedir = os.path.dirname(tfile)
             filenam = os.path.basename(tfile)
@@ -356,7 +382,7 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
         delete_dir(daily_tempdir)
 
     # -- make monthly tarballs containing all daily tarballs
-    tar = tarfile.open(l3_tarfile, "w:gz")
+    tar = tarfile.open(l3_tarfile, "w:")
     for tfile in tar_files:
         # filedir = os.path.dirname(tfile)
         filenam = os.path.basename(tfile)
@@ -423,7 +449,7 @@ def create_l3c_tarball(inpdir, idnumber, tempdir, l3_tarfile):
 
     # -- create final tarfile to be copied into ECFS
     # print (" * Create \'%s\'" % l3_tarfile)
-    tar = tarfile.open(l3_tarfile, "w:gz")
+    tar = tarfile.open(l3_tarfile, "w:")
     for tfile in tar_files:
         # filedir = os.path.dirname(tfile)
         filenam = os.path.basename(tfile)
@@ -453,9 +479,10 @@ def create_tarname(ctype, datestring, sensor, platform):
            create_tarname( "L3C", 200806, AVHRR, NOAA18 )
            create_tarname( "L2", 200806, AVHRR, NOAA18 )
     """
+    filver = get_file_version()
     esacci = "ESACCI"
     cloudp = "CLOUD-CLD_PRODUCTS"
-    suffix = "fv1.0.tar.gz"
+    suffix = "fv"+filver+".tar"
 
     tarname = datestring + '-' + esacci + '-' + ctype + \
               '_' + cloudp + '-' + sensor + '_' + \

@@ -48,6 +48,7 @@ perm = os.path.join("/perm", basepath)
 scratch = os.path.join("/scratch", basepath)
 perm_base = os.path.join(perm, itype, repository)
 scratch_base = os.path.join(scratch, itype, repository)
+svn_path = "/hpc/perm/ms/de/sf7/esa_cci_c_proc/orac_repository/trunk"
 
 # cca:
 esa_routine = os.path.join(perm_base, "esa_routines")

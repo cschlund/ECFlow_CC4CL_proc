@@ -517,6 +517,7 @@ while [ $ifile -lt $nl1b ]; do
 
     # -- set preprocessing basename
     preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
+    #preproc_base=${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
 
 
     # -- process first WATer phase
@@ -645,10 +646,11 @@ while [ $ifile -lt $nl1b ]; do
 
         echo `exec date +%Y/%m/%d:%H:%M:%S` "RUNNING OF POSTPROCESSING" ${postproc_driver} "SUCCESSFUL" >> ${daily_log} 
 
+        # C.Schlundt, 13.05.2015 config_attributes.file: file_version='1.3'
         if [[ ${INSTRUMENT} = "AVHRR" ]]; then 
 
             typeset -u UPLATFORM=${PLATFORM} 
-            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv1.0.nc 
+            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv${file_version}.nc 
             finalcomb_out_path_primary=${l2_outp_post}/${finalfileprimary} 
             finalcomb_out_path_secondary=${l2_outp_post}/${finalfilesecondary} 
 
@@ -656,8 +658,8 @@ while [ $ifile -lt $nl1b ]; do
 
             typeset -u UPLATFORM=${PLATFORM} 
             echo ${UPLATFORM} ${INSTRUMENT} 
-            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv1.0.nc 
-            finalfilesecondary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv1.0.secondary.nc 
+            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv${file_version}.nc 
+            finalfilesecondary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv${file_version}.secondary.nc 
             finalcomb_out_path_primary=${l2_outp_post}/${finalfileprimary} 
             finalcomb_out_path_secondary=${l2_outp_post}/${finalfilesecondary} 
         fi 
@@ -665,7 +667,7 @@ while [ $ifile -lt $nl1b ]; do
     fi     
        
 
-	echo  `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
+    echo  `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
     echo " " >> ${daily_log}
     echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _S_' >> ${checkfile}
 
