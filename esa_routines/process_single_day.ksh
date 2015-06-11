@@ -666,7 +666,7 @@ while [ $ifile -lt $nl1b ]; do
     fi     
        
 
-	echo  `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
+    echo  `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
     echo " " >> ${daily_log}
     echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _S_' >> ${checkfile}
 

@@ -74,14 +74,38 @@ program mpi_wrapper
   character(len=15) :: instrument,wrapper_mode,platform
   character(len=4) :: year
   character(len=2) :: month
-  character(len=512) :: jid,log_dir,out_dir
-  character(len=1024) :: logfile,ilogfile
-  character(len=256) :: to_upper
+  character(len=512) :: jid,log_dir,out_dir,L2_file_list_dir
+  character(len=1024) :: logfile,ilogfile,L2_file_list,L2_sum_file_list
+  !character(len=256) :: to_upper
+
 
   ! Openmp variables
   integer                                :: nompthreads
   integer                                           :: omp_get_max_threads
   integer                                           :: omp_get_num_threads
+
+  INTERFACE
+
+     Pure Function to_upper (str) Result (string)
+
+       !   ==============================
+       !   Changes a string to upper case
+       !   ==============================
+
+       Implicit None
+
+       Character(*), Intent(In) :: str
+       Character(LEN(str))      :: string
+
+       Integer :: ic, i
+
+       Character(26), Parameter :: cap = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+       Character(26), Parameter :: low = 'abcdefghijklmnopqrstuvwxyz'
+
+     End Function to_upper
+
+  END INTERFACE
+
 
   !Initialize MPI
   call MPI_INIT(ierror)
@@ -97,7 +121,7 @@ program mpi_wrapper
      ! get number of arguments
      nargs = COMMAND_ARGUMENT_COUNT()
      ! if more than one argument passed, all inputs on command line
-     if(nargs .eq. 12) then
+     if(nargs .eq. 13) then
 
         CALL GET_COMMAND_ARGUMENT(1,inventory_file_config)
         CALL GET_COMMAND_ARGUMENT(2,instrument)
@@ -108,9 +132,10 @@ program mpi_wrapper
         CALL GET_COMMAND_ARGUMENT(7,jid)
         CALL GET_COMMAND_ARGUMENT(8,log_dir)
         CALL GET_COMMAND_ARGUMENT(9,out_dir)
-        CALL GET_COMMAND_ARGUMENT(10,config_paths)
-        CALL GET_COMMAND_ARGUMENT(11,config_attributes)
-        CALL GET_COMMAND_ARGUMENT(12,single_day_ksh)
+        CALL GET_COMMAND_ARGUMENT(10,L2_file_list_dir)
+        CALL GET_COMMAND_ARGUMENT(11,config_paths)
+        CALL GET_COMMAND_ARGUMENT(12,config_attributes)
+        CALL GET_COMMAND_ARGUMENT(13,single_day_ksh)
 
      endif
 
@@ -128,6 +153,20 @@ program mpi_wrapper
           &//trim(adjustl(jid))//'.log'))
 
      open(11,file=trim(adjustl(logfile)),status='replace')
+
+     !open file for L2 output list
+     L2_file_list=trim(adjustl(trim(adjustl(L2_file_list_dir))//'/'//'L2_ncfile_list_l2b_' &
+          & // trim(instrument) // '_' // to_upper(trim(platform)) // '_' // &
+          & trim(year) // '_' // trim(month) //'.txt'))
+
+     open(12,file=trim(adjustl(L2_file_list)),status='replace')
+
+     L2_sum_file_list=trim(adjustl(trim(adjustl(L2_file_list_dir))//'/'//'L2_ncfile_list_l2b_sum_'&
+          & // trim(instrument) // '_' // to_upper(trim(platform)) // '_' // &
+          & trim(year) // '_' // trim(month) //'.txt'))
+
+     open(13,file=trim(adjustl(L2_sum_file_list)),status='replace')
+
 
      !set threadnumber to default=single-threaded
      nompthreads=1
@@ -460,8 +499,14 @@ program mpi_wrapper
 
         file_inventory_post(ifile)=trim(adjustl(filepath2048))
 
+        ! write path of L2 post-processed file to list
+        call create_L2_list_or_file(file_inventory_post(ifile), instrument, &
+             platform, year, month, config_attributes, .false.)
+
      enddo
 
+     close(12)
+     close(13)
      close(15)
      close(16)
      close(17)
@@ -718,39 +763,47 @@ program mpi_wrapper
 
                  !run main for water
                  dummyfile2048=adjustl(file_inventory_liq(ifile))
-                 call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_liq)
+                 call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_liq,ierror)
+
+                 if (ierror .gt. 0) write(*,*) "ECP liq error status = ", ierror, " for file ", dummyfile2048
 
                  !run main for ice
                  dummyfile2048=adjustl(file_inventory_ice(ifile))
-                 call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_ice)
+                 call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_ice,ierror)
 
-                 !run postprocessing
-                 dummyfile1024=adjustl(file_inventory_post(ifile))
-                 call post_process_level2(mytask,ntasks,lower_bound,upper_bound,dummyfile1024,rc_post)
+                 if (ierror .gt. 0) write(*,*) "ECP ice error status = ", ierror, " for file ", dummyfile2048
 
+                 if (ierror .eq. 0) then
 
-                 rc_pre=0
-                 rc_liq=0
-                 rc_ice=0
-                 rc_post=0
-
-                 !cleanup and rename if everything worked well
-                 if(rc_pre .eq. 0 .and.&
-                      & rc_ice .eq. 0 .and.&
-                      & rc_liq .eq. 0 .and.&
-                      & rc_post .eq. 0) then
-                    dummyfile1024=adjustl(file_inventory_pre(ifile))
-                    call clean_up_pre(dummyfile1024)
-                    dummyfile2048=adjustl(file_inventory_liq(ifile))
-                    call clean_up_main(dummyfile2048)
+                    !run postprocessing
                     dummyfile1024=adjustl(file_inventory_post(ifile))
-                    write(*,*) "Calling move_post"
-                    call move_post(dummyfile1024,instrument,platform,year,month,config_attributes)
-                 endif
+                    call post_process_level2(mytask,ntasks,lower_bound,upper_bound,dummyfile1024,rc_post)
+
+                    rc_pre=0
+                    rc_liq=0
+                    rc_ice=0
+                    rc_post=0
+
+                    !cleanup and rename if everything worked well
+                    if(rc_pre .eq. 0 .and.&
+                         & rc_ice .eq. 0 .and.&
+                         & rc_liq .eq. 0 .and.&
+                         & rc_post .eq. 0) then
+                       dummyfile1024=adjustl(file_inventory_pre(ifile))
+                       !call clean_up_pre(dummyfile1024)
+                       dummyfile2048=adjustl(file_inventory_liq(ifile))
+                       !call clean_up_main(dummyfile2048)
+                       dummyfile1024=adjustl(file_inventory_post(ifile))
+                       write(*,*) "Calling create_L2_list_or_file"
+                       call create_L2_list_or_file(dummyfile1024,instrument, &
+                            platform,year,month,config_attributes,.true.)
+                    endif
 
 #ifdef DEBUG
-                 call flush(300+mytask)
+                    call flush(300+mytask)
 #endif
+
+                 endif
 
               enddo
               !report work is done, sent at next call of loop
