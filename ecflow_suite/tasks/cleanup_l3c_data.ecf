@@ -16,11 +16,11 @@ else
          "--year %START_YEAR% --month %START_MONTH% " \
          "clear_l3 --prodtype L3C --satellite %SATELLITE% --instrument %SENSOR% "
 
-    #python %CLEANUP_SCRATCH% \
-    #    --inpdir %ESA_LEVEL3DIR% \
-    #    --cfgdir %ESA_CONFIGDIR% \
-    #    --year %START_YEAR% --month %START_MONTH% \
-    #    clear_l3 --prodtype L3C --satellite %SATELLITE% --instrument %SENSOR%
+    python %CLEANUP_SCRATCH% \
+       --inpdir %ESA_LEVEL3DIR% \
+       --cfgdir %ESA_CONFIGDIR% \
+       --year %START_YEAR% --month %START_MONTH% \
+       clear_l3 --prodtype L3C --satellite %SATELLITE% --instrument %SENSOR%
 
 fi
 
