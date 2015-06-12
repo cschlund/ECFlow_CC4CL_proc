@@ -78,6 +78,10 @@ cproc_flag=`echo '"'${proc_flag[*]}'"'`
 cnchannels=`echo '"'${nchannels[*]}'"'`
 cprod_name=`echo '"'${prod_name}'"'`
 
+aatsr_drift="n/a"
+ecmwf_path2="n/a"
+ecmwf_path3="n/a"
+
 # daily .config
 echo " 
 #

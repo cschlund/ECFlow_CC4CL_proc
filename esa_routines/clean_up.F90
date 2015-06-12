@@ -61,7 +61,7 @@ end subroutine clean_up_main
 
  
  
-subroutine move_post(string,instrument,platform,year,month,config_attributes)
+subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_attributes,move_L2)
 
   character(len=1024) :: string
   character(len=15)   :: instrument,platform, file_version
@@ -78,10 +78,11 @@ subroutine move_post(string,instrument,platform,year,month,config_attributes)
   character(len=2560) :: command_line
   character(len=2304) :: directory
   character(len=256)  :: dir
-  integer :: estat,cstat,i,ic
+  integer             :: estat,cstat,i,ic
   character(len=1024) :: cmsg
-  character(len=256) :: to_upper
-  character(len=256) :: config_attributes
+  character(len=256)  :: to_upper
+  logical             :: move_L2 ! rename L2 output file?
+  character(len=256)  :: config_attributes
 
   dir='post'
   prefix_dummy='postproc_driver_'
@@ -89,11 +90,11 @@ subroutine move_post(string,instrument,platform,year,month,config_attributes)
   suffix_source='.primary.nc'
   suffix_target='.nc'
 
-  write(*,*) "in move_post"
+  write(*,*) "in create_L2_list_or_file"
 
   write(*,*) "call get_file_version"
   call get_file_version(config_attributes, file_version)
-  write (*,*) 'in move_post:  file_version is = ', trim(file_version)
+  write (*,*) 'in create_L2_list_or_file:  file_version is = ', trim(file_version)
 
   if(trim(adjustl(instrument)) .eq. 'AVHRR' .or. trim(adjustl(instrument)) .eq. 'avhrr') then
 
@@ -132,10 +133,19 @@ subroutine move_post(string,instrument,platform,year,month,config_attributes)
      ! TO DO: import file version
      finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // trim(file_version) // trim(suffix_target)
 
-     command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
-     call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+     if (move_L2) then
 
-     write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+
+        write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+
+     else
+
+        write(12,*) """" // trim(directory) // trim(dir) // "/" // trim(finalprimary) // """"
+        write(13,*) """" // trim(directory) // trim(dir) // "/" // trim(finalprimary) // """"
+
+     endif
 
   endif
 
@@ -144,7 +154,7 @@ subroutine move_post(string,instrument,platform,year,month,config_attributes)
      cut_off = index(trim(adjustl(string)),'/',BACK=.true.)
      directory = trim(adjustl(string(1:cut_off)))
      write(*,*) cut_off,trim(directory)
-
+     
      cut_off=index(trim(adjustl(string)),'/',BACK=.true.)
      dri_file=trim(adjustl(string(cut_off+1:len_trim(string))))
      write(*,*) cut_off,trim(adjustl(dri_file))
@@ -176,14 +186,23 @@ subroutine move_post(string,instrument,platform,year,month,config_attributes)
           '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // & 
           trim(platform) // trim(file_version) // trim(suffix_target)
 
-     command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
-     call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+     if (move_L2) then
 
-     write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
+
+        write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
+
+     else
+
+        write(12,*) """" // trim(directory) // trim(dir) // "/" // trim(finalprimary) // """"
+        write(13,*) """" // trim(directory) // trim(dir) // "/" // trim(finalprimary) // """"
+
+     endif
 
   endif
-  
-end subroutine move_post
+
+end subroutine create_L2_list_or_file
 
 ! 2015-05-20: C. Schlundt
 subroutine get_file_version(config_attributes, file_version)
