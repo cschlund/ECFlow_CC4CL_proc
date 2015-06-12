@@ -7,6 +7,7 @@
 
 import argparse
 import os
+import sys
 import datetime
 
 from pycmsaf.logger import setup_root_logger
@@ -30,24 +31,50 @@ def find_nearest_date(args_pick):
                                  args_pick.day, args_pick.hour,
                                  args_pick.minute, args_pick.seconds)
 
-    # get file list
-    files = get_file_list_via_pattern(args_pick.inpdir, '*.' + args_pick.suffix)
-    files.sort()
+    # all logger info containing args_pick because retrieval logfile
+    # is a bit chaotic due to wrapper (aprun, parallel mode)
 
-    # verify file list
-    file_list = verify_aux_files(files)
+    # scratch is a bitch, thus try several times in case of scratch issues
+    tryno = 10
+    tryno_range = range(1,tryno+1,1)
 
-    # get date list
-    dates = map(extract_date, files)
+    for t in tryno_range:
+        logger.info("Get file list: {0}".format(args_pick))
+        files = get_file_list_via_pattern(args_pick.inpdir, 
+                                          '*.' + args_pick.suffix)
+        if len(files) == 0:
+            logger.info("{1}.TRY No file list returned for {0}".
+                        format(args_pick, t))
+            if t < tryno: 
+                continue
+            else:
+                logger.info("Are you sure that you are searching "
+                            "in the right path? for {0}".format(args_pick))
+                sys.exit(0)
+        else: 
+            logger.info("Sort file list: {0}.TRY".format(t, args_pick))
+            files.sort()
 
-    # get diffs list
-    diffs = map(lambda x: abs((x - ref_date).total_seconds()), dates)
+            logger.info("Verify file list: {0}".format(args_pick))
+            file_list = verify_aux_files(files)
 
-    # grep nearest date
-    min_val = min(diffs)
-    min_idx = diffs.index(min_val)
+            if len(file_list) > 0:
+                logger.info("Get date list: {0}".format(args_pick))
+                dates = map(extract_date, files)
 
-    return files[min_idx]
+                logger.info("Get date_diff list: {0}".format(args_pick))
+                diffs = map(lambda x: abs((x - ref_date).total_seconds()), dates)
+
+                logger.info("Grep nearest date: {0}".format(args_pick))
+                min_val = min(diffs)
+                min_idx = diffs.index(min_val)
+
+                return files[min_idx]
+            else:
+                logger.info("Verified file list is empty for {0}! "
+                            "Check if input data are really available!".
+                            format(args_pick))
+                sys.exit(0)
 
 
 def extract_date(ifile):
@@ -130,4 +157,4 @@ if __name__ == '__main__':
 
     # Call function associated with the selected subcommand
     mfile = args.func(args)
-    print mfile
+    logger.info("PICK_AUX_RETURN:{0}".format(mfile))
