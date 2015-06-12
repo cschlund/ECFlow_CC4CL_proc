@@ -3,10 +3,10 @@
 %include <export.h>
 
 # -- no core file
-#export ATP_ENABLED=0
+export ATP_ENABLED=0
 # -- core file
-export ATP_ENABLED=1
-ulimit -c unlimited
+#export ATP_ENABLED=1
+#ulimit -c unlimited
 # -- stacksize (keep it always that way)
 ulimit -s unlimited
 
