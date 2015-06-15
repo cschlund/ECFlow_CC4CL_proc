@@ -9,6 +9,8 @@ import argparse
 import os
 import sys
 import datetime
+import time
+import numpy
 
 from pycmsaf.logger import setup_root_logger
 
@@ -26,6 +28,8 @@ def find_nearest_date(args_pick):
     :param args_pick: command line arguments
     :return: String (full qualified file)
     """
+    logger.info("Find Auxiliary File for: {0}".format(args_pick))
+
     # reference date
     ref_date = datetime.datetime(args_pick.year, args_pick.month,
                                  args_pick.day, args_pick.hour,
@@ -39,41 +43,39 @@ def find_nearest_date(args_pick):
     tryno_range = range(1,tryno+1,1)
 
     for t in tryno_range:
-        logger.info("Get file list: {0}".format(args_pick))
-        files = get_file_list_via_pattern(args_pick.inpdir, 
+        logger.info("Get file list")
+        file_list = get_file_list_via_pattern(args_pick.inpdir, 
                                           '*.' + args_pick.suffix)
-        if len(files) == 0:
-            logger.info("{1}.TRY No file list returned for {0}".
-                        format(args_pick, t))
+        if len(file_list) == 0:
             if t < tryno: 
+                logger.info("{0}.TRY: No file list returned, "
+                            "sleep a bit".format(t))
+                time.sleep(numpy.random.randint(1, 20))
                 continue
             else:
                 logger.info("Are you sure that you are searching "
-                            "in the right path? for {0}".format(args_pick))
+                            "in the right path?")
                 sys.exit(0)
         else: 
-            logger.info("Sort file list: {0}.TRY".format(t, args_pick))
-            files.sort()
+            file_list.sort()
+            logger.info("Sorted file list: {0}".format(file_list))
+            verified_file_list = verify_aux_files(file_list)
+            logger.info("Verified file list: {0}".format(verified_file_list))
 
-            logger.info("Verify file list: {0}".format(args_pick))
-            file_list = verify_aux_files(files)
-
-            if len(file_list) > 0:
-                logger.info("Get date list: {0}".format(args_pick))
-                dates = map(extract_date, files)
-
-                logger.info("Get date_diff list: {0}".format(args_pick))
+            if len(verified_file_list) > 0:
+                logger.info("Get date list")
+                dates = map(extract_date, verified_file_list)
+                logger.info("Date list: {0}".format(dates))
+                logger.info("Get date_diff list")
                 diffs = map(lambda x: abs((x - ref_date).total_seconds()), dates)
-
-                logger.info("Grep nearest date: {0}".format(args_pick))
+                logger.info("Date_Diff list: {0}".format(diffs))
+                logger.info("Now grep nearest date")
                 min_val = min(diffs)
                 min_idx = diffs.index(min_val)
-
                 return files[min_idx]
             else:
-                logger.info("Verified file list is empty for {0}! "
-                            "Check if input data are really available!".
-                            format(args_pick))
+                logger.info("Verified file list is empty! "
+                            "Check if input data are really available!")
                 sys.exit(0)
 
 
