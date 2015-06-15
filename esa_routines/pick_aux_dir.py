@@ -57,18 +57,16 @@ def find_nearest_date(args_pick):
                             "in the right path?")
                 sys.exit(0)
         else: 
+            logger.info("Sort file list")
             file_list.sort()
-            logger.info("Sorted file list: {0}".format(file_list))
+            logger.info("Verify file list")
             verified_file_list = verify_aux_files(file_list)
-            logger.info("Verified file list: {0}".format(verified_file_list))
 
             if len(verified_file_list) > 0:
                 logger.info("Get date list")
                 dates = map(extract_date, verified_file_list)
-                logger.info("Date list: {0}".format(dates))
                 logger.info("Get date_diff list")
                 diffs = map(lambda x: abs((x - ref_date).total_seconds()), dates)
-                logger.info("Date_Diff list: {0}".format(diffs))
                 logger.info("Now grep nearest date")
                 min_val = min(diffs)
                 min_idx = diffs.index(min_val)
