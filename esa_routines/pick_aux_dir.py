@@ -72,7 +72,7 @@ def find_nearest_date(args_pick):
                 logger.info("Now grep nearest date")
                 min_val = min(diffs)
                 min_idx = diffs.index(min_val)
-                return files[min_idx]
+                return verified_file_list[min_idx]
             else:
                 logger.info("Verified file list is empty! "
                             "Check if input data are really available!")
