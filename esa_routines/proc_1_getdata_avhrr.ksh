@@ -58,8 +58,12 @@ get_avhrr_data()
      download_dir="${INPUTDIR}/AVHRR/${platform}/${YEAR}/${MONTH}"
      mkdir -p ${download_dir}
 
+     print `print Start of dearchiving:` `date`
+
      # -- download file
      ecp ${ecfs_file} ${download_dir}
+
+     print `print End of dearchiving:` `date`
 
      if [ ${?} -ne 0 ]; then
          print " --- FAILED: Download of ${ecfs_file} ! "
@@ -69,11 +73,18 @@ get_avhrr_data()
      # -- extract monthly tarfile, 
      #    e.g. AVHRR_GAC_L1C_NOAA15_200801.tar
      cd ${download_dir}
+
+     print `print Start of monthly tar file extraction:` `date`
+
      tar xf ${tarfile} && rm -f ${tarfile}
+
+     print `print End of monthly tar file extraction:` `date`
 
      # -- extract daily zip files
      pattern="${tar_prefix}${SAT}_${YEAR}${MONTH}*${bz2_suffix}"
      zip_files=$(ls ${pattern})
+
+     print `print Start of daily tar file extraction:` `date`
 
      for zipfile in ${zip_files}
      do
@@ -96,6 +107,8 @@ get_avhrr_data()
          tar xfj ${zipfile} && rm -f ${zipfile}
          cd ${download_dir}
      done
+
+     print `print End of daily tar file extraction:` `date`
 
  else
      print " * no file available for $YEAR, $MONTH, $SAT"
