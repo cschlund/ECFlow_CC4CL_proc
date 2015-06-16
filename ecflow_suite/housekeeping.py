@@ -175,7 +175,7 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA16"]["start_date"] = datetime.date(2001, 3, 20)
     avhrr_dict["NOAA17"]["start_date"] = datetime.date(2002, 10, 15)
     avhrr_dict["NOAA18"]["start_date"] = datetime.date(2005, 8, 30)
-    avhrr_dict["NOAA19"]["start_date"] = datetime.date(2009, 6, 2)
+    avhrr_dict["NOAA19"]["start_date"] = datetime.date(2009, 6, 1)
     avhrr_dict["METOPA"]["start_date"] = datetime.date(2007, 5, 21)
     avhrr_dict["METOPB"]["start_date"] = datetime.date(2013, 4, 24)
     # --------------------------------------------------------------------
