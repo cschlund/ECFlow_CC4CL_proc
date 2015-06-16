@@ -32,7 +32,7 @@ ecfs_l3_dir = "ec:/sf7/ESA_Cloud_cci_data/L3"
 ecfs_l2_dir = "ec:/sf7/ESA_Cloud_cci_data/L2"
 
 # serial and parallel threads
-serial_threads_number = 1
+serial_threads_number = 2
 parallel_threads_number = 4
 
 # -------------------------------------------------------
