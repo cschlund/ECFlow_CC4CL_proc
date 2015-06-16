@@ -10,6 +10,7 @@ from config_suite import *
 from dateutil.rrule import rrule, MONTHLY
 from pycmsaf.avhrr_gac.database import AvhrrGacDatabase
 from pycmsaf.ssh_client import SSHClient
+from datetime import date, timedelta
 
 logger = logging.getLogger('root')
 
@@ -187,7 +188,7 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA15"]["end_date"] = avhrr_dict["NOAA17"]["start_date"]
     avhrr_dict["NOAA16"]["end_date"] = avhrr_dict["NOAA18"]["start_date"]
     avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"]
-    avhrr_dict["NOAA18"]["end_date"] = avhrr_dict["NOAA19"]["start_date"]
+    avhrr_dict["NOAA18"]["end_date"] = avhrr_dict["NOAA19"]["start_date"] - timedelta(days=1)
     avhrr_dict["NOAA19"]["end_date"] = datetime.date(2014, 12, 31)
     avhrr_dict["METOPA"]["end_date"] = avhrr_dict["METOPB"]["start_date"]
     avhrr_dict["METOPB"]["end_date"] = datetime.date(2014, 12, 31)
