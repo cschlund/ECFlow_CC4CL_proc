@@ -44,8 +44,9 @@ def find_nearest_date(args_pick):
 
     for t in tryno_range:
         logger.info("Get file list")
-        file_list = get_file_list_via_pattern(args_pick.inpdir, 
-                                          '*.' + args_pick.suffix)
+        search_path = os.path.join(args_pick.inpdir, 
+                                   args_pick.year, args_pick.month)
+        file_list = get_file_list_via_pattern(search_path, '*.' + args_pick.suffix)
         if len(file_list) == 0:
             if t < tryno: 
                 logger.info("{0}.TRY: No file list returned, "
