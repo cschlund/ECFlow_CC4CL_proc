@@ -21,25 +21,6 @@
 #       2014-04-15 MJ migration to cca/sf7, Stage I
 #
 
-# C. Schlundt, 12.06.2015
-# function for grep path_and_file_string from 
-# returncode ofpython script pick_aux_dir.py
-grep_wanted()
-{
-    STRING=$1
-    PICK_AUX_RETURN=PICK_AUX_RETURN:
-    LEN_RETCODE=${#PICK_AUX_RETURN}
-    split_string=$(echo ${STRING} | tr " " "\n")
-    for str in ${split_string}; do 
-        if [[ ${str} == *$PICK_AUX_RETURN* ]]; then 
-            len=${#str}
-            ret=`exec echo ${str} | cut -c $((LEN_RETCODE + 1))-$len` 
-            echo "${ret}"
-            break
-        fi  
-    done 
-}
-
 set -x
 
 # -- source config path files
@@ -88,7 +69,6 @@ fi
 
 echo `exec date +%Y/%m/%d:%H:%M:%S` "SET PLATFORMS" >> ${daily_log}
 
-
 # -- now fill them with the paths to the files to be processed
 if [[ ${INSTRUMENT} = "AVHRR" ]]; then
     
@@ -131,7 +111,7 @@ elif [[ ${INSTRUMENT} = "MODIS" ]]; then
 	
 	    searchl1b=M*D021KM.*.hdf
 	    searchgeo=M*D03.*.hdf
-
+	    
     elif [[ ${PLATFORM} = "AQUA" ]]; then
 
         SPLATFORM="MYD"
@@ -216,60 +196,107 @@ fi
 
 echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE FILE LISTS" >> ${daily_log}
 
-searchstring=${inputdir_instr_date}/${searchl1b}
+#searchstring=${inputdir_instr_date}/${searchl1b}
 
-nl1b_check=`ls $searchstring | wc -l`
+#nl1b_check=`ls $searchstring | wc -l`
 
-if [ nl1b_check -eq 0 ]; then
+# if [ nl1b_check -eq 0 ]; then
+#     echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
+#     echo "nl1b == 0" >> ${daily_log}
+#     exit
+# fi
+
+dbfile="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/AVHRR_GAC_archive_v2_excl_N17_M1_M2_post.sqlite3"
+gacdb_client="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/gacdb_client.py"
+list_orbits_script="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/list_daily_orbits.R"
+orbits_file="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/temp_cfg_files/orbits_"${YEAR}${MONTHS}${DAYS}_${PLATFORM}.txt #"/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/sql/orbits_"${YEAR}${MONTHS}${DAYS}_${PLATFORM}.txt
+
+Rscript ${list_orbits_script} --vanilla ${gacdb_client} ${dbfile} ${YEAR} ${MONTHS} ${DAYS} ${PLATFORM} ${orbits_file} ${l1_dirbase} avhrr
+
+set -A l1b_list `Rscript ${list_orbits_script} --vanilla ${gacdb_client} ${dbfile} ${YEAR} ${MONTHS} ${DAYS} ${PLATFORM} ${orbits_file} ${l1_dirbase} avhrr`
+set -A geo_list `Rscript ${list_orbits_script} --vanilla ${gacdb_client} ${dbfile} ${YEAR} ${MONTHS} ${DAYS} ${PLATFORM} ${orbits_file} ${l1_dirbase} sunsatangles`
+rm -f ${orbits_file}
+
+#nl1b_check=0
+nl1b=${#l1b_list[*]}
+nl1b_loop=`expr $nl1b - 1`
+
+for f in {0..$nl1b_loop}; do #for f in $l1b_list; do
+
+    #((nl1b_check=nl1b_check+1))
+
+    echo "Adding ${l1b_list[$f]}"
+
+    echo '"'${l1b_list[$f]}'"' >> ${l1b_file}
+    
+done
+
+if [ $nl1b -eq 0 ]; then
     echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
     echo "nl1b == 0" >> ${daily_log}
     exit
 fi
 
 
-for f in $searchstring; do
+# for f in $searchstring; do
 
-    echo "Adding $f"
+#     echo "Adding $f"
 
-    echo '"'$f'"' >> ${l1b_file}
+#     echo '"'$f'"' >> ${l1b_file}
     
-    l1b_list[$il1b]=$f
+#     l1b_list[$il1b]=$f
 
-    ((il1b=il1b+1))
+#     ((il1b=il1b+1))
 
-done
+# done
 
+#searchstring=${inputdir_instr_date}/${searchgeo}
 
-searchstring=${inputdir_instr_date}/${searchgeo}
-
-ngeo_check=`ls $searchstring | wc -l`
+#ngeo_check=`ls $searchstring | wc -l`
 
 # -- check if numbers are equal and greater zero:
-if [ nl1b_check -ne ngeo_check ]; then   
+# if [ nl1b_check -ne ngeo_check ]; then   
+#     echo "NUMBERS OF FILES TO PROCESS DO NOT MATCH! PROCESSING FAILED...EXITING" >> ${daily_log}
+#     echo "nl1b="$nl1b_check"!=ngeo="$ngeo_check >> ${daily_log}
+#     exit
+# fi
+
+#echo `exec date +%Y/%m/%d:%H:%M:%S` "A TOTAL OF"  $nl1b_check " FILES WILL BE PROCESSED" >> ${daily_log}
+
+#ngeo_check=0
+ngeo=${#geo_list[*]}
+ngeo_loop=`expr $ngeo - 1`
+
+for f in {0..$ngeo_loop}; do #for f in $geo_list; do
+
+    #((ngeo_check=ngeo_check+1))
+
+    echo "Adding ${geo_list[$f]}"
+
+    echo '"'${geo_list[$f]}'"' >> ${geo_file}
+    
+done
+
+# -- check if numbers are equal and greater zero:
+if [ $nl1b -ne $ngeo ]; then   
     echo "NUMBERS OF FILES TO PROCESS DO NOT MATCH! PROCESSING FAILED...EXITING" >> ${daily_log}
-    echo "nl1b="$nl1b_check"!=ngeo="$ngeo_check >> ${daily_log}
+    echo "nl1b="$nl1b"!=ngeo="$ngeo >> ${daily_log}
     exit
 fi
 
+echo `exec date +%Y/%m/%d:%H:%M:%S` "A TOTAL OF"  $nl1b " FILES WILL BE PROCESSED" >> ${daily_log}
 
-echo `exec date +%Y/%m/%d:%H:%M:%S` "A TOTAL OF"  $nl1b_check " FILES WILL BE PROCESSED" >> ${daily_log}
-
-
-for f in $searchstring;do
+# for f in $searchstring;do
 	
-    echo "Adding $f"
+#     echo "Adding $f"
     
-    echo '"'$f'"' >> ${geo_file}
+#     echo '"'$f'"' >> ${geo_file}
 
-    geo_list[$igeo]=$f
+#     geo_list[$igeo]=$f
 
-    ((igeo=igeo+1))
+#     ((igeo=igeo+1))
 
-done
-
-
-nl1b=${#l1b_list[*]}
-ngeo=${#geo_list[*]}
+# done
 
 # -- now loop over the files and process them step by step
 ifile=0
@@ -291,11 +318,12 @@ echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK ALBEDO" >> ${daily_log}
 aux_input_dir=${path_to_albedo}
 suffix=hdf
 type=alb
-pick_logsoutput=$(python $pick_aux_datafile \
+#. ${ESA_ROUT}/pick_aux_dir.new.ksh      
+#path_and_file_to_albedo=${pickfile}
+# -- C. Schlundt, 2014-12-02
+path_and_file_to_albedo=$(python $pick_aux_datafile \
     --inpdir $aux_input_dir --suffix $suffix \
     --year $YEAR --month $MONTHS --day $DAYS)
-echo $pick_logsoutput
-path_and_file_to_albedo=$(grep_wanted "$pick_logsoutput")
 
 
 # -- modis brdf
@@ -303,22 +331,24 @@ echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK BRDF" >> ${daily_log}
 aux_input_dir=${path_to_brdf}
 suffix=hdf
 type=brdf
-pick_logsoutput=$(python $pick_aux_datafile \
+#. ${ESA_ROUT}/pick_aux_dir.new.ksh      
+#path_and_file_to_brdf=${pickfile}
+# -- C. Schlundt, 2014-12-02
+path_and_file_to_brdf=$(python $pick_aux_datafile \
     --inpdir $aux_input_dir --suffix $suffix \
     --year $YEAR --month $MONTHS --day $DAYS)
-echo $pick_logsoutput
-path_and_file_to_brdf=$(grep_wanted "$pick_logsoutput")
 
 # -- ice_snow
 echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK SNOW" >> ${daily_log}    
 aux_input_dir=${path_to_ice}
 suffix=HDFEOS
 type=is
-pick_logsoutput=$(python $pick_aux_datafile \
+#. ${ESA_ROUT}/pick_aux_dir.new.ksh      
+#path_and_file_to_ice=${pickfile}
+# -- C. Schlundt, 2014-12-02
+path_and_file_to_ice=$(python $pick_aux_datafile \
     --inpdir $aux_input_dir --suffix $suffix \
     --year $YEAR --month $MONTHS --day $DAYS)
-echo $pick_logsoutput
-path_and_file_to_ice=$(grep_wanted "$pick_logsoutput")
 
 
 # -- emissivity
@@ -326,11 +356,12 @@ echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK EMIS" >> ${daily_log}
 aux_input_dir=${path_to_emissivity}
 suffix=nc
 type=em
-pick_logsoutput=$(python $pick_aux_datafile \
+#. ${ESA_ROUT}/pick_aux_dir.new.ksh      
+#path_and_file_to_emissivity=${pickfile}
+# -- C. Schlundt, 2014-12-02
+path_and_file_to_emissivity=$(python $pick_aux_datafile \
     --inpdir $aux_input_dir --suffix $suffix \
     --year $YEAR --month $MONTHS --day $DAYS)
-echo $pick_logsoutput
-path_and_file_to_emissivity=$(grep_wanted "$pick_logsoutput")
 
 
 lpick=1
@@ -414,14 +445,15 @@ while [ $ifile -lt $nl1b ]; do
     echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK ECMWF FILE" >> ${daily_log}
 
     # -- pick ecmwf file
+    #. ${ESA_ROUT}/pick_ecmwf_dir.ksh
+    #path_to_ecmwf=${ecmwf_file}
+    # -- C. Schlundt, 2014-12-02
     aux_input_dir=${path_to_ecmwf}
     suffix=nc #grb
-    pick_logsoutput=$(python $pick_aux_datafile \
+    path_to_ecmwf=$(python $pick_aux_datafile \
         --inpdir $aux_input_dir --suffix $suffix \
         --year $YEAR --month $MONTHS --day $DAYS \
         --hour $HOUR --minute $MINUTE)
-    echo $pick_logsoutput
-    path_to_ecmwf=$(grep_wanted "$pick_logsoutput")
 
 
     # --------------------------------------------------------------------- #
@@ -531,6 +563,7 @@ while [ $ifile -lt $nl1b ]; do
 
     # -- set preprocessing basename
     preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
+    #preproc_base=${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
 
 
     # -- process first WATer phase
@@ -659,11 +692,10 @@ while [ $ifile -lt $nl1b ]; do
 
         echo `exec date +%Y/%m/%d:%H:%M:%S` "RUNNING OF POSTPROCESSING" ${postproc_driver} "SUCCESSFUL" >> ${daily_log} 
 
-        # C.Schlundt, 13.05.2015 config_attributes.file: file_version='1.3'
         if [[ ${INSTRUMENT} = "AVHRR" ]]; then 
 
             typeset -u UPLATFORM=${PLATFORM} 
-            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv${file_version}.nc 
+            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv1.0.nc 
             finalcomb_out_path_primary=${l2_outp_post}/${finalfileprimary} 
             finalcomb_out_path_secondary=${l2_outp_post}/${finalfilesecondary} 
 
@@ -671,8 +703,8 @@ while [ $ifile -lt $nl1b ]; do
 
             typeset -u UPLATFORM=${PLATFORM} 
             echo ${UPLATFORM} ${INSTRUMENT} 
-            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv${file_version}.nc 
-            finalfilesecondary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv${file_version}.secondary.nc 
+            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv1.0.nc 
+            finalfilesecondary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}-${UPLATFORM}-fv1.0.secondary.nc 
             finalcomb_out_path_primary=${l2_outp_post}/${finalfileprimary} 
             finalcomb_out_path_secondary=${l2_outp_post}/${finalfilesecondary} 
         fi 
