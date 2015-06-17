@@ -268,26 +268,23 @@ while [ $unix_counter -le $unix_stop ]; do
     CURRENT_DATE=${YEAR}${MONS}${DAYS}
     echo ""
 
-    # subdir for climatology files (scratch and ecfs)
-    climat=climatology
-
     # this is where the stuff is in the ecfs 
     source_albedo=${toplevel_aux}/${albedo_ecfs}/${YEAR}/${MONS}/${DAYS}
-    source_albedo_climatology=${toplevel_aux}/${albedo_ecfs}/${climat}/${MONS}/${DAYS}
+    source_albedo_climatology=${toplevel_aux}/${albedo_ecfs}/${MONS}/${DAYS}
     source_BRDF=${toplevel_aux}/${BRDF_ecfs}/${YEAR}/${MONS}/${DAYS}
-    source_BRDF_climatology=${toplevel_aux}/${BRDF_ecfs}/${climat}/${MONS}/${DAYS}
+    source_BRDF_climatology=${toplevel_aux}/${BRDF_ecfs}/${MONS}/${DAYS}
     source_ice_snow=${toplevel_aux}/${ice_snow_ecfs}/${YEAR}/${MONS}/${DAYS}
     source_emissivity=${toplevel_aux}/${emissivity_ecfs}/${YEAR}/${MONS}/${DAYS}
-    source_emissivity_climatology=${toplevel_aux}/${emissivity_ecfs}/${climat}
+    source_emissivity_climatology=${toplevel_aux}/${emissivity_ecfs}
 
     # this is where the aux data goes on $TEMP
     target_albedo=${temp_aux}/${albedo_temp}/${YEAR}/${MONS}/${DAYS}
-    target_albedo_climatology=${temp_aux}/${albedo_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
+    target_albedo_climatology=${temp_aux}/${albedo_temp}/${YEAR}/${MONS}/${DAYS}
     target_BRDF=${temp_aux}/${brdf_temp}/${YEAR}/${MONS}/${DAYS}
-    target_BRDF_climatology=${temp_aux}/${brdf_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
+    target_BRDF_climatology=${temp_aux}/${brdf_temp}/${YEAR}/${MONS}/${DAYS}
     target_ice_snow=${temp_aux}/${ice_snow_temp}/${YEAR}/${MONS}/${DAYS}
     target_emissivity=${temp_aux}/${emissivity_temp}/${YEAR}/${MONS}/${DAYS}
-    target_emissivity_climatology=${temp_aux}/${emissivity_temp}/${climat}/${YEAR}/${MONS}/${DAYS}
+    target_emissivity_climatology=${temp_aux}/${emissivity_temp}/${YEAR}/${MONS}/${DAYS}
 
 
     # -- (1) get albedo --
@@ -419,7 +416,7 @@ while [ $unix_counter -le $unix_stop ]; do
     # NRT before 19950504
     printf "\nThus: take TMPYEAR: $TMPYEAR (fake_climatology!) instead of $YEAR"
     source_ice_snow_fake=${toplevel_aux}/${ice_snow_ecfs}/${TMPYEAR}/${MONS}/${DAYS}
-    target_ice_snow_fake=${temp_aux}/${ice_snow_temp}/fake_climatology/${YEAR}/${MONS}/${DAYS}
+    target_ice_snow_fake=${temp_aux}/${ice_snow_temp}/${YEAR}/${MONS}/${DAYS}
     SOURCEPATH=${source_ice_snow_fake}
     TARGETPATH=${target_ice_snow_fake}
     SEARCHSTRING_CLIMAT=${ice_snow_type}_${TMPYEAR}${MONS}${DAYS}
