@@ -268,14 +268,17 @@ while [ $unix_counter -le $unix_stop ]; do
     CURRENT_DATE=${YEAR}${MONS}${DAYS}
     echo ""
 
+    # subdir for climatology files in ecfs
+    climat=climatology
+
     # this is where the stuff is in the ecfs 
     source_albedo=${toplevel_aux}/${albedo_ecfs}/${YEAR}/${MONS}/${DAYS}
-    source_albedo_climatology=${toplevel_aux}/${albedo_ecfs}/${MONS}/${DAYS}
+    source_albedo_climatology=${toplevel_aux}/${albedo_ecfs}/${climat}/${MONS}/${DAYS}
     source_BRDF=${toplevel_aux}/${BRDF_ecfs}/${YEAR}/${MONS}/${DAYS}
-    source_BRDF_climatology=${toplevel_aux}/${BRDF_ecfs}/${MONS}/${DAYS}
+    source_BRDF_climatology=${toplevel_aux}/${BRDF_ecfs}/${climat}/${MONS}/${DAYS}
     source_ice_snow=${toplevel_aux}/${ice_snow_ecfs}/${YEAR}/${MONS}/${DAYS}
     source_emissivity=${toplevel_aux}/${emissivity_ecfs}/${YEAR}/${MONS}/${DAYS}
-    source_emissivity_climatology=${toplevel_aux}/${emissivity_ecfs}
+    source_emissivity_climatology=${toplevel_aux}/${emissivity_ecfs}/${climat}
 
     # this is where the aux data goes on $TEMP
     target_albedo=${temp_aux}/${albedo_temp}/${YEAR}/${MONS}/${DAYS}
