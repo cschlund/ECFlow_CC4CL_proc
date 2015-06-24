@@ -29,6 +29,13 @@ satellite    = toupper( args[ 8 ] )
 # remove previous output_file
 if ( file.exists( output_file ) ) foo = file.remove( output_file )
 
+# create date for last day of previous month
+previous.date = as.Date(paste(year, month, "01", sep="-"), "%Y-%m-%d") - 1
+# extract year and month from previous day's date
+previous.year  = format(previous.date,"%Y")
+previous.month = format(previous.date,"%m")
+previous.yyyymm = paste(previous.year, previous.month, sep="")
+
 # get number of days in month to be processed
 ndays = numberOfDays( as.Date(paste(year, month, "01", sep="-"), "%Y-%m-%d") )
 
@@ -61,6 +68,16 @@ for ( day in 1:ndays ){
             # only keep rows that contain non-negative scanline indexes 
             out  = data[ data[ , 3 ] >= 0 & data[ , 4] >= 0 , ]
 
+            # exclude overlap orbit if from previous month (L1 data will have been deleted)
+            if ( day==1 ){
+                yyyymm = strtrim(out$V1,6)
+                day_one_overlap = match(previous.yyyymm, yyyymm)
+                if ( !is.na( day_one_overlap ) ){
+                remove = which(previous.yyyymm == yyyymm)
+                out = out[ -remove, ] 
+                }
+            }
+                
             # write clean output data to file
             write.table( out , file = output_file , row.names = F , 
                     col.names = F , quote = F , sep = ",", append = T )
