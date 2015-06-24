@@ -207,29 +207,19 @@ echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE FILE LISTS" >> ${daily_log}
 # fi
 
 dbfile="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/AVHRR_GAC_archive_v2_excl_N17_M1_M2_post.sqlite3"
-gacdb_client="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/gacdb_client.py"
-list_orbits_script="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/list_daily_orbits.R"
-orbits_file="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/temp_cfg_files/orbits_"${YEAR}${MONTHS}${DAYS}_${PLATFORM}.txt #"/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/sql/orbits_"${YEAR}${MONTHS}${DAYS}_${PLATFORM}.txt
+list_orbits_script_py="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/list_daily_orbits.py"
 
-Rscript ${list_orbits_script} --vanilla ${gacdb_client} ${dbfile} ${YEAR} ${MONTHS} ${DAYS} ${PLATFORM} ${orbits_file} ${l1_dirbase} avhrr
+yyyymmdd=${YEAR}${MONTHS}${DAYS}
+set -A l1b_list_temp `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} avhrr`
+set -A geo_list `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} sunsatangles`
 
-set -A l1b_list `Rscript ${list_orbits_script} --vanilla ${gacdb_client} ${dbfile} ${YEAR} ${MONTHS} ${DAYS} ${PLATFORM} ${orbits_file} ${l1_dirbase} avhrr`
-set -A geo_list `Rscript ${list_orbits_script} --vanilla ${gacdb_client} ${dbfile} ${YEAR} ${MONTHS} ${DAYS} ${PLATFORM} ${orbits_file} ${l1_dirbase} sunsatangles`
-rm -f ${orbits_file}
-
-#nl1b_check=0
-nl1b=${#l1b_list[*]}
+nl1b_temp=${#l1b_list_temp[*]}
+nl1b=`expr $nl1b_temp / 3`
 nl1b_loop=`expr $nl1b - 1`
 
-for f in {0..$nl1b_loop}; do #for f in $l1b_list; do
-
-    #((nl1b_check=nl1b_check+1))
-
-    echo "Adding ${l1b_list[$f]}"
-
-    echo '"'${l1b_list[$f]}'"' >> ${l1b_file}
-    
-done
+l1b_list={1..$nl1b}
+startx_list={1..$nl1b}
+endx_list={1..$nl1b}
 
 if [ $nl1b -eq 0 ]; then
     echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
@@ -237,6 +227,34 @@ if [ $nl1b -eq 0 ]; then
     exit
 fi
 
+index=0
+for f in {0..$nl1b_loop}; do 
+    echo "Adding ${l1b_list[$f]}"
+    index=`expr $f + $f \* 2`
+    l1b_list[$f]=${l1b_list_temp[$index]}
+    echo '"'${l1b_list[$f]}'"' >> ${l1b_file}
+    startx_list[$f]=${l1b_list_temp[$index+1]}
+    endx_list[$f]=${l1b_list_temp[$index+2]}
+done
+
+# nl1b=${#l1b_list[*]}
+# nl1b_loop=`expr $nl1b - 1`
+
+# if [ $nl1b -eq 0 ]; then
+#     echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
+#     echo "nl1b == 0" >> ${daily_log}
+#     exit
+# fi
+
+# for f in {0..$nl1b_loop}; do #for f in $l1b_list; do
+
+#     #((nl1b_check=nl1b_check+1))
+
+#     echo "Adding ${l1b_list[$f]}"
+
+#     echo '"'${l1b_list[$f]}'"' >> ${l1b_file}
+    
+# done
 
 # for f in $searchstring; do
 
@@ -267,6 +285,13 @@ fi
 ngeo=${#geo_list[*]}
 ngeo_loop=`expr $ngeo - 1`
 
+# -- check if numbers are equal and greater zero:
+if [ $nl1b -ne $ngeo ]; then   
+    echo "NUMBERS OF FILES TO PROCESS DO NOT MATCH! PROCESSING FAILED...EXITING" >> ${daily_log}
+    echo "nl1b="$nl1b"!=ngeo="$ngeo >> ${daily_log}
+    exit
+fi
+
 for f in {0..$ngeo_loop}; do #for f in $geo_list; do
 
     #((ngeo_check=ngeo_check+1))
@@ -276,13 +301,6 @@ for f in {0..$ngeo_loop}; do #for f in $geo_list; do
     echo '"'${geo_list[$f]}'"' >> ${geo_file}
     
 done
-
-# -- check if numbers are equal and greater zero:
-if [ $nl1b -ne $ngeo ]; then   
-    echo "NUMBERS OF FILES TO PROCESS DO NOT MATCH! PROCESSING FAILED...EXITING" >> ${daily_log}
-    echo "nl1b="$nl1b"!=ngeo="$ngeo >> ${daily_log}
-    exit
-fi
 
 echo `exec date +%Y/%m/%d:%H:%M:%S` "A TOTAL OF"  $nl1b " FILES WILL BE PROCESSED" >> ${daily_log}
 
@@ -362,7 +380,7 @@ type=em
 path_and_file_to_emissivity=$(python $pick_aux_datafile \
     --inpdir $aux_input_dir --suffix $suffix \
     --year $YEAR --month $MONTHS --day $DAYS)
-
+ 
 
 lpick=1
 
@@ -407,6 +425,7 @@ while [ $ifile -lt $nl1b ]; do
             fsplit=$(echo ${l1b_file} | tr "_" "\n")
             for x in ${fsplit}; do 
                 if [[ ${x} == *T*Z ]]; then 
+		    DAYCUT=`exec echo ${x} | cut -c 7-8` 
                     HOUR=`exec echo ${x} | cut -c 10-11` 
                     MINUTE=`exec echo ${x} | cut -c 12-13` 
                     break 
@@ -453,7 +472,7 @@ while [ $ifile -lt $nl1b ]; do
     path_to_ecmwf=$(python $pick_aux_datafile \
         --inpdir $aux_input_dir --suffix $suffix \
         --year $YEAR --month $MONTHS --day $DAYS \
-        --hour $HOUR --minute $MINUTE)
+        --hour $HOUR --minute $MINUTE)  >> ${daily_log}
 
 
     # --------------------------------------------------------------------- #
@@ -473,13 +492,17 @@ while [ $ifile -lt $nl1b ]; do
         continue
     fi 
 
-
     # -- write information in config file for preprocessing
     preproc_driver=${l2_outp}/preproc_driver_${l1b_file}.dat
 
     rm -f ${preproc_driver}
     touch ${preproc_driver}
 
+    # -- set start and end scanlines as provided by database call
+    starty=`expr ${startx_list[$ifile]} + 1`
+    endy=`expr ${endx_list[$ifile]} + 1`
+
+    # -- write preprocessing driver
     . ${ESA_ROUT}/write_preproc_file.ksh
 
     if [ ${?} -ne 0 ]; then 
@@ -562,9 +585,8 @@ while [ $ifile -lt $nl1b ]; do
       
 
     # -- set preprocessing basename
-    preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
-    #preproc_base=${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
-
+    preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
+    # preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
 
     # -- process first WATer phase
     phase=WAT
@@ -695,7 +717,7 @@ while [ $ifile -lt $nl1b ]; do
         if [[ ${INSTRUMENT} = "AVHRR" ]]; then 
 
             typeset -u UPLATFORM=${PLATFORM} 
-            finalfileprimary=${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv1.0.nc 
+            finalfileprimary=${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}00-ESACCI-L2_CLOUD-CLD_PRODUCTS-${INSTRUMENT}GAC-${UPLATFORM}-fv1.0.nc 
             finalcomb_out_path_primary=${l2_outp_post}/${finalfileprimary} 
             finalcomb_out_path_secondary=${l2_outp_post}/${finalfilesecondary} 
 
