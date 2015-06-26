@@ -1,3 +1,4 @@
+*~
 *idea
 *.pyc
 *.log
@@ -27,3 +28,4 @@ test.exe
 test.f90
 test.py
 test.sh
+sql/list_daily_orbits.R
