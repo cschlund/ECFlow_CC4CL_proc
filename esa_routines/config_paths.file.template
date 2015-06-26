@@ -119,3 +119,6 @@ l3outputpath=$OUTPUTDIR/level3
 era_comp=/scratch/ms/de/sf7/esa_cci_c_proc/era_interim
 # free path
 free_path=/usr/bin
+# PyGAC database and script to list daily orbits
+dbfile=$PERM_BASE/sql/AVHRR_GAC_archive_v2_post_overlap.sqlite3
+list_orbits_script_py=$PERM_BASE/sql/list_daily_orbits.py

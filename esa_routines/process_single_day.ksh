@@ -193,32 +193,19 @@ elif [[ ${INSTRUMENT} = "MODIS" ]]; then
     
 fi
 
-
 echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE FILE LISTS" >> ${daily_log}
-
-#searchstring=${inputdir_instr_date}/${searchl1b}
-
-#nl1b_check=`ls $searchstring | wc -l`
-
-# if [ nl1b_check -eq 0 ]; then
-#     echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
-#     echo "nl1b == 0" >> ${daily_log}
-#     exit
-# fi
-
-dbfile="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/AVHRR_GAC_archive_v2_excl_N17_M1_M2_post.sqlite3"
-list_orbits_script_py="/perm/ms/de/sf7/esa_cci_c_proc/CCFLOW_DEVELOP/ECFlow_CC4CL_proc/sql/list_daily_orbits.py"
 
 yyyymmdd=${YEAR}${MONTHS}${DAYS}
 set -A l1b_list_temp `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} avhrr`
 set -A geo_list `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} sunsatangles`
 
 nl1b_temp=${#l1b_list_temp[*]}
-nl1b=`expr $nl1b_temp / 3`
+nl1b=`expr $nl1b_temp / 4`
 nl1b_loop=`expr $nl1b - 1`
 
 l1b_list={1..$nl1b}
-startx_list={1..$nl1b}
+starty_list={1..$nl1b}
+endy_list={1..$nl1b}
 endx_list={1..$nl1b}
 
 if [ $nl1b -eq 0 ]; then
@@ -230,58 +217,14 @@ fi
 index=0
 for f in {0..$nl1b_loop}; do 
     echo "Adding ${l1b_list[$f]}"
-    index=`expr $f + $f \* 2`
+    index=`expr $f + $f \* 3`
     l1b_list[$f]=${l1b_list_temp[$index]}
     echo '"'${l1b_list[$f]}'"' >> ${l1b_file}
-    startx_list[$f]=${l1b_list_temp[$index+1]}
-    endx_list[$f]=${l1b_list_temp[$index+2]}
+    starty_list[$f]=${l1b_list_temp[$index+1]}
+    endy_list[$f]=${l1b_list_temp[$index+2]}
+    endx_list[$f]=${l1b_list_temp[$index+3]}
 done
 
-# nl1b=${#l1b_list[*]}
-# nl1b_loop=`expr $nl1b - 1`
-
-# if [ $nl1b -eq 0 ]; then
-#     echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
-#     echo "nl1b == 0" >> ${daily_log}
-#     exit
-# fi
-
-# for f in {0..$nl1b_loop}; do #for f in $l1b_list; do
-
-#     #((nl1b_check=nl1b_check+1))
-
-#     echo "Adding ${l1b_list[$f]}"
-
-#     echo '"'${l1b_list[$f]}'"' >> ${l1b_file}
-    
-# done
-
-# for f in $searchstring; do
-
-#     echo "Adding $f"
-
-#     echo '"'$f'"' >> ${l1b_file}
-    
-#     l1b_list[$il1b]=$f
-
-#     ((il1b=il1b+1))
-
-# done
-
-#searchstring=${inputdir_instr_date}/${searchgeo}
-
-#ngeo_check=`ls $searchstring | wc -l`
-
-# -- check if numbers are equal and greater zero:
-# if [ nl1b_check -ne ngeo_check ]; then   
-#     echo "NUMBERS OF FILES TO PROCESS DO NOT MATCH! PROCESSING FAILED...EXITING" >> ${daily_log}
-#     echo "nl1b="$nl1b_check"!=ngeo="$ngeo_check >> ${daily_log}
-#     exit
-# fi
-
-#echo `exec date +%Y/%m/%d:%H:%M:%S` "A TOTAL OF"  $nl1b_check " FILES WILL BE PROCESSED" >> ${daily_log}
-
-#ngeo_check=0
 ngeo=${#geo_list[*]}
 ngeo_loop=`expr $ngeo - 1`
 
@@ -292,9 +235,7 @@ if [ $nl1b -ne $ngeo ]; then
     exit
 fi
 
-for f in {0..$ngeo_loop}; do #for f in $geo_list; do
-
-    #((ngeo_check=ngeo_check+1))
+for f in {0..$ngeo_loop}; do
 
     echo "Adding ${geo_list[$f]}"
 
@@ -303,18 +244,6 @@ for f in {0..$ngeo_loop}; do #for f in $geo_list; do
 done
 
 echo `exec date +%Y/%m/%d:%H:%M:%S` "A TOTAL OF"  $nl1b " FILES WILL BE PROCESSED" >> ${daily_log}
-
-# for f in $searchstring;do
-	
-#     echo "Adding $f"
-    
-#     echo '"'$f'"' >> ${geo_file}
-
-#     geo_list[$igeo]=$f
-
-#     ((igeo=igeo+1))
-
-# done
 
 # -- now loop over the files and process them step by step
 ifile=0
@@ -499,8 +428,10 @@ while [ $ifile -lt $nl1b ]; do
     touch ${preproc_driver}
 
     # -- set start and end scanlines as provided by database call
-    starty=`expr ${startx_list[$ifile]} + 1`
-    endy=`expr ${endx_list[$ifile]} + 1`
+    startx=1
+    endx=${endx_list[$ifile]}
+    starty=`expr ${starty_list[$ifile]} + 1`
+    endy=`expr ${endy_list[$ifile]} + 1`
 
     # -- write preprocessing driver
     . ${ESA_ROUT}/write_preproc_file.ksh
