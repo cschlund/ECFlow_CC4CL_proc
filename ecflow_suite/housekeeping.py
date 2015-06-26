@@ -10,6 +10,7 @@ from config_suite import *
 from dateutil.rrule import rrule, MONTHLY
 from pycmsaf.avhrr_gac.database import AvhrrGacDatabase
 from pycmsaf.ssh_client import SSHClient
+from datetime import date, timedelta
 
 logger = logging.getLogger('root')
 
@@ -166,40 +167,30 @@ def get_avhrr_prime_dict():
                     avhrr_dict[s][i] = "PM"
 
     # --------------------------------------------------------------------
-    avhrr_dict["NOAA7"]["start_date"] = datetime.date(1982, 1, 1)
-    avhrr_dict["NOAA7"]["end_date"] = datetime.date(1985, 2, 1)
-    # --------------------------------------------------------------------
-    avhrr_dict["NOAA9"]["start_date"] = datetime.date(1985, 2, 25)
-    avhrr_dict["NOAA9"]["end_date"] = datetime.date(1988, 11, 7)
-    # --------------------------------------------------------------------
+    avhrr_dict["NOAA7"]["start_date"]  = datetime.date(1982, 1, 1)
+    avhrr_dict["NOAA9"]["start_date"]  = datetime.date(1985, 2, 25)
     avhrr_dict["NOAA11"]["start_date"] = datetime.date(1988, 11, 8)
-    avhrr_dict["NOAA11"]["end_date"] = datetime.date(1994, 10, 16)
-    # --------------------------------------------------------------------
     avhrr_dict["NOAA12"]["start_date"] = datetime.date(1991, 9, 17)
-    avhrr_dict["NOAA12"]["end_date"] = datetime.date(1998, 12, 31)  # ->n15
-    # --------------------------------------------------------------------
     avhrr_dict["NOAA14"]["start_date"] = datetime.date(1995, 4, 10)
-    avhrr_dict["NOAA14"]["end_date"] = datetime.date(2001, 3, 31)  # ->n16
+    avhrr_dict["NOAA15"]["start_date"] = datetime.date(1998, 12, 15)
+    avhrr_dict["NOAA16"]["start_date"] = datetime.date(2001, 3, 20)
+    avhrr_dict["NOAA17"]["start_date"] = datetime.date(2002, 10, 15)
+    avhrr_dict["NOAA18"]["start_date"] = datetime.date(2005, 8, 30)
+    avhrr_dict["NOAA19"]["start_date"] = datetime.date(2009, 6, 1)
+    avhrr_dict["METOPA"]["start_date"] = datetime.date(2007, 5, 21)
+    avhrr_dict["METOPB"]["start_date"] = datetime.date(2013, 4, 24)
     # --------------------------------------------------------------------
-    avhrr_dict["NOAA15"]["start_date"] = datetime.date(1999, 1, 1)
-    avhrr_dict["NOAA15"]["end_date"] = datetime.date(2002, 10, 31)  # ->n17
-    # --------------------------------------------------------------------
-    avhrr_dict["NOAA16"]["start_date"] = datetime.date(2001, 4, 1)
-    avhrr_dict["NOAA16"]["end_date"] = datetime.date(2005, 8, 31)  # ->n18
-    # --------------------------------------------------------------------
-    avhrr_dict["NOAA17"]["start_date"] = datetime.date(2002, 11, 1)
-    avhrr_dict["NOAA17"]["end_date"] = datetime.date(2007, 5, 31)  # ->m02
-    # --------------------------------------------------------------------
-    avhrr_dict["NOAA18"]["start_date"] = datetime.date(2005, 9, 1)
-    avhrr_dict["NOAA18"]["end_date"] = datetime.date(2009, 6, 30)  # ->n19
-    # --------------------------------------------------------------------
-    avhrr_dict["NOAA19"]["start_date"] = datetime.date(2009, 7, 1)
+    avhrr_dict["NOAA7"]["end_date"]  = datetime.date(1985, 2, 1)
+    avhrr_dict["NOAA9"]["end_date"]  = datetime.date(1988, 11, 7)
+    avhrr_dict["NOAA11"]["end_date"] = datetime.date(1994, 10, 16)
+    avhrr_dict["NOAA12"]["end_date"] = avhrr_dict["NOAA15"]["start_date"]
+    avhrr_dict["NOAA14"]["end_date"] = avhrr_dict["NOAA16"]["start_date"]
+    avhrr_dict["NOAA15"]["end_date"] = avhrr_dict["NOAA17"]["start_date"]
+    avhrr_dict["NOAA16"]["end_date"] = avhrr_dict["NOAA18"]["start_date"]
+    avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"]
+    avhrr_dict["NOAA18"]["end_date"] = avhrr_dict["NOAA19"]["start_date"] - timedelta(days=1)
     avhrr_dict["NOAA19"]["end_date"] = datetime.date(2014, 12, 31)
-    # --------------------------------------------------------------------
-    avhrr_dict["METOPA"]["start_date"] = datetime.date(2007, 6, 1)
-    avhrr_dict["METOPA"]["end_date"] = datetime.date(2013, 4, 30)  # ->m01
-    # --------------------------------------------------------------------
-    avhrr_dict["METOPB"]["start_date"] = datetime.date(2013, 5, 1)
+    avhrr_dict["METOPA"]["end_date"] = avhrr_dict["METOPB"]["start_date"]
     avhrr_dict["METOPB"]["end_date"] = datetime.date(2014, 12, 31)
     # --------------------------------------------------------------------
 

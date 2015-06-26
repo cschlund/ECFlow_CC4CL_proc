@@ -70,6 +70,9 @@ def verify_aux_files(file_list):
             if len(filebase) != 29:
                 file_list.remove(fil)
 
+        if 'XXXX' in ifil:
+            file_list.remove(fil)
+
     return file_list
 
 
