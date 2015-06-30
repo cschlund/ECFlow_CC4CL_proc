@@ -25,7 +25,7 @@ EC_tasks_per_node=1
 EC_total_tasks=1
 EC_threads_per_task=1
 EC_hyperthreads=1
-OMP_STACKSIZE=256MB
+OMP_STACKSIZE=256M
 
 # source config files
 config_file_paths=${1}

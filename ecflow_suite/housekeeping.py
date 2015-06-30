@@ -171,7 +171,7 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA9"]["start_date"]  = datetime.date(1985, 2, 25)
     avhrr_dict["NOAA11"]["start_date"] = datetime.date(1988, 11, 1)
     avhrr_dict["NOAA12"]["start_date"] = datetime.date(1991, 9, 17)
-    avhrr_dict["NOAA14"]["start_date"] = datetime.date(1995, 4, 10)
+    avhrr_dict["NOAA14"]["start_date"] = datetime.date(1995, 1, 20)
     avhrr_dict["NOAA15"]["start_date"] = datetime.date(1998, 12, 15)
     avhrr_dict["NOAA16"]["start_date"] = datetime.date(2001, 3, 20)
     avhrr_dict["NOAA17"]["start_date"] = datetime.date(2002, 10, 15)
@@ -273,6 +273,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("SVN_VERSION", svn_version)
     suite.add_variable("ECF_TRIES", '1')
     suite.add_variable("ECF_SUBMIT", ecflow_submit)
+    suite.add_variable("GACDB_CLIENT", gacdb_client)
     suite.add_variable("MAKE_CFG_FILE", make_cfg_files)
     suite.add_variable("COUNT_ORBIT_FILES", count_orbit_files)
     suite.add_variable("CLEANUP_SCRATCH", cleanup_scratch)
@@ -285,6 +286,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("DUMMYRUN", dummycase)
     suite.add_variable("WRITE_MPMD_TASKFILE", write_mpmd_taskfile)
     suite.add_variable("WRITE_MPMD_CFGFILES", write_mpmd_cfgfiles)
+    suite.add_variable("COUNT_AVHRR_ORBITS", count_avhrr_orbits)
     suite.add_variable("MPMD_SUBMITTER", mpmd_submitter)
 
     # some processing directories
@@ -302,6 +304,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("CFG_ATTRI_FILE", cfg_attri_file)
     suite.add_variable("CFG_PREFIX", cfg_prefix)
     suite.add_variable("CFG_SUFFIX", cfg_suffix)
+    suite.add_variable("SQL_AVHRR_GAC", sql_avhrr_gac)
 
     # ksh scripts
     suite.add_variable("GET_AVHRR_KSH", get_avhrr_ksh)

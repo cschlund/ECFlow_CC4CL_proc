@@ -360,6 +360,10 @@ while [ $unix_counter -le $unix_stop ]; do
 
     #convert date to DOY for emissivity filename
     DOY=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS}`
+    DOYMAX=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} 12 31`    
+    if [ $DOYMAX -eq 366 ]; then
+	DOY=`expr ${DOY} - 1` # account for leap year
+    fi
     DDOY=${DOY} 
     if [ "${DOY}" -lt 10 ]; then
       DDOY=0${DOY}

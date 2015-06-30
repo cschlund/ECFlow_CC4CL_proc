@@ -50,6 +50,7 @@ scratch = os.path.join("/scratch", basepath)
 perm_base = os.path.join(perm, itype, repository)
 scratch_base = os.path.join(scratch, itype, repository)
 svn_path = "/hpc/perm/ms/de/sf7/esa_cci_c_proc/orac_repository/trunk"
+sql_path = os.path.join(perm_base, "sql")
 
 # cca:
 esa_routine = os.path.join(perm_base, "esa_routines")
@@ -68,12 +69,14 @@ cleanup_scratch = os.path.join(esa_routine, "cleanup_scratch.py")
 archive_data = os.path.join(esa_routine, "proc_4_archive_data.py")
 write_mpmd_taskfile = os.path.join(esa_routine, "write_l3_mpmd_taskfile.R")
 write_mpmd_cfgfiles = os.path.join(esa_routine, "write_l3_mpmd_config_files.R")
+count_avhrr_orbits = os.path.join(esa_routine, "count_AVHRR_orbits.R")
 
 # config files
 cfg_paths_file = os.path.join(esa_routine, "config_paths.file")
 cfg_attri_file = os.path.join(esa_routine, "config_attributes.file")
 cfg_prefix = "config_proc_"
 cfg_suffix = ".file"
+sql_avhrr_gac = os.path.join(sql_path, "AVHRR_GAC_archive_v2_post_overlap.sqlite3")
 
 # ksh scripts
 get_avhrr_ksh = os.path.join(esa_routine, "proc_1_getdata_avhrr.ksh")
@@ -97,6 +100,7 @@ ld_lib_path = "/perm/ms/de/sf7/esa_cci_c_proc/software/" \
 # server settings @ ecgate
 mpmd_submitter = os.path.join(pycmsaf_bin, "mpmd.py")
 ecflow_submit = os.path.join(pycmsaf_bin, "ecf_submit.py")
+gacdb_client = os.path.join(pycmsaf_bin, "gacdb_client.py")
 ecf_files_dir = os.path.join(perm_base, "ecflow_suite/tasks")
 ecf_include_dir = os.path.join(perm_base, "ecflow_suite/include")
 ecf_home_dir = os.path.join(scratch_base, "generated")
