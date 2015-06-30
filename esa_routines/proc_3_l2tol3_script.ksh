@@ -248,7 +248,7 @@ l2info=${outputdir}/l2files_${exec_time}.tmp
 if [ "${prodtype}" = l3a ] ; then
     cp ${l2info_dum} ${l2info}
 else
-    ccat ${l2info_dum} | grep output/${datum} > ${l2info}
+    cat ${l2info_dum} | grep output/${datum} > ${l2info}
 fi
 uuid_tag=`/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/ossp_uuid-1.6.2/bin/uuid -v 4`
 
