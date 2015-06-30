@@ -16,8 +16,10 @@ lmain=-lorac
 lpost=-lpostproc
 
 #performance
-FFLAGS= -O omp -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread3 -hmpi1 -hflex_mp=tolerant -rom -ef -em
-LFLAGS= -O omp -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread3 -hmpi1 -hflex_mp=tolerant -rom -ef -em
+FFLAGS= -O noomp -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread0 -hmpi1 -hflex_mp=tolerant -rom -ef -em
+LFLAGS= -O noomp -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread0 -hmpi1 -hflex_mp=tolerant -rom -ef -em
+# FFLAGS= -O omp -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread3 -hmpi1 -hflex_mp=tolerant -rom -ef -em
+# LFLAGS= -O omp -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread3 -hmpi1 -hflex_mp=tolerant -rom -ef -em
 DFLAGS= -DWRAPPER -DDEBUG
 
 #debugging

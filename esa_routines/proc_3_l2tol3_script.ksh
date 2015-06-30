@@ -245,21 +245,17 @@ mkdir -p ${outputdir}
 l2info=${outputdir}/l2files_${exec_time}.tmp
 
 #write file list
-cat ${l2info_dum} | grep ${datum} > ${l2info}
-#if [[ "${prodtype}" = l2b || "${prodtype}" = l2b_sum ]] ; then
-#   cat ${l2info_dum} | grep ${datum} > ${l2info}
-#else
-#   find ${l2info_dum} -type f -name "*.nc"  -exec ${ESA_ROUT}/add_dq.ksh '{}' \; > ${l2info}
-#fi
-
-#olduuid_tag=`/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/uuid_gen -t`
+if [ "${prodtype}" = l3a ] ; then
+    cp ${l2info_dum} ${l2info}
+else
+    ccat ${l2info_dum} | grep output/${datum} > ${l2info}
+fi
 uuid_tag=`/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/ossp_uuid-1.6.2/bin/uuid -v 4`
 
 echo `date` 'preparation of names and lists finished, execute now l2->l3 processing for' ${datum}
 echo ''
 echo ${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}"
 echo ''
-#${l3execpath}/vfb.x
 ${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}"
 
 if [ "${?}" -eq 0  ] ; then
