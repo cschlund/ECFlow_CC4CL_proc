@@ -152,6 +152,11 @@ get_aux()
     retlst=-1
     retrpl=-1
 
+    if [ ${SOURCE} == "ec:/sf4/orac_aux/UWisc_Emissivity/2004/01/01/global_emis_inf10_monthFilled_MYD11C3.A2004001.nc.bz2" ]; then
+	echo "Using emissivity file of date 20040201 for 20040101, which is missing in the archive."
+	SOURCE="ec:/sf4/orac_aux/UWisc_Emissivity/2004/02/01/global_emis_inf10_monthFilled_MYD11C3.A2004032.nc.bz2"
+    fi
+
     # check if there is a directory and file for this day
     printf "    SOURCE: $SOURCE\n"
     check_source=$(els ${SOURCE})
