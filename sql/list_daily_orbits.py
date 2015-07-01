@@ -69,13 +69,14 @@ if __name__ == '__main__':
         # Compose datetime string as created by pygac
         tstart = datetime2pygac(rec['start_time_l1c'])
 
-        path = l1_dir_current_day
+        # Search pattern of AVHRR files
         pattern = "ECC_GAC_" + ftype + "*_" + tstart + "_*"
 
         # Search for corresponding l1c file
         if rec['start_time_l1c'].date() == previous_date and not current_date.day == 1:
             l1_files_previous_day = [pjoin(l1_dir_previous_day, fname)
                                      for fname in os.listdir(l1_dir_previous_day)]
+            path = l1_dir_previous_day
             fname_src = get_file_list_via_pattern(path, pattern)
             fname_dst = pjoin(l1_dir_current_day, os.path.basename(fname_src))
 
@@ -84,6 +85,7 @@ if __name__ == '__main__':
             if not checkFile:
                 shutil.copy(src=fname_src, dst=fname_dst)
         if rec['start_time_l1c'].date() == current_date:
+            path = l1_dir_current_day
             fname_dst = get_file_list_via_pattern(path, pattern)
 
         if fname_dst:
