@@ -1,3 +1,4 @@
+# '${l2proc_version}'
 # these few lines write the driver file for
 # the preprocessing of the current granule/orbit
 echo "'${sensor}'
@@ -22,7 +23,6 @@ echo "'${sensor}'
 '${cf_convention}'
 '${processing_inst}'
 '${l2processor}'
-'${l2proc_version}'
 '${contact_email}'
 '${contact_website}'
 '${file_version}'

@@ -9,5 +9,7 @@ ${sensor_platform}
 ${nchannels}
 ${proc_flag}
 ${phase}
+CTRL%PROCESS_CLOUDY_ONLY=${cloudy_only}
+CTRL%PROCESS_ONE_PHASE_ONLY=${one_phase_only}
 #END">${mainproc_driver}
 
