@@ -23,6 +23,9 @@
 
 set -x
 
+one_phase_only=".true."
+cloudy_only=".true."
+
 # -- source config path files
 config_file_paths=${1}
 . ${config_file_paths}
@@ -427,11 +430,18 @@ while [ $ifile -lt $nl1b ]; do
     rm -f ${preproc_driver}
     touch ${preproc_driver}
 
-    # -- set start and end scanlines as provided by database call
-    startx=1
-    endx=${endx_list[$ifile]}
-    starty=`expr ${starty_list[$ifile]} + 1`
-    endy=`expr ${endy_list[$ifile]} + 1`
+    # -- set start and end x/y dimensions
+    if [ ${testrun} -eq 1 ]; then # if test run, apply 10x10 pixel resolution
+	startx=${teststartx}
+	endx=${testendx}
+	starty=${teststarty}
+	endy=${testendy}
+    else # if not test run, use dimensions as provided by database
+	startx=1
+	endx=${endx_list[$ifile]}
+	starty=`expr ${starty_list[$ifile]} + 1`
+	endy=`expr ${endy_list[$ifile]} + 1`
+    fi
 
     # -- write preprocessing driver
     . ${ESA_ROUT}/write_preproc_file.ksh
@@ -516,8 +526,8 @@ while [ $ifile -lt $nl1b ]; do
       
 
     # -- set preprocessing basename
-    preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
-    # preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYS}${HOUR}${MINUTE}_${file_version}
+    preproc_base=${project}"-L2-CLOUD-CLD-"${INSTRUMENT}_${l2processor}"_"${PLATFORM}"_"${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
+    # preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
 
     # -- process first WATer phase
     phase=WAT
