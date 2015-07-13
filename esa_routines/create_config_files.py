@@ -254,6 +254,8 @@ def proc2(args_ret):
         f.write("RTTOV_version='11'\n")
         f.write("ECMWF_version='ERA-Interim'\n")
         f.write("SVN_version='"+args_ret.svn_version+"'\n")
+        f.write("one_phase_only='.false.'\n")
+        f.write("cloudy_only='.false.'\n")
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:

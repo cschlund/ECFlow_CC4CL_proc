@@ -23,9 +23,6 @@
 
 set -x
 
-one_phase_only=".true."
-cloudy_only=".true."
-
 # -- source config path files
 config_file_paths=${1}
 . ${config_file_paths}
