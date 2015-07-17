@@ -1,0 +1,90 @@
+%include <pbs_parallel_extract_sat_data.h>
+%include <head.h>
+%include <export.h>
+
+# -- no core file
+export ATP_ENABLED=0
+# -- core file
+#export ATP_ENABLED=1
+#ulimit -c unlimited
+# -- stacksize (keep it always that way)
+ulimit -s unlimited
+
+echo "I am task %TASK% in family %FAMILY% responsible for extracting daily satellite data tarfiles"
+
+if [ %DUMMYRUN% == 1 ]; then 
+
+    python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+
+else
+
+    if [ %SENSOR% == "AVHRR" ]; then
+
+    # -- settings
+    sat_date_base="%SATELLITE%_%START_YEAR%_%START_MONTH%"
+
+    # -- working directory: write core file here
+    cd %ESA_ECF_LOG_DIR%
+    
+    # -- create job id number
+    primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
+    id=`date +%%s`
+    sleep 3
+    jid=ID${primary_id}_US${id}
+
+    # -- write MPMD task list
+    echo "Write MPMD Taskfile for extract_sat_data in SUITE/FAMILY: "%SUITE%/%FAMILY%
+
+    platform=`echo %SATELLITE% | tr '[:upper:]' '[:lower:]'`
+    download_dir="%ESA_INPUTDIR%/AVHRR/${platform}/%START_YEAR%/%START_MONTH%"
+    cd ${download_dir}
+
+    taskfile="%ESA_CONFIGDIR%/extract_sat_data_${sat_date_base}_${jid}.txt"
+    rm -f $taskfile
+    touch $taskfile
+    tar_prefix="AVHRR_GAC_L1C_"
+    bz2_suffix=".tar.bz2"
+
+    # -- create list of daily zip files
+    pattern="${tar_prefix}%SATELLITE%_%START_YEAR%%START_MONTH%*${bz2_suffix}"
+    zip_files=$(ls `pwd`/${pattern})
+
+    # -- for each daily zip file, create output folder and add entry to taskfile
+    for zipfile in ${zip_files}
+    do
+        echo " * Working on: ${zipfile}"
+
+         # -- extract day from zipfile
+        fbase=`echo ${zipfile} | cut -d "/" -f14`
+        split=`echo ${fbase} | cut -d "_" -f5`
+        fday=`echo ${split} | cut -c 7-8`
+
+         # -- create final input directory
+        final_dir="${download_dir}/${fday}/%START_YEAR%%START_MONTH%${fday}"
+        mkdir -p ${final_dir}
+
+         # -- write MPMD taskfile
+	echo "tar xfj ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
+    done
+
+    # To avoid creation of cores in case of abort, which takes ages...
+    module unload atp
+
+    # For OpenMP tasks
+    export OMP_NUM_THREADS=$EC_threads_per_task
+
+    # -- call aprun using the MPMD submitter
+    echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${taskfile}
+
+    # -- extract and subsequently delete daily zip files
+    aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% ${taskfile}
+
+    else
+
+	echo "For MODIS, extraction of daily tarfiles not yet parallelized!"
+
+    fi
+
+fi
+
+%include <tail.h>
