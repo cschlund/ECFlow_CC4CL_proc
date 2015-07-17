@@ -27,6 +27,7 @@
 #   2014-11-12 C. Schlundt: modified in order to get new AVHRR GAC L1C data
 #   2015-01-14 C. Schlundt: ahvrr_top added
 #   2015-02-24 C. Schlundt: check data availability before ecp call
+#   2015-07-16 O. Sus: extraction of daily zip files moved to MPMD task
 #
 # ##############################################################################
 
@@ -79,37 +80,6 @@ get_avhrr_data()
      tar xf ${tarfile} && rm -f ${tarfile}
 
      print End of monthly tar file extraction: `date`
-
-     # -- extract daily zip files
-     pattern="${tar_prefix}${SAT}_${YEAR}${MONTH}*${bz2_suffix}"
-     zip_files=$(ls ${pattern})
-
-     print Start of daily tar file extraction: `date`
-
-     for zipfile in ${zip_files}
-     do
-         print " * Working on: ${zipfile}"
-
-         # -- extract day from zipfile
-         fbase=`echo ${zipfile} | cut -d '.' -f1`
-         split=`echo ${fbase} | cut -d "_" -f5`
-         fday=`echo ${split} | cut -c 7-8`
-
-         # -- create final input directory
-         final_dir="${download_dir}/${fday}/${YEAR}${MONTH}${fday}"
-         mkdir -p ${final_dir}
-
-         # -- move zipfile to final dir.
-         mv ${zipfile} ${final_dir}
-
-         # -- extract files
-         cd ${final_dir}
-         tar xfj ${zipfile} && rm -f ${zipfile}
-         cd ${download_dir}
-     done
-
-     print End of daily tar file extraction: `date`
-
  else
      print " * no file available for $YEAR, $MONTH, $SAT"
      return 1
