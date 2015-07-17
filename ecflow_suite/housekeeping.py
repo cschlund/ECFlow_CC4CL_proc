@@ -408,6 +408,7 @@ def add_main_proc_tasks(family, prefamily, month_trigger):
     Adds main processing specific tasks to the given family.
     :rtype : dictionary
     """
+    extract_sat_data = add_task(family, 'extract_sat_data')
     set_cpu_number = add_task(family, 'set_cpu_number')
     retrieval = add_task(family, 'retrieval')
     cleanup_l1_data = add_task(family, 'cleanup_l1_data')
@@ -421,16 +422,17 @@ def add_main_proc_tasks(family, prefamily, month_trigger):
     cleanup_l3c_data = add_task(family, 'cleanup_l3c_data')
 
     if month_trigger:
-        add_trigger_month(set_cpu_number, prefamily, month_trigger)
+        add_trigger_month(extract_sat_data, prefamily, month_trigger)
 
     else:
         if len(prefamily) == 1: 
-            add_trigger(set_cpu_number, prefamily[0])
+            add_trigger(extract_sat_data, prefamily[0])
         elif len(prefamily) == 2:
-            add_trigger_expr(set_cpu_number, prefamily[0], prefamily[1])
+            add_trigger_expr(extract_sat_data, prefamily[0], prefamily[1])
         else:
             logger.info("Max. trigger expression equals 2!")
 
+    add_trigger(set_cpu_number, extract_sat_data)
     add_trigger(retrieval, set_cpu_number)
     add_trigger(cleanup_l1_data, retrieval)
     add_trigger(archive_l2_data, retrieval)
@@ -442,7 +444,8 @@ def add_main_proc_tasks(family, prefamily, month_trigger):
     add_trigger(archive_l3c_data, make_l3c_data)
     add_trigger(cleanup_l3c_data, archive_l3c_data)
 
-    return {'set_cpu_number': set_cpu_number,
+    return {'extract_sat_data': extract_sat_data,
+            'set_cpu_number': set_cpu_number,
             'retrieval': retrieval,
             'cleanup_l1_data': cleanup_l1_data,
             'archive_l2_data': archive_l2_data,
