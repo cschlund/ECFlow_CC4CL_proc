@@ -268,6 +268,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("ECF_OUT", ecf_out_dir)
     # default value
     suite.add_variable("EC_TOTAL_SLAVES", 1)
+    suite.add_variable("NDAYS_SATDATA", 1)
 
     # Miscellaneous:
     suite.add_variable("SVN_VERSION", svn_version)
@@ -315,7 +316,8 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("SINGLE_DAY_KSH", single_day_ksh)
     suite.add_variable("RUN_L2TOL3_KSH", run_l2tol3_ksh)
     suite.add_variable("WRAPPER_EXE", wrapper_exe)
-
+    suite.add_variable("BIG_FAM", big_fam)
+    suite.add_variable("MAINPROC_FAM", mainproc_fam)
 
 def add_fam(node, fam):
     """

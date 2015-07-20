@@ -20,7 +20,13 @@ else
 
         # -- execute ksh script
         %GET_AVHRR_KSH% %CFG_PATHS_FILE% ${cfg_fil}
-    
+	
+	# -- count number of tarfiles
+	platform=`echo %SATELLITE% | tr '[:upper:]' '[:lower:]'`
+	download_dir="%ESA_INPUTDIR%/%SENSOR%/${platform}/%START_YEAR%/%START_MONTH%"
+	new=`exec ls -A ${download_dir}/%SENSOR%_GAC_L1C_%SATELLITE%_%START_YEAR%%START_MONTH%* | wc -l`
+	ecflow_client --alter add variable 'NDAYS_SATDATA' "$new" '/%SUITE%/%BIG_FAM%/%START_YEAR%/%START_MONTH%/%MAINPROC_FAM%/%SENSOR%/%SATELLITE%'
+	
     else
     
         cfg_typ="1_getdata_modis_"

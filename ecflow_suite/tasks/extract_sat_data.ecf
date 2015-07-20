@@ -48,14 +48,11 @@ else
     # -- create list of daily zip files
     pattern="${tar_prefix}%SATELLITE%_%START_YEAR%%START_MONTH%*${bz2_suffix}"
     zip_files=$(ls `pwd`/${pattern})
-    n_zip_files=0
 
     # -- for each daily zip file, create output folder and add entry to taskfile
     for zipfile in ${zip_files}
     do
         echo " * Working on: ${zipfile}"
-
-	n_zip_files=`expr $n_zip_files + 1`
 
          # -- extract day from zipfile
         fbase=`echo ${zipfile} | cut -d "/" -f14`
@@ -69,14 +66,6 @@ else
          # -- write MPMD taskfile
 	echo "tar xfj ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
     done
-
-    if [[ $n_zip_files < $NDAYS_OF_MONTH ]]; then
-	n_missing_days=`expr $NDAYS_OF_MONTH - $n_zip_files`
-	for (( i=1; i<=${n_missing_days}; i++ ))
-	do
-	    echo "echo \"No data available.\"" >> $taskfile
-	done
-    fi
 
     # To avoid creation of cores in case of abort, which takes ages...
     module unload atp
