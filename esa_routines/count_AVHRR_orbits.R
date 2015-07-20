@@ -81,13 +81,13 @@ for ( day in 1:ndays ){
             # write clean output data to file
             write.table( out , file = output_file , row.names = F , 
                     col.names = F , quote = F , sep = ",", append = T )
+
             # remove temporary file
             foo = file.remove( daily_list )
         }, 
     error=function(e)
         {
             if ( file.exists( daily_list ) ) foo = file.remove( daily_list )
-            if ( file.exists( output_file ) ) foo = file.remove( output_file )
         }
     )  
 
