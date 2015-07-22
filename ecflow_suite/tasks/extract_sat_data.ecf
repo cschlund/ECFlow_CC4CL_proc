@@ -47,7 +47,13 @@ else
 
     # -- create list of daily zip files
     pattern="${tar_prefix}%SATELLITE%_%START_YEAR%%START_MONTH%*${bz2_suffix}"
-    zip_files=$(ls `pwd`/${pattern})
+    if [ -e $pattern ]
+    then
+	zip_files=$(ls `pwd`/${pattern})
+    else
+	echo "No archives to be extracted available."
+	exit
+    fi
 
     # -- for each daily zip file, create output folder and add entry to taskfile
     for zipfile in ${zip_files}
