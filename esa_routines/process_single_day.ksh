@@ -83,35 +83,35 @@ if [[ ${INSTRUMENT} = "AVHRR" ]]; then
 	
         if [[ ${l1_filebase} == ECC_GAC* ]]; then 
             # -- new file nomenclature (pygac)
-	        searchl1b=*avhrr*h5
-	        searchgeo=*sunsatangles*h5
+	    searchl1b=*avhrr*h5
+	    searchgeo=*sunsatangles*h5
         else
             # -- old file nomenclature
-	        searchl1b=*_avhrr.h5
-	        searchgeo=*_sunsatangles.h5
+	    searchl1b=*_avhrr.h5
+	    searchgeo=*_sunsatangles.h5
         fi
 
     else
 
         if [[ ${l1_filebase} == ECC_GAC* ]]; then 
             # -- new file nomenclature (pygac)
-	        searchl1b=*avhrr*${PLATFORM}*h5
-	        searchgeo=*sunsatangles*${PLATFORM}*h5
+	    searchl1b=*avhrr*${PLATFORM}*h5
+	    searchgeo=*sunsatangles*${PLATFORM}*h5
         else
             # -- old file nomenclature
-	        searchl1b=${PLATFORM}*_avhrr.h5
-	        searchgeo=${PLATFORM}*_sunsatangles.h5
+	    searchl1b=${PLATFORM}*_avhrr.h5
+	    searchgeo=${PLATFORM}*_sunsatangles.h5
         fi
 	
     fi
 
 elif [[ ${INSTRUMENT} = "MODIS" ]]; then
-  
+    
     if [[ ${PLATFORM} = "all" ]]; then  
 	
-	    searchl1b=M*D021KM.*.hdf
-	    searchgeo=M*D03.*.hdf
-	    
+	searchl1b=M*D021KM.*.hdf
+	searchgeo=M*D03.*.hdf
+	
     elif [[ ${PLATFORM} = "AQUA" ]]; then
 
         SPLATFORM="MYD"
@@ -121,10 +121,10 @@ elif [[ ${INSTRUMENT} = "MODIS" ]]; then
 
     elif [[ ${PLATFORM} = "TERRA" ]];then
 
-	    SPLATFORM="MOD"
+	SPLATFORM="MOD"
 
-	    searchl1b=${SPLATFORM}021KM.*.hdf
-	    searchgeo=${SPLATFORM}03.*.hdf
+	searchl1b=${SPLATFORM}021KM.*.hdf
+	searchgeo=${SPLATFORM}03.*.hdf
 
     fi
     
@@ -181,32 +181,35 @@ fi
 il1b=0
 igeo=0
 
+echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE FILE LISTS" >> ${daily_log}
 
 # --  Build the directory where the input data is staged by proc1
 if [[ ${INSTRUMENT} = "AVHRR" ]]; then
 
-    inputdir_instr_date=${inputdir_instr}/${PLATFORM}/${YEAR}/${MONTHS}/${DAYS}/${YEAR}${MONTHS}${DAYS}
+    yyyymmdd=${YEAR}${MONTHS}${DAYS}
+    set -A l1b_list_temp `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} avhrr`
+    set -A geo_list `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} sunsatangles`
+
+    nl1b_temp=${#l1b_list_temp[*]}
+    nl1b=`expr $nl1b_temp / 4`
+    nl1b_loop=`expr $nl1b - 1`
+
+    l1b_list={1..$nl1b}
+    starty_list={1..$nl1b}
+    endy_list={1..$nl1b}
+    endx_list={1..$nl1b}
     
 elif [[ ${INSTRUMENT} = "MODIS" ]]; then
-  
+    
     inputdir_instr_date=${inputdir_instr}/${SPLATFORM}/${YEAR}/${MONTHS}/${DAYS}
+    set -A l1b_list `ls ${inputdir_instr_date}/${searchl1b}`    
+    set -A geo_list `ls ${inputdir_instr_date}/${searchgeo}`    
+
+    nl1b=${#l1b_list[*]}
+    nl1b_loop=`expr $nl1b - 1`
     
 fi
 
-echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE FILE LISTS" >> ${daily_log}
-
-yyyymmdd=${YEAR}${MONTHS}${DAYS}
-set -A l1b_list_temp `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} avhrr`
-set -A geo_list `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} sunsatangles`
-
-nl1b_temp=${#l1b_list_temp[*]}
-nl1b=`expr $nl1b_temp / 4`
-nl1b_loop=`expr $nl1b - 1`
-
-l1b_list={1..$nl1b}
-starty_list={1..$nl1b}
-endy_list={1..$nl1b}
-endx_list={1..$nl1b}
 
 if [ $nl1b -eq 0 ]; then
     echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
@@ -217,12 +220,14 @@ fi
 index=0
 for f in {0..$nl1b_loop}; do 
     echo "Adding ${l1b_list[$f]}"
-    index=`expr $f + $f \* 3`
-    l1b_list[$f]=${l1b_list_temp[$index]}
+    if [[ ${INSTRUMENT} = "AVHRR" ]]; then 
+	index=`expr $f + $f \* 3`
+	l1b_list[$f]=${l1b_list_temp[$index]}
+	starty_list[$f]=${l1b_list_temp[$index+1]}
+	endy_list[$f]=${l1b_list_temp[$index+2]}
+	endx_list[$f]=${l1b_list_temp[$index+3]}
+    fi
     echo '"'${l1b_list[$f]}'"' >> ${l1b_file}
-    starty_list[$f]=${l1b_list_temp[$index+1]}
-    endy_list[$f]=${l1b_list_temp[$index+2]}
-    endx_list[$f]=${l1b_list_temp[$index+3]}
 done
 
 ngeo=${#geo_list[*]}
@@ -309,7 +314,7 @@ type=em
 path_and_file_to_emissivity=$(python $pick_aux_datafile \
     --inpdir $aux_input_dir --suffix $suffix \
     --year $YEAR --month $MONTHS --day $DAYS)
- 
+
 
 lpick=1
 
@@ -318,8 +323,7 @@ echo `exec date +%Y/%m/%d:%H:%M:%S` "START LOOP OVER FILES" >> ${daily_log}
 while [ $ifile -lt $nl1b ]; do 
 
     echo `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "STARTED" >> ${daily_log} 
-    echo "FILE" $((${ifile}+1)) "OF" ${nl1b} "IS IN WORK" >> ${daily_log}
-          
+    echo "FILE" $((${ifile}+1)) "OF" ${nl1b} "IS IN WORK" >> ${daily_log}    
 
     # --------------------------------------------------------------------- #
     #                                                                       #
@@ -337,7 +341,6 @@ while [ $ifile -lt $nl1b ]; do
     path_to_USGS=${USGS_file}
     path_to_ecmwf=${INPUTDIR}/ERAinterim/${YEAR}/${MONTHS}/${DAYS}
     path_to_coeffs=${perm_aux}/coeffs
-
 
     echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE OUTPUT DIRS" >> ${daily_log}
 
@@ -365,8 +368,9 @@ while [ $ifile -lt $nl1b ]; do
 
             # -- old avhrr file nomenclature
             #noaa18_20080101_2228_99999_satproj_11018_12302_avhrr.h5
-	        HOUR=`exec echo ${l1b_file} | rev | cut -c 35-36 | rev`
-	        MINUTE=`exec echo ${l1b_file} | rev | cut -c 33-34 | rev`
+	    HOUR=`exec echo ${l1b_file} | rev | cut -c 35-36 | rev`
+	    MINUTE=`exec echo ${l1b_file} | rev | cut -c 33-34 | rev`
+	    DAYCUT=`exec echo ${l1b_file} | rev | cut -c 31-32 | rev`
 
         fi
 
@@ -375,8 +379,9 @@ while [ $ifile -lt $nl1b ]; do
 
         # -- setting hour and minute from MODIS filename
         l1b_file=`exec basename ${l1b_list[ifile]} .hdf` 
-	    HOUR=`exec echo ${l1b_file} | cut -f 3-3 -d . | cut -c 1-2`
-	    MINUTE=`exec echo ${l1b_file} | cut -f 3-3 -d . | cut -c 3-4` 
+	HOUR=`exec echo ${l1b_file} | cut -f 3-3 -d . | cut -c 1-2`
+	MINUTE=`exec echo ${l1b_file} | cut -f 3-3 -d . | cut -c 3-4` 
+	DAYCUT=${DAYS}
 
     fi
 
@@ -389,7 +394,6 @@ while [ $ifile -lt $nl1b ]; do
         continue
     fi
     
-
     echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK ECMWF FILE" >> ${daily_log}
 
     # -- pick ecmwf file
@@ -409,7 +413,7 @@ while [ $ifile -lt $nl1b ]; do
     #       PRE-PROCESSING                                                  #
     #                                                                       #
     # --------------------------------------------------------------------- #
-
+    
     # -- make preproc output directory
     l2_outp_pre=${l2_outp}/pre_proc
 
@@ -434,10 +438,18 @@ while [ $ifile -lt $nl1b ]; do
 	starty=${teststarty}
 	endy=${testendy}
     else # if not test run, use dimensions as provided by database
-	startx=1
-	endx=${endx_list[$ifile]}
-	starty=`expr ${starty_list[$ifile]} + 1`
-	endy=`expr ${endy_list[$ifile]} + 1`
+	 # for AVHRR, or full resolution for MODIS
+	if [[ ${INSTRUMENT} = "AVHRR" ]]; then 
+	    startx=1
+	    endx=${endx_list[$ifile]}
+	    starty=`expr ${starty_list[$ifile]} + 1`
+	    endy=`expr ${endy_list[$ifile]} + 1`
+	elif [[ ${INSTRUMENT} = "MODIS" ]]; then
+	    startx=-1
+	    endx=-1
+	    starty=-1
+	    endy=-1
+	fi
     fi
 
     # -- write preprocessing driver
@@ -449,7 +461,7 @@ while [ $ifile -lt $nl1b ]; do
         ((ifile=$ifile+1)) 
         continue
     fi     
-      
+    
     
     echo `exec date +%Y/%m/%d:%H:%M:%S` "STARTING  PREPROCESSING" ${preproc_driver} "ON" ${OMP_NUM_THREADS} "THREADS" >> ${daily_log}
 
@@ -474,7 +486,7 @@ while [ $ifile -lt $nl1b ]; do
     # -- set back again on maximum threads from LL
 
     echo `exec date +%Y/%m/%d:%H:%M:%S` "STARTING  PROCESSING" ${preproc_driver} "ON" ${OMP_NUM_THREADS} "THREADS" >> ${daily_log}
-      
+    
     # -- make main proc output directory      
     l2_outp_main=${l2_outp}/main
 
@@ -497,8 +509,8 @@ while [ $ifile -lt $nl1b ]; do
         typeset -u UPLATFORM=${PLATFORM} 
         CPLATFORM=${UPLATFORM}
 
-	    sensor_platform=${INSTRUMENT}-${CPLATFORM}
-	    sensor_version=${sensor_version_avhrr}
+	sensor_platform=${INSTRUMENT}-${CPLATFORM}
+	sensor_version=${sensor_version_avhrr}
 
     elif [[ ${INSTRUMENT} = "MODIS" ]]; then 
 
@@ -520,7 +532,7 @@ while [ $ifile -lt $nl1b ]; do
         sensor_version=${sensor_version_modis} 
 
     fi
-      
+    
 
     # -- set preprocessing basename
     preproc_base=${project}"-L2-CLOUD-CLD-"${INSTRUMENT}_${l2processor}"_"${PLATFORM}"_"${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
@@ -555,8 +567,8 @@ while [ $ifile -lt $nl1b ]; do
     else 
         echo `exec date +%Y/%m/%d:%H:%M:%S` "RUNNING OF PROCESSING" ${mainproc_driver} "SUCCESSFUL" >> ${daily_log}
     fi     
-      
-      
+    
+    
     # -- process then ICE phase
     phase=ICE
     ice_out_path=${l2_outp_main}/${preproc_base}${phase}
@@ -585,7 +597,7 @@ while [ $ifile -lt $nl1b ]; do
     else 
         echo `exec date +%Y/%m/%d:%H:%M:%S` "RUNNING OF PROCESSING" ${mainproc_driver} "SUCCESSFUL" >> ${daily_log}
     fi     
-      
+    
 
 
     # --------------------------------------------------------------------- #
@@ -670,7 +682,7 @@ while [ $ifile -lt $nl1b ]; do
         fi 
 
     fi     
-       
+    
 
     echo  `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
     echo " " >> ${daily_log}
@@ -685,8 +697,8 @@ done
 echo "#------------------------------------------#" >> ${daily_log}
 echo "#------------------------------------------#" >> ${daily_log}
 echo `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF DATE" \
-${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} "FINISHED" \
->> ${daily_log}
+    ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} "FINISHED" \
+    >> ${daily_log}
 echo "A TOTAL OF" ${ifile} "FILES OUT OF" ${nl1b} "WERE COMPLETED" >> ${daily_log}
 echo "#------------------------------------------#" >> ${daily_log}
 echo "#------------------------------------------#" >> ${daily_log}
@@ -715,5 +727,5 @@ type=em
 searchfile="${searchdir}/${YEAR}${MONTHS}${DAYS}_${type}_${ID}_listing.dat"
 rm -f ${searchfile}
 
-    
+
 # -- END --
