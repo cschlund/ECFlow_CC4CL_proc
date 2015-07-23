@@ -138,6 +138,8 @@ get_aux()
     SOURCE_CLIMAT=${4}
     TARGET_CLIMAT=${5}
     YEAR=${6}
+    MONTH=${7}
+    DAY=${8}
 
     printf "*** get_aux() started\n"
     #printf "    SOURCE: $SOURCE\n"
@@ -161,12 +163,18 @@ get_aux()
     printf "    SOURCE: $SOURCE\n"
     check_source=$(els ${SOURCE})
     retcls=${?}
+    date=${YEAR}${MONTH}${DAY}
+    get_climat=true
+    # only get MODIS-derived climatologies before 18/02/2000
+    if [[ ${date} -gt 20000217 && $TYPE -eq 1 ]]; then
+	get_climat=false
+    fi
     
-    if [ "${retcls}" -eq 0  ]; then 
+    if [ "${retcls}" -eq 0 ]; then 
 
         copy_file ${SOURCE} ${TARGET} ${TYPE}
 
-    else
+    elif $get_climat; then
 
         printf "    SOURCE_CLIMAT: $SOURCE_CLIMAT\n"
         check_source_cli=$(els ${SOURCE_CLIMAT})
@@ -320,7 +328,7 @@ while [ $unix_counter -le $unix_stop ]; do
 
     if [ $aflag -ne 0 ]; then
         printf "\nGet MODIS ALBEDO data from ECFS for $CURRENT_DATE\n"
-        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR} ${MONS} ${DAYS}
     fi
 
 
@@ -349,7 +357,7 @@ while [ $unix_counter -le $unix_stop ]; do
 
     if [ $aflag -ne 0 ]; then
         printf "\nGet BRDF data from ECFS for $CURRENT_DATE\n"
-        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR} ${MONS} ${DAYS}
     fi
 
 
@@ -393,7 +401,7 @@ while [ $unix_counter -le $unix_stop ]; do
 
     if [ $aflag -ne 0 ]; then
         printf "\nGet EMISSIVITY data from ECFS for $CURRENT_DATE\n"
-        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR} ${MONS} ${DAYS}
     fi
 
 
@@ -448,7 +456,7 @@ while [ $unix_counter -le $unix_stop ]; do
 
     if [ $aflag -ne 0 ]; then
         printf "\nGet NISE data from ECFS for $CURRENT_DATE\n"
-        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR}
+        get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR} ${MONS} ${DAYS}
     fi
 
     #echo "DAY=$DAYS"
