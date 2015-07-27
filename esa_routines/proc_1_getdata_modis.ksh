@@ -44,84 +44,84 @@ get_modis()
         return 1
     fi
 
-    # now go into $DATADIR on $SCRATCH and unpack the tars
-    # and throw them away once everything is untared.
-    cd ${DATADIR}
+#     # now go into $DATADIR on $SCRATCH and unpack the tars
+#     # and throw them away once everything is untared.
+#     cd ${DATADIR}
 
-    SOURCEFILE=`exec basename ${SOURCEFILE}`
-    do_it=0
-    RANDOM=10
+#     SOURCEFILE=`exec basename ${SOURCEFILE}`
+#     do_it=0
+#     RANDOM=10
 
-    if [ "${cflag}" -eq 1 ]; then 
+#     if [ "${cflag}" -eq 1 ]; then 
 
-        if [ "${rflag}" -eq 1 ]; then 
+#         if [ "${rflag}" -eq 1 ]; then 
 
-            echo "RANDOM CHECKING REQUESTED" 
-            rn=${RANDOM} 
-            rns=`expr ${rn}/32768*100 | bc -l` 
-            rni=`exec echo $rns | cut -f 1 -d .` 
-            rni1=`exec echo $rni | cut -c 1` 
+#             echo "RANDOM CHECKING REQUESTED" 
+#             rn=${RANDOM} 
+#             rns=`expr ${rn}/32768*100 | bc -l` 
+#             rni=`exec echo $rns | cut -f 1 -d .` 
+#             rni1=`exec echo $rni | cut -c 1` 
 
-            if [ "${rni1}" -eq 0 ]; then 
-                rni=0 
-            fi 
+#             if [ "${rni1}" -eq 0 ]; then 
+#                 rni=0 
+#             fi 
 
-            if [ "${rni}" -le rcut ]; then 
-                echo "RANDOM NUMBER AND CUT" ${rni} ${rcut} 
-                do_it=1 
-            fi 
+#             if [ "${rni}" -le rcut ]; then 
+#                 echo "RANDOM NUMBER AND CUT" ${rni} ${rcut} 
+#                 do_it=1 
+#             fi 
 
-        else 
+#         else 
 
-            echo "STRICT CHECKING REQUESTED" 
-            do_it=1 
+#             echo "STRICT CHECKING REQUESTED" 
+#             do_it=1 
 
-        fi 
+#         fi 
 
 
-        if [ "$do_it" -eq 1 ]; then 
+#         if [ "$do_it" -eq 1 ]; then 
 
-            #checkname=`exec ls * | grep checksums` 
-            checkname=`exec tar -tf ${SOURCEFILE} | grep checksums` 
-            tar xf  ${SOURCEFILE}  && rm -f ${SOURCEFILE} 
-            file=${checkname} 
+#             #checkname=`exec ls * | grep checksums` 
+#             checkname=`exec tar -tf ${SOURCEFILE} | grep checksums` 
+#             tar xf  ${SOURCEFILE}  && rm -f ${SOURCEFILE} 
+#             file=${checkname} 
 
-            # while loop 
-            iline=0 
-            ccounter=0 
-            while read line 
-            do 
-                (( iline=$iline+1 )) # go to next line              
+#             # while loop 
+#             iline=0 
+#             ccounter=0 
+#             while read line 
+#             do 
+#                 (( iline=$iline+1 )) # go to next line              
 
-                if [ "${iline}" -gt 4 ]; then 
+#                 if [ "${iline}" -gt 4 ]; then 
 
-                    cksumorg=`exec echo "$line" | awk '{print $1}'` 
-                    current_file=`exec echo "$line" | awk '{print $3}'` 
-                    cksumnew=`exec cksum ${current_file} | awk '{print $1}'` 
-                    front=`exec echo ${current_file} | cut -c1`
+#                     cksumorg=`exec echo "$line" | awk '{print $1}'` 
+#                     current_file=`exec echo "$line" | awk '{print $3}'` 
+#                     cksumnew=`exec cksum ${current_file} | awk '{print $1}'` 
+#                     front=`exec echo ${current_file} | cut -c1`
 
-                    if [ "${cksumorg}" -ne "${cksumnew}" ] && [ "${front}" = "M" ]; then 
+#                     if [ "${cksumorg}" -ne "${cksumnew}" ] && [ "${front}" = "M" ]; then 
 
-                        echo "Corrupt File:" $current_file ${cksumorg} ${cksumnew} 
-                        basefile=`exec basename ${current_file} .hdf` 
-                        mv $current_file $basefile.corrupt 
-                        (( ccounter=$ccounter+1 )) 
+#                         echo "Corrupt File:" $current_file ${cksumorg} ${cksumnew} 
+#                         basefile=`exec basename ${current_file} .hdf` 
+#                         mv $current_file $basefile.corrupt 
+#                         (( ccounter=$ccounter+1 )) 
 
-                    fi 
+#                     fi 
 
-                fi 
+#                 fi 
 
-            done <"$file" 
+#             done <"$file" 
 
-            echo "FAILED: Number of corrupt files detected in " ${SOURCEFILE} ": " ${ccounter} 
+#             echo "FAILED: Number of corrupt files detected in " ${SOURCEFILE} ": " ${ccounter} 
 
-        fi 
+#         fi 
 
-    else 
+#     else 
 
-        tar xf ${SOURCEFILE}  && rm -f ${SOURCEFILE} 
+#         tar xf ${SOURCEFILE}  && rm -f ${SOURCEFILE} 
 
-    fi
+#     fi
 
 }
 
@@ -137,7 +137,6 @@ set -xv
 
 # source proc 1 configfile
 . $2
-
 
 # Get short product/platform specifier
 if [[ ${platform} = "MYD" ]]; then 
