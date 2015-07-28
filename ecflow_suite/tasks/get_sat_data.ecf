@@ -35,7 +35,20 @@ else
 
         # -- execute ksh script
         %GET_MODIS_KSH% %CFG_PATHS_FILE% ${cfg_fil}
-    
+	
+	# -- count number of tarfiles
+	if [ %SATELLITE% == "AQUA" ]
+	then
+	    platform="MYD"
+	elif [ %SATELLITE% == "TERRA" ]
+	then
+	    platform="MOD"
+	fi
+
+	download_dir="%ESA_INPUTDIR%/%SENSOR%/${platform}/%START_YEAR%/%START_MONTH%"    
+	new=`exec ls -A ${download_dir}/${platform}*%START_YEAR%_%START_MONTH%_*.tar | wc -l`
+	ecflow_client --alter add variable 'NDAYS_SATDATA' "$new" '/%SUITE%/%BIG_FAM%/%START_YEAR%/%START_MONTH%/%MAINPROC_FAM%/%SENSOR%/%SATELLITE%'
+
     fi
 
 fi
