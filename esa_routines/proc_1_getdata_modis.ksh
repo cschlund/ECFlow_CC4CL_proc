@@ -32,7 +32,7 @@ get_modis()
         echo "GET_MODIS DATA:" 
         echo ${SOURCEFILE} 
         ecp ${SOURCEFILE} ${DATADIR} 
-        sret=${?}
+	sret=${?}
     fi
 
     # was retrieval succesful? if not, return 1
@@ -163,7 +163,7 @@ while [ $unix_counter -le $unix_stop ]; do
     MONS=`perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');'` 
     DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'` 
 
-    DATADIR=${INPUTDIR}/MODIS/${platform}/${YEAR}/${MONS}/${DAYS} 
+    DATADIR=${INPUTDIR}/MODIS/${platform}/${YEAR}/${MONS}/
 
     # check if data already on scratch
     if [ -d $DATADIR ]; then 
@@ -172,7 +172,7 @@ while [ $unix_counter -le $unix_stop ]; do
         nfiles1=$(ls -A $DATADIR/${splat}021KM.* |wc -l)
         nfiles2=$(ls -A $DATADIR/${splat}03.* |wc -l)
 
-        echo "Number of files: $nfiles1 (${splat}021KM) = $nfiles2 (${splat}03)"
+        echo "Number of files: $nfiles1 (${splat}021KM) = $nfiles2 (${splat}03)?"
 
         if [ $nfiles1 -gt 0 ] && [ $nfiles2 -gt 0 ]; then 
             if [ $nfiles1 -eq $nfiles2 ]; then 
