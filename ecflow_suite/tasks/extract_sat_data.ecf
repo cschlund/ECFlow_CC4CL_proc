@@ -18,86 +18,105 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    if [ %SENSOR% == "AVHRR" ]; then
-
     # -- settings
-	sat_date_base="%SATELLITE%_%START_YEAR%_%START_MONTH%"
+    sat_date_base="%SATELLITE%_%START_YEAR%_%START_MONTH%"
 
     # -- working directory: write core file here
-	cd %ESA_ECF_LOG_DIR%
-	
+    cd %ESA_ECF_LOG_DIR%
+    
     # -- create job id number
-	primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
-	id=`date +%%s`
-	sleep 3
-	jid=ID${primary_id}_US${id}
+    primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
+    id=`date +%%s`
+    sleep 3
+    jid=ID${primary_id}_US${id}
+
+    # -- define path to taskfile
+    taskfile="%ESA_CONFIGDIR%/extract_sat_data_${sat_date_base}_${jid}.txt"
+    rm -f $taskfile
+    touch $taskfile
 
     # -- write MPMD task list
-	echo "Write MPMD Taskfile for extract_sat_data in SUITE/FAMILY: "%SUITE%/%FAMILY%
+    echo "Write MPMD Taskfile for extract_sat_data in SUITE/FAMILY: "%SUITE%/%FAMILY%
 
+    if [ %SENSOR% == "AVHRR" ]
+    then 
 	platform=`echo %SATELLITE% | tr '[:upper:]' '[:lower:]'`
-	download_dir="%ESA_INPUTDIR%/AVHRR/${platform}/%START_YEAR%/%START_MONTH%"
-	cd ${download_dir}
-
-	taskfile="%ESA_CONFIGDIR%/extract_sat_data_${sat_date_base}_${jid}.txt"
-	rm -f $taskfile
-	touch $taskfile
 	tar_prefix="AVHRR_GAC_L1C_"
-	bz2_suffix=".tar.bz2"
+	tar_suffix=".tar.bz2"
+	pattern="${tar_prefix}%SATELLITE%_%START_YEAR%%START_MONTH%*${tar_suffix}"
+    elif [ %SATELLITE% == "AQUA" ]
+    then
+	platform="MYD"
+	tar_prefix="MYD"
+	tar_suffix=".tar"
+	pattern="${tar_prefix}*_%START_YEAR%_%START_MONTH%*${tar_suffix}"
+    elif [ %SATELLITE% == "TERRA" ]
+    then
+	platform="MOD"
+	tar_prefix="MOD"
+	tar_suffix=".tar"
+	pattern="${tar_prefix}*_%START_YEAR%_%START_MONTH%*${tar_suffix}"
+    fi
+
+    download_dir="%ESA_INPUTDIR%/%SENSOR%/${platform}/%START_YEAR%/%START_MONTH%"
+    cd ${download_dir}
+    
+    for f in `pwd`/${pattern}; do
+	if [ -e "$f" ]
+	then
+	    echo "Archives to be extracted available." 
+	else
+	    echo "No archives to be extracted available."
+	    ecflow_client --complete
+	    trap 0
+	    exit
+	fi
+	break
+    done
 
     # -- create list of daily zip files
-	pattern="${tar_prefix}%SATELLITE%_%START_YEAR%%START_MONTH%*${bz2_suffix}"
-
-	for f in `pwd`/${pattern}; do
-	    if [ -e "$f" ]
-	    then
-		echo "Archives to be extracted available." 
-	    else
-		echo "No archives to be extracted available."
-		ecflow_client --complete
-		trap 0
-		exit
-	    fi
-	    break
-	done
-
-	zip_files=$(ls `pwd`/${pattern})
-	
+    zip_files=$(ls `pwd`/${pattern})
+    
     # -- for each daily zip file, create output folder and add entry to taskfile
-	for zipfile in ${zip_files}
-	do
-            echo " * Working on: ${zipfile}"
+    for zipfile in ${zip_files}
+    do
+        echo " * Working on: ${zipfile}"
 
          # -- extract day from zipfile
-            fbase=`echo ${zipfile} | cut -d "/" -f14`
+        fbase=`echo ${zipfile} | cut -d "/" -f14`
+
+	if [ %SENSOR% == "AVHRR" ]
+	then 
             split=`echo ${fbase} | cut -d "_" -f5`
             fday=`echo ${split} | cut -c 7-8`
+            final_dir="${download_dir}/${fday}/%START_YEAR%%START_MONTH%${fday}"
+            # -- write MPMD taskfile
+	    echo "tar xfj ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
+	elif [ %SENSOR% == "MODIS" ]
+	then
+            split=`echo ${fbase} | cut -d "_" -f4`
+            fday=`echo ${split} | cut -c 1-2`
+            final_dir="${download_dir}/${fday}"
+            # -- write MPMD taskfile
+	    echo "tar xf ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
+	fi
 
          # -- create final input directory
-            final_dir="${download_dir}/${fday}/%START_YEAR%%START_MONTH%${fday}"
-            mkdir -p ${final_dir}
-
-         # -- write MPMD taskfile
-	    echo "tar xfj ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
-	done
+        mkdir -p ${final_dir}
+	
+    done
 
     # To avoid creation of cores in case of abort, which takes ages...
-	module unload atp
+    module unload atp
 
     # For OpenMP tasks
-	export OMP_NUM_THREADS=$EC_threads_per_task
-
+    export OMP_NUM_THREADS=$EC_threads_per_task
+    
     # -- call aprun using the MPMD submitter
-	echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${taskfile}
+    echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${taskfile}
 
     # -- extract and subsequently delete daily zip files
-	aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% ${taskfile}
-
-    else
-
-	echo "For MODIS, extraction of daily tarfiles not yet parallelized!"
-
-    fi
+    aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% ${taskfile}
 
 fi
 
