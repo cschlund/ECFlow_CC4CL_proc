@@ -10,6 +10,7 @@ ${nchannels}
 ${proc_flag}
 ${phase}
 CTRL%PROCESS_CLOUDY_ONLY=${cloudy_only}
-CTRL%PROCESS_ONE_PHASE_ONLY=${one_phase_only}
+CTRL%NTYPES_TO_PROCESS=${ntypes_to_process_ICE}
+CTRL%TYPES_TO_PROCESS=${types_to_process_ICE}
 #END">${mainproc_driver}
 

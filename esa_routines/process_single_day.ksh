@@ -548,7 +548,7 @@ while [ $ifile -lt $nl1b ]; do
 
     rm -f ${mainproc_driver}
     touch ${mainproc_driver}
-    . ${ESA_ROUT}/write_orac_file.ksh
+    . ${ESA_ROUT}/write_orac_file_${phase}.ksh
 
     if [ ${?} -ne 0 ]; then 
         echo "WRITING OF PROCDRIVER FOR" ${mainproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log} 
@@ -578,7 +578,7 @@ while [ $ifile -lt $nl1b ]; do
 
     rm -f ${mainproc_driver}
     touch ${mainproc_driver}
-    . ${ESA_ROUT}/write_orac_file.ksh
+    . ${ESA_ROUT}/write_orac_file_${phase}.ksh
 
     if [ ${?} -ne 0 ]; then 
         echo "WRITING OF PROCDRIVER FOR" ${mainproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log} 
@@ -639,6 +639,10 @@ while [ $ifile -lt $nl1b ]; do
     cprocessing_inst=`echo "'"${processing_inst}"'"`      
     cproject=`echo "'"${project}"'"`      
 
+    switch_phases='.false.'
+    if [[ ${ntypes_to_process_ICE} -eq 10 && ${ntypes_to_process_WAT} -eq 10 ]]; then
+	switch_phases='.true.'
+    fi
 
     # -- name of combined result
     comb_out_path=${l2_outp_post}/${l1b_file}

@@ -156,7 +156,10 @@ cfullbrdf=${cinclude_full_brdf}
 rttov_version=${RTTOV_version}
 ecmwf_version=${ECMWF_version}
 svn_version=${SVN_version}
-one_phase_only=${one_phase_only}
+ntypes_to_process_ICE=${ntypes_to_process_ICE}
+types_to_process_ICE=${types_to_process_ICE}
+ntypes_to_process_WAT=${ntypes_to_process_WAT}
+types_to_process_WAT=${types_to_process_WAT}
 cloudy_only=${cloudy_only}
 
 #END"> ${logs_monthly}/process_single_day_${DAILY_PATH}.config
