@@ -23,20 +23,23 @@ get_modis()
     cflag=${3}
     rflag=${4}
     rcut=${5}
+    tarFileName=${6}
 
     els ${SOURCEFILE}
-    flag=${?}
+    flag1=${?}
+    ls ${DATADIR}/${tarFileName}
+    flag2=${?}
     
     # just in case there are files, retrieve them:
-    if [ "$flag" -eq 0  ]; then 
+    if [ "$flag1" -eq 0 ] && [ "$flag2" -eq 0 ]; then 
         echo "GET_MODIS DATA:" 
         echo ${SOURCEFILE} 
         ecp ${SOURCEFILE} ${DATADIR} 
 	sret=${?}
     fi
 
-    # was retrieval succesful? if not, return 1
-    if [ "$sret" -ne 0  ]; then 
+    # was retrieval successful? if not, return 1
+    if [ "$sret" -ne 0 ]; then 
         echo "GET_MODIS FAILED: Not all files were retrieved from:" 
         echo ${SOURCEFILE} 
         echo "IN" 
@@ -180,7 +183,7 @@ while [ $unix_counter -le $unix_stop ]; do
             fi
         fi
     fi
-
+    
     # get data from ECFS
     if [ $aflag -ne 0 ]; then 
         echo "No data available on scratch, so get them!"
@@ -194,12 +197,14 @@ while [ $unix_counter -le $unix_stop ]; do
 
         # Build now path to MODIS files of that given doy
         SOURCEL1B=${modis_top}/${platform}/${YEAR}${MONS}/${splat}021km_${YEAR}_${MONS}_${DAYS}.tar
+	L1B_name=${splat}021km_${YEAR}_${MONS}_${DAYS}.tar
         SOURCEGEO=${modis_top}/${platform}/${YEAR}${MONS}/${splat}03_${YEAR}_${MONS}_${DAYS}.tar
+	GEO_name=${splat}03_${YEAR}_${MONS}_${DAYS}.tar
 
         # Get those files from ECFS
-        get_modis ${SOURCEL1B} ${DATADIR} ${cflag} ${rflag} ${rcut}
+        get_modis ${SOURCEL1B} ${DATADIR} ${cflag} ${rflag} ${rcut} ${L1B_name}
         retcl1b=${?}
-        get_modis ${SOURCEGEO} ${DATADIR} ${cflag} ${rflag} ${rcut}
+        get_modis ${SOURCEGEO} ${DATADIR} ${cflag} ${rflag} ${rcut} ${GEO_name}
         retcgeo=${?}
 
         retc=1
