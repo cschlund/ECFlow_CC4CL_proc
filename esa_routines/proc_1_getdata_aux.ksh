@@ -368,10 +368,12 @@ while [ $unix_counter -le $unix_stop ]; do
 
     #convert date to DOY for emissivity filename
     DOY=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS}`
+    DOY_CLIMAT=$DOY
     DOYMAX=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} 12 31`    
-    if [ $DOYMAX -eq 366 ]; then
-	DOY=`expr ${DOY} - 1` # account for leap year
+    if [ $DOYMAX -eq 366 ] && [ $MONS -gt 02 ]; then
+	DOY_CLIMAT=`expr ${DOY_CLIMAT} - 1` # account for leap year
     fi
+
     DDOY=${DOY} 
     if [ "${DOY}" -lt 10 ]; then
       DDOY=0${DOY}
@@ -380,6 +382,15 @@ while [ $unix_counter -le $unix_stop ]; do
       DDOY=0${DDOY}
     fi
     DOY=${DDOY}  
+
+    DDOY_CLIMAT=${DOY_CLIMAT} 
+    if [ "${DOY_CLIMAT}" -lt 10 ]; then
+      DDOY_CLIMAT=0${DOY_CLIMAT}
+    fi
+    if [ "${DOY_CLIMAT}" -lt 100 ]; then
+      DDOY_CLIMAT=0${DDOY_CLIMAT}
+    fi
+    DOY_CLIMAT=${DDOY_CLIMAT}  
 
     # NRT data
     SOURCEPATH=${source_emissivity}
@@ -392,7 +403,7 @@ while [ $unix_counter -le $unix_stop ]; do
     SOURCEPATH_CLIMAT=${source_emissivity_climatology}
     TARGETPATH_CLIMAT=${target_emissivity_climatology}
     SEARCHSTRING_CLIMAT=${emissivity_type}XXXX${DOY}
-    SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${emissivity_suffix}
+    SOURCEFILE_CLIMAT=${SOURCEPATH_CLIMAT}/${SEARCHSTRING_CLIMAT}${emissivity_suffix_climat}
     TARGETFILE_CLIMAT=${TARGETPATH_CLIMAT}/$(basename ${SOURCEFILE_CLIMAT})
 
     # availability check

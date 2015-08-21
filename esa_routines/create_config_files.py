@@ -106,6 +106,7 @@ def getaux(args_aux):
             else:
                 # from 2007 onwards and for climatology filename
                 f.write("emissivity_suffix=.041.nc.bz2\n")
+            f.write("emissivity_suffix_climat=.041.nc.bz2\n")
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
