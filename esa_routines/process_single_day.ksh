@@ -219,7 +219,6 @@ fi
 
 index=0
 for f in {0..$nl1b_loop}; do 
-    echo "Adding ${l1b_list[$f]}"
     if [[ ${INSTRUMENT} = "AVHRR" ]]; then 
 	index=`expr $f + $f \* 3`
 	l1b_list[$f]=${l1b_list_temp[$index]}
@@ -227,6 +226,7 @@ for f in {0..$nl1b_loop}; do
 	endy_list[$f]=${l1b_list_temp[$index+2]}
 	endx_list[$f]=${l1b_list_temp[$index+3]}
     fi
+    echo "Adding ${l1b_list[$f]}"
     echo '"'${l1b_list[$f]}'"' >> ${l1b_file}
 done
 
