@@ -26,12 +26,12 @@ get_modis()
     tarFileName=${6}
 
     els ${SOURCEFILE}
-    flag1=${?}
+    flag1=${?} # is file available in ECFS? process if = 0
     ls ${DATADIR}/${tarFileName}
-    flag2=${?}
+    flag2=${?} # is file available on scratch? process if != 0
     
     # just in case there are files, retrieve them:
-    if [ "$flag1" -eq 0 ] && [ "$flag2" -eq 0 ]; then 
+    if [ "$flag1" -eq 0 ] && [ "$flag2" -ne 0 ]; then 
         echo "GET_MODIS DATA:" 
         echo ${SOURCEFILE} 
         ecp ${SOURCEFILE} ${DATADIR} 
