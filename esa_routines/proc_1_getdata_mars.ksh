@@ -24,6 +24,10 @@ set -xv
 #proc1 configfile ausfuehren
 . $2
 
+MM=$(printf %02d $STARTMONTH)
+gridInfoFile=${INPUTDIR}/ERAinterim/${STARTYEAR}/${MM}/gridinfo.txt
+rm -f ${gridInfoFile}
+Rscript ${ESA_ROUT}/write_ERA_gridinfo.R --vanilla ${lonIncr} ${latIncr} ${gridInfoFile}
 
 unix_start=`${ESA_ROUT}/ymdhms2unix.ksh $STARTYEAR $STARTMONTH $STARTDAY`
 
@@ -67,7 +71,7 @@ while [ $unix_counter -le $unix_stop ]; do
         # get ERA interim by the day
         DATE=${YEAR}${MONS}${DAYS}
 
-        ${ESA_ROUT}/get_era_cci.ksh $DATE $DATADIRE
+        ${ESA_ROUT}/get_era_cci.ksh $DATE $DATADIRE $latIncr $lonIncr $gridInfoFile
         retc=${?}
 
         if [ $retc -ne 0  ]; then 

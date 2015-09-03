@@ -14,8 +14,13 @@ import datetime
 from pycmsaf.logger import setup_root_logger
 from housekeeping import get_id
 
-logger = setup_root_logger(name='sissi')
-
+logger  = setup_root_logger(name='sissi')
+# set ERA-Interim and grid resolution
+latIncr = 0.72 # ERA-Interim latitude resolution in degrees
+lonIncr = 0.72 # ERA-Interim longitude resolution in degrees
+# preprocessing grid is the same as ERA, but in reciprocal notation
+dellat  = round(1./latIncr,7) 
+dellon  = round(1./lonIncr,7) 
 
 def getsat(args_sat):
     """
@@ -107,6 +112,12 @@ def getaux(args_aux):
                 # from 2007 onwards and for climatology filename
                 f.write("emissivity_suffix=.041.nc.bz2\n")
             f.write("emissivity_suffix_climat=.041.nc.bz2\n")
+        elif args_aux.getdata == "era":
+            f.write("\n")
+            f.write("# this is the ERA-Interim increment in degrees\n")            
+            # write lat/lon increment as set at the top of this script
+            f.write("latIncr="+str(latIncr)+"\n")
+            f.write("lonIncr="+str(lonIncr)+"\n")
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
@@ -170,8 +181,9 @@ def proc2(args_ret):
         f.write("# 1: ecmwf grid, 2: L3 grid, 3: own definition\n")
         f.write("gridflag=3\n")
         f.write("# this is the inverse of the actual increment\n")
-        f.write("dellon=2.0\n")
-        f.write("dellat=2.0\n")
+        # write dellon/dellat as derived from lonIncr/latIncr
+        f.write("dellon="+str(dellon)+"\n")
+        f.write("dellat="+str(dellat)+"\n")
         f.write("\n")
         f.write("# start and end pixel in across/along track direction\n")
         f.write("teststartx=10\n")
