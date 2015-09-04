@@ -65,8 +65,16 @@ while [ $unix_counter -le $unix_stop ]; do
     if [ $aflag -ne 0 ]; then
         echo "No data available on scratch, get them now"
 
-        echo "CREATE target directory: ${DATADIRE}"
+        echo "Create target directory: ${DATADIRE}"
         mkdir -p $DATADIRE
+
+	gridInfoFile=${INPUTDIR}/ERAinterim/${YEAR}/${MONS}/gridinfo.txt
+	# only create gridInfoFile if it doesn't exist yet
+	if [[ ! -e ${gridInfoFile} ]] 	
+	then
+	    echo "Create grid information file for remapping"
+	    Rscript ${ESA_ROUT}/write_ERA_gridinfo.R --vanilla ${lonIncr} ${latIncr} ${gridInfoFile}
+	fi
 
         # get ERA interim by the day
         DATE=${YEAR}${MONS}${DAYS}
