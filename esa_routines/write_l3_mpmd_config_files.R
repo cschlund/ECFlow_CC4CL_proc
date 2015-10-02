@@ -16,6 +16,9 @@ cfg_suffix   = args[11]
 cfg_base     = args[12]
 base_path    = args[13]
 flist_l2_out = args[14]
+global_conf  = args[15]
+
+global_values = read.table( global_conf, as.is=T, col.names = "values")
 
 ## base path of L2 output data
 #base_path ="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/output"
@@ -59,17 +62,17 @@ for (i in 1:ndays) {
 	paste("sensor=", sensor, sep=""),
 	paste("platform=", platform, sep=""),
 	paste("filelist_level2_output=", flist_l2_out, sep=""),
-	"local=F",
-	"slon=0",
-	"elon=18",
-	"slat=42",
-	"elat=53",
-	"gridxloc=10",
-	"gridyloc=10",
-	"gridxl3=2",
-	"gridyl3=2",
-	"gridxl2b=10",
-	"gridyl2b=10",
+	global_values$values[pmatch("local", global_values$values)],
+	global_values$values[pmatch("slon", global_values$values)],
+	global_values$values[pmatch("elon", global_values$values)],
+	global_values$values[pmatch("slat", global_values$values)],
+	global_values$values[pmatch("elat", global_values$values)],
+	global_values$values[pmatch("gridxloc", global_values$values)],
+	global_values$values[pmatch("gridyloc", global_values$values)],
+	global_values$values[pmatch("gridxl3", global_values$values)], 
+	global_values$values[pmatch("gridyl3", global_values$values)],
+	global_values$values[pmatch("gridxl2b", global_values$values)],
+	global_values$values[pmatch("gridyl2b", global_values$values)],
 	paste("id=", L2_id, sep="")
 
 	), fileConn)
