@@ -59,15 +59,20 @@ else
 
 
     # -- write L2B (L3U) daily config files
-    echo "Write MPMD "%NDAYS_OF_MONTH%" daily config files for "${prodtype}": "\
+    echo "Write "%NDAYS_OF_MONTH%" MPMD daily config files for "${prodtype}": "\
          %START_YEAR%/%START_MONTH%" and "%SENSOR%/%SATELLITE%
+
+    l3_global_config_file="%ESA_CONFIGDIR%/${prodtype}_%SENSOR%_${sat_date_base}.txt"
+
+    python %MAKE_CFG_FILE% -cf ${l3_global_config_file} -sy %START_YEAR% -ey %END_YEAR% -sm %START_MONTH% -em %END_MONTH% l2tol3 -ins %SENSOR% -inp n/a -typ ${prodtype}
 
     Rscript %WRITE_MPMD_CFGFILES% --vanilla \
             %START_YEAR% %START_MONTH% ${prodtype} \
             %SENSOR% %SATELLITE% ${jid} %NDAYS_OF_MONTH% \
             %ESA_CONFIGDIR% %CFG_PREFIX% %CFG_SUFFIX% ${cfg_base} \
             %ESA_OUTPUTDIR% \
-            ${filelist_level2_output}
+            ${filelist_level2_output}\
+            ${l3_global_config_file}
 
     # To avoid creation of cores in case of abort, which takes ages...
     module unload atp
