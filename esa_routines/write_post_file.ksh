@@ -8,12 +8,4 @@ echo "'${wat_out_path}.primary.nc'
 '${comb_out_path}.primary.nc'
 '${comb_out_path}.secondary.nc'
 ${switch_phases}
-${cloudy_only}
-${cotthres}
-${cotthres1}
-${cotthres2}
-${proc_flag}
-${INSTRUMENT}
-${lsec}
-${lstrict}
 #END">${postproc_driver}
