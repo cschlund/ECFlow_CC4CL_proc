@@ -21,6 +21,7 @@ FILENAME_REMAPWEIGHTS=${MONTHDIR}/remapweights.nc
 for TIME in 00 06 12 18; do
 
 FILENAME_GRIB='"'${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.grb'"'
+FILENAME_GRIB2='"'${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}_HR.grb'"'
 FILENAME_NETCDF='"'${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.nc'"'
 
 echo "GET_ERA_CCI: Retrieve gribfile " $FILENAME_GRIB
@@ -62,6 +63,19 @@ mars << EOF
                             grid=${latIncr}/${lonIncr},
                             target=${FILENAME_GRIB}
 
+                      retrieve,
+                            time=${STIME},
+                            date=${DATE},
+                            stream=oper,
+                            levtype=sfc,
+                            expver=1,
+                            type=${TYPE},
+                            step=${STEP},
+                            class=ei,
+                            param=31/141/235,
+                            grid=0.1/0.1,
+                            target=${FILENAME_GRIB2}
+
 EOF
 
 rc=$?
@@ -77,20 +91,22 @@ fi
 
 done
 
-
-
 for TIME in 00 06 12 18; do 
 
     FILENAME_GRIB=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.grb
+    FILENAME_GRIB2=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}_HR.grb
     FILENAME_NETCDF=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.nc
+    FILENAME_NETCDF2=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}_HR.nc
 
     cdo -t ecmwf -f nc copy ${FILENAME_GRIB} ${FILENAME_NETCDF}    
+    cdo -t ecmwf -f nc copy ${FILENAME_GRIB2} ${FILENAME_NETCDF2}    
 
     rc=$?
                         
     if [ ${rc} -eq 0 ]; then 
         echo "The MARS GRIB data converted successfully to NetCDF format for ${DATE}!" 
         rm -f ${FILENAME_GRIB}
+        rm -f ${FILENAME_GRIB2}
     fi
     
     if [ ${rc} -ge 1 ]; then 
@@ -113,7 +129,8 @@ for TIME in 00 06 12 18; do
     fi
 
     rc=$?
-                        
+    #rc=1
+    
     if [ ${rc} -eq 0 ]; then 
 	echo "Now doing the actual remapping of file ${FILENAME_NETCDF}..."
 	cdo remap,${gridInfoFile},${FILENAME_REMAPWEIGHTS} ${FILENAME_NETCDF} ${FILENAME_NETCDF}_temp
