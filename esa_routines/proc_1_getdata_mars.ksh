@@ -24,72 +24,47 @@ set -xv
 #proc1 configfile ausfuehren
 . $2
 
+# availability flag
+aflag=-1
+
 MM=$(printf %02d $STARTMONTH)
-gridInfoFile=${INPUTDIR}/ERAinterim/${STARTYEAR}/${MM}/gridinfo.txt
-rm -f ${gridInfoFile}
-Rscript ${ESA_ROUT}/write_ERA_gridinfo.R --vanilla ${lonIncr} ${latIncr} ${gridInfoFile}
 
-unix_start=`${ESA_ROUT}/ymdhms2unix.ksh $STARTYEAR $STARTMONTH $STARTDAY`
+DATADIR=${INPUTDIR}/ERAinterim/${STARTYEAR}/${MM}
 
-if [ $STOPDAY -eq 0 ] ; then 
-    STOPDAY=`cal $STOPMONTH $STOPYEAR | tr -s " " "\n" | tail -1` # nr days of month
-fi
-
-unix_stop=`${ESA_ROUT}/ymdhms2unix.ksh $STOPYEAR $STOPMONTH $STOPDAY`
-unix_counter=$unix_start
-
-while [ $unix_counter -le $unix_stop ]; do 
-
-    # availability flag
-    aflag=-1
-
-    YEAR=`perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');'`
-    MONS=`perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');'`
-    DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'`
-
-    DATADIRE=${INPUTDIR}/ERAinterim/${YEAR}/${MONS}/${DAYS}
-
-    # check if data already on scratch
-    if [ -d $DATADIRE ]; then
-        echo "YES: $DATADIRE exists"
-
-        nfiles=$(ls $DATADIRE/* | wc -l)
-        echo "Number of files: $nfiles"
+# check if data already on scratch
+if [ -d $DATADIR ]; then
+    echo "YES: $DATADIR exists"
+    
+    nfiles=$(ls $DATADIR/* | wc -l)
+    echo "Number of files: $nfiles"
 
         if [ $nfiles -gt 0 ]; then
             aflag=0
         fi
+fi
+
+# get data from MARS
+if [ $aflag -ne 0 ]; then
+    echo "No data available on scratch, get them now"
+    
+    echo "Create target directory: ${DATADIR}"
+    mkdir -p $DATADIR
+    
+    gridInfoFile=${INPUTDIR}/ERAinterim/${STARTYEAR}/${MM}/gridinfo.txt
+    # only create gridInfoFile if it doesn't exist yet
+    if [[ ! -e ${gridInfoFile} ]] 	
+    then
+	echo "Create grid information file for remapping"
+	Rscript ${ESA_ROUT}/write_ERA_gridinfo.R --vanilla ${lonIncr} ${latIncr} ${gridInfoFile}
     fi
+    
+    # get ERA interim
+    DATE=${STARTYEAR}${MM}
 
-    # get data from MARS
-    if [ $aflag -ne 0 ]; then
-        echo "No data available on scratch, get them now"
-
-        echo "Create target directory: ${DATADIRE}"
-        mkdir -p $DATADIRE
-
-	gridInfoFile=${INPUTDIR}/ERAinterim/${YEAR}/${MONS}/gridinfo.txt
-	# only create gridInfoFile if it doesn't exist yet
-	if [[ ! -e ${gridInfoFile} ]] 	
-	then
-	    echo "Create grid information file for remapping"
-	    Rscript ${ESA_ROUT}/write_ERA_gridinfo.R --vanilla ${lonIncr} ${latIncr} ${gridInfoFile}
-	fi
-
-        # get ERA interim by the day
-        DATE=${YEAR}${MONS}${DAYS}
-
-        ${ESA_ROUT}/get_era_cci.ksh $DATE $DATADIRE $latIncr $lonIncr $gridInfoFile
-        retc=${?}
-
-        if [ $retc -ne 0  ]; then 
-            echo "GET_ERA_CCI FAILED: Not all files were retrieved for " ${DATE}"."
-        fi
+    ${ESA_ROUT}/get_era_cci.ksh $STARTYEAR $MM $DATADIR $latIncr $lonIncr $gridInfoFile
+    retc=${?}
+    
+    if [ $retc -ne 0  ]; then 
+        echo "GET_ERA_CCI FAILED: Not all files were retrieved for " ${DATE}"."
     fi
-
-    # go to next day
-    (( unix_counter += 86400 ))
-
-done
-
-# END
+fi

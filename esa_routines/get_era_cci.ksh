@@ -4,43 +4,45 @@
 
 set -x
 
-DATE=${1}
-DATADIR=${2}
-latIncr=${3}
-lonIncr=${4}
-gridInfoFile=${5}
+YEAR=${1}
+MONTH=${2}
+DATADIR=${3}
+latIncr=${4}
+lonIncr=${5}
+gridInfoFile=${6}
 
 export MARS_MULTITARGET_STRICT_FORMAT=1
 
 TYPE=an
 STEP=00
 
-MONTHDIR=`exec dirname ${DATADIR}`
-FILENAME_REMAPWEIGHTS=${MONTHDIR}/remapweights.nc
+DATE=$YEAR$MONTH
 
-for TIME in 00 06 12 18; do
+ndays=`cal ${MONTH} ${YEAR} | egrep -v [a-z] | wc -w`
+dates=""
 
-FILENAME_GRIB='"'${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.grb'"'
-FILENAME_GRIB2='"'${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}_HR.grb'"'
-FILENAME_NETCDF='"'${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.nc'"'
+for f in {1..$ndays}; do 
+    ff=`expr $(printf %02d $f)`
+    if [[ ${f} == ${ndays} ]]; then
+	dates=${dates}${YEAR}${MONTH}${ff}
+    else
+	dates=${dates}${YEAR}${MONTH}${ff}/
+    fi
+done
+
+FILENAME_REMAPWEIGHTS=${DATADIR}/remapweights.nc
+FILENAME_GRIB='"'${DATADIR}/ERA_Interim_${TYPE}_[date]_[time]+${STEP}.grb'"'
+FILENAME_GRIB2='"'${DATADIR}/ERA_Interim_${TYPE}_[date]_[time]+${STEP}_HR.grb'"'
 
 echo "GET_ERA_CCI: Retrieve gribfile " $FILENAME_GRIB
-
-
-[[ ${TIME} -eq 00 ]] && STIME=00:00:00
-[[ ${TIME} -eq 06 ]] && STIME=06:00:00
-[[ ${TIME} -eq 12 ]] && STIME=12:00:00
-[[ ${TIME} -eq 18 ]] && STIME=18:00:00
 
 mars << EOF
 
                       retrieve,
-                            time=${STIME},
-                            date=${DATE},
+                            time=00/06/12/18,
+                            date=${dates},
                             stream=oper,
-                          # levtype=pl,
                             levtype=ml,
-                          # levelist=100/200/300/400/500/600/700/850/925/1000,
                             levelist=all,
                             expver=1,
                             type=${TYPE},
@@ -51,8 +53,8 @@ mars << EOF
                             target=${FILENAME_GRIB}
 
                       retrieve,
-                            time=${STIME},
-                            date=${DATE},
+                            time=00/06/12/18,
+                            date=${dates},
                             stream=oper,
                             levtype=sfc,
                             expver=1,
@@ -64,8 +66,8 @@ mars << EOF
                             target=${FILENAME_GRIB}
 
                       retrieve,
-                            time=${STIME},
-                            date=${DATE},
+                            time=00/06/12/18,
+                            date=${dates},
                             stream=oper,
                             levtype=sfc,
                             expver=1,
@@ -81,64 +83,63 @@ EOF
 rc=$?
                     
 if [ ${rc} -eq 0 ]; then 
-    echo "The MARS ERA interim request for ${DATE} ran successfully at `date`!"
+    echo "The MARS ERA interim request for ${YEAR}${MONTH} ran successfully!"
 fi
 
 if [ ${rc} -ge 1 ]; then 
-    echo "ERROR: The MARS ERA interim request for ${DATE} FAILED at `date`!" 
+    echo "ERROR: The MARS ERA interim request for ${DATE} FAILED" 
     exit 1
 fi
 
+sep="+"
+for file in ${DATADIR}/*grb; do 
+    base=`exec echo "${file}" | awk '{ print $1 }' | cut -f1 -d${sep}`
+    end=`exec basename "${file}" .grb | awk '{ print $1 }' | cut -f2 -d${sep}`
+    cutoff=`expr length ${base} - 2`
+    basecut=`expr ${base} | cut -c -${cutoff}`
+    FILENAME_NETCDF=${basecut}${sep}${end}.nc
+    cdo -t ecmwf -f nc copy "${file}" ${FILENAME_NETCDF}
+    rc=$?
+    if [ ${rc} -eq 0 ]; then 
+        echo "MARS GRIB data converted successfully to NetCDF format for files ${file} (source) and ${FILENAME_NETCDF} (target)." 
+        rm -f "${file}"
+    else
+        echo "ERROR: MARS GRIB data conversion to NetCDF format FAILED for files ${file} (source) and ${FILENAME_NETCDF} (target)." 
+        exit 1	
+    fi
 done
 
-for TIME in 00 06 12 18; do 
-
-    FILENAME_GRIB=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.grb
-    FILENAME_GRIB2=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}_HR.grb
-    FILENAME_NETCDF=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}.nc
-    FILENAME_NETCDF2=${DATADIR}/ERA_Interim_${TYPE}_${DATE}_${TIME}+${STEP}_HR.nc
-
-    cdo -t ecmwf -f nc copy ${FILENAME_GRIB} ${FILENAME_NETCDF}    
-    cdo -t ecmwf -f nc copy ${FILENAME_GRIB2} ${FILENAME_NETCDF2}    
-
+# Produce NetCDF file of remapping weights for ERA data.
+# This file is needed by CDO to remap ERA data onto
+# the preprocessing grid, and helps to double processing speed.
+# Do this only if file does not exist yet.
+if [[ ! -e ${FILENAME_REMAPWEIGHTS} ]] 
+then
+    FILENAME_NETCDF=`find $DATADIR -type f \( -iname "*.nc" ! -iname "*HR.nc" \) | head -n 1`
+    echo "Generating ERA-Interim remapping weights for ${DATE}"
+    echo "Input file = "${FILENAME_NETCDF}", output file = "${FILENAME_REMAPWEIGHTS}  
+    cdo gendis,${gridInfoFile} ${FILENAME_NETCDF} ${FILENAME_REMAPWEIGHTS}  
     rc=$?
-                        
     if [ ${rc} -eq 0 ]; then 
-        echo "The MARS GRIB data converted successfully to NetCDF format for ${DATE}!" 
-        rm -f ${FILENAME_GRIB}
-        rm -f ${FILENAME_GRIB2}
+        echo "Remapping weights successfully created for ${DATE}!" 
+    else
+	echo "ERROR: Creating remapping weights FAILED ${DATE}!" 
+	exit 1
     fi
-    
-    if [ ${rc} -ge 1 ]; then 
-        echo "ERROR: The MARS GRIB data conversion to NetCDF format FAILED for ${DATE}!" 
-        exit 1
-    fi
+fi
 
-    # Produce NetCDF file of remapping weights for ERA data.
-    # This file is needed by CDO to remap ERA data onto
-    # the preprocessing grid, and helps to double processing speed.
-    # Do this only if file does not exist yet.
-    if [[ ! -e ${FILENAME_REMAPWEIGHTS} ]] 
-    then
-	echo "Generating ERA-Interim remapping weights for ${DATE}"
-	cdo gendis,${gridInfoFile} ${FILENAME_NETCDF} ${FILENAME_REMAPWEIGHTS}  
-	rc2=$?
-	if [ ${rc2} -eq 0 ]; then 
-            echo "Remapping weights successfully created for ${DATE}!" 
-	fi
-    fi
+set -A to_be_remapped `find $DATADIR -type f -iname "*00.nc"`
+nremap=`expr ${#to_be_remapped[*]} - 1`
 
+for f in {0..$nremap}; do 
+    echo ${to_be_remapped[$f]}
+    cdo remap,${gridInfoFile},${FILENAME_REMAPWEIGHTS} ${to_be_remapped[$f]} ${to_be_remapped[$f]}_temp    
     rc=$?
-    #rc=1
-    
     if [ ${rc} -eq 0 ]; then 
-	echo "Now doing the actual remapping of file ${FILENAME_NETCDF}..."
-	cdo remap,${gridInfoFile},${FILENAME_REMAPWEIGHTS} ${FILENAME_NETCDF} ${FILENAME_NETCDF}_temp
-	rc2=$?
-	if [ ${rc2} -eq 0 ]; then 
-	    mv ${FILENAME_NETCDF}_temp ${FILENAME_NETCDF}
-	fi
+	echo "successfully remapped ${to_be_remapped[$f]}"
+ 	mv ${to_be_remapped[$f]}_temp ${to_be_remapped[$f]}
+    else
+	echo "ERROR: Remapping file ${to_be_remapped[$f]}." 
+	exit 1	
     fi
-
 done
-
