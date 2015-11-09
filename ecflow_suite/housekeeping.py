@@ -317,7 +317,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("PROC2_ORAC_KSH", proc2_orac_ksh)
     suite.add_variable("SINGLE_DAY_KSH", single_day_ksh)
     suite.add_variable("RUN_L2TOL3_KSH", run_l2tol3_ksh)
-    suite.add_variable("REMAP_ERA_KSH", remap_era_ksh)
+    suite.add_variable("REMAP_ERA_PARALLEL_KSH", remap_era_parallel_ksh)
     suite.add_variable("REMAP_ERA_SEQUENTIAL_KSH", remap_era_sequential_ksh)
     suite.add_variable("WRAPPER_EXE", wrapper_exe)
     suite.add_variable("BIG_FAM", big_fam)
