@@ -28,7 +28,7 @@ else
     
     # -- remap low resolution ERA data onto preprocessing grid
     # write taskfile
-    Rscript %WRITE_MPMD_REMAP_TASKFILE% --vanilla ${era_dir} ${gridInfoFile} ${remapWeightsFile} ${taskfile} %REMAP_ERA_KSH%
+    Rscript %WRITE_MPMD_REMAP_TASKFILE% --vanilla ${era_dir} ${gridInfoFile} ${remapWeightsFile} ${taskfile} %REMAP_ERA_PARALLEL_KSH%
 
     # To avoid creation of cores in case of abort, which takes ages...
     module unload atp
