@@ -69,6 +69,7 @@ cleanup_scratch = os.path.join(esa_routine, "cleanup_scratch.py")
 archive_data = os.path.join(esa_routine, "proc_4_archive_data.py")
 write_mpmd_taskfile = os.path.join(esa_routine, "write_l3_mpmd_taskfile.R")
 write_mpmd_cfgfiles = os.path.join(esa_routine, "write_l3_mpmd_config_files.R")
+write_mpmd_remap_taskfile = os.path.join(esa_routine, "write_mpmd_remap_taskfile.R")
 count_avhrr_orbits = os.path.join(esa_routine, "count_AVHRR_orbits.R")
 
 # config files
@@ -86,6 +87,8 @@ get_aux_ksh = os.path.join(esa_routine, "proc_1_getdata_aux.ksh")
 proc2_orac_ksh = os.path.join(esa_routine, "proc_2_process.ksh")
 single_day_ksh = os.path.join(esa_routine, "process_single_day.ksh")
 run_l2tol3_ksh = os.path.join(esa_routine, "proc_3_l2tol3_script.ksh")
+remap_era_parallel_ksh = os.path.join(esa_routine, "remap_ERA_parallel.ksh")
+remap_era_sequential_ksh = os.path.join(esa_routine, "remap_ERA_sequential.ksh")
 
 # exe scripts
 wrapper_exe = os.path.join(esa_routine, "mpi_wrapper.x")
