@@ -339,7 +339,7 @@ while [ $ifile -lt $nl1b ]; do
     path_to_l1b=${l1b_list[$ifile]}
     path_to_geo=${geo_list[$ifile]}
     path_to_USGS=${USGS_file}
-    path_to_ecmwf=${INPUTDIR}/ERAinterim/${YEAR}/${MONTHS}/${DAYS}
+    path_to_ecmwf=${INPUTDIR}/ERAinterim/${YEAR}/${MONTHS}
     path_to_coeffs=${perm_aux}/coeffs
 
     echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE OUTPUT DIRS" >> ${daily_log}
