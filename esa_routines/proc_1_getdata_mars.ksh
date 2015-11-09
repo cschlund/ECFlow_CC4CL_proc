@@ -24,6 +24,12 @@ set -xv
 #proc1 configfile ausfuehren
 . $2
 
+#name of grid info file
+gridInfoFile=${3}
+
+#name of remapping weights file
+remapWeightsFile=${4}
+
 # availability flag
 aflag=-1
 
@@ -35,7 +41,7 @@ DATADIR=${INPUTDIR}/ERAinterim/${STARTYEAR}/${MM}
 if [ -d $DATADIR ]; then
     echo "YES: $DATADIR exists"
     
-    nfiles=$(ls $DATADIR/* | wc -l)
+    nfiles=$(ls $DATADIR/ERA_Interim*nc | wc -l)
     echo "Number of files: $nfiles"
 
         if [ $nfiles -gt 0 ]; then
@@ -50,7 +56,6 @@ if [ $aflag -ne 0 ]; then
     echo "Create target directory: ${DATADIR}"
     mkdir -p $DATADIR
     
-    gridInfoFile=${INPUTDIR}/ERAinterim/${STARTYEAR}/${MM}/gridinfo.txt
     # only create gridInfoFile if it doesn't exist yet
     if [[ ! -e ${gridInfoFile} ]] 	
     then
@@ -61,7 +66,7 @@ if [ $aflag -ne 0 ]; then
     # get ERA interim
     DATE=${STARTYEAR}${MM}
 
-    ${ESA_ROUT}/get_era_cci.ksh $STARTYEAR $MM $DATADIR $latIncr $lonIncr $gridInfoFile
+    ${ESA_ROUT}/get_era_cci.ksh $STARTYEAR $MM $DATADIR $latIncr $lonIncr $gridInfoFile $remapWeightsFile
     retc=${?}
     
     if [ $retc -ne 0  ]; then 
