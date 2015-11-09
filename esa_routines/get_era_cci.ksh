@@ -10,6 +10,7 @@ DATADIR=${3}
 latIncr=${4}
 lonIncr=${5}
 gridInfoFile=${6}
+FILENAME_REMAPWEIGHTS=${7}
 
 export MARS_MULTITARGET_STRICT_FORMAT=1
 
@@ -30,7 +31,6 @@ for f in {1..$ndays}; do
     fi
 done
 
-FILENAME_REMAPWEIGHTS=${DATADIR}/remapweights.nc
 FILENAME_GRIB='"'${DATADIR}/ERA_Interim_${TYPE}_[date]_[time]+${STEP}.grb'"'
 FILENAME_GRIB2='"'${DATADIR}/ERA_Interim_${TYPE}_[date]_[time]+${STEP}_HR.grb'"'
 
@@ -102,44 +102,32 @@ for file in ${DATADIR}/*grb; do
     rc=$?
     if [ ${rc} -eq 0 ]; then 
         echo "MARS GRIB data converted successfully to NetCDF format for files ${file} (source) and ${FILENAME_NETCDF} (target)." 
-        rm -f "${file}"
+   
+        # Produce NetCDF file of remapping weights for ERA data.
+        # This file is needed by CDO to remap ERA data onto
+        # the preprocessing grid, and helps to double processing speed.
+        # Do this only if file does not exist yet.
+	if [[ ! -e ${FILENAME_REMAPWEIGHTS} ]] 
+	then
+	    # FILENAME_NETCDF=`find $DATADIR -type f \( -iname "*.nc" ! -iname "*HR.nc" \) | head -n 1`
+	    echo "Generating ERA-Interim remapping weights for ${DATE}"
+	    echo "Input file = "${FILENAME_NETCDF}", output file = "${FILENAME_REMAPWEIGHTS}  
+	    cdo gendis,${gridInfoFile} ${FILENAME_NETCDF} ${FILENAME_REMAPWEIGHTS}  
+	    rc=$?
+	    if [ ${rc} -eq 0 ]; then 
+		echo "Remapping weights successfully created for ${DATE}!" 
+		rm -f ${FILENAME_NETCDF}
+	    else
+		echo "ERROR: Creating remapping weights FAILED ${DATE}!" 
+		exit 1
+	    fi
+	fi       	
     else
         echo "ERROR: MARS GRIB data conversion to NetCDF format FAILED for files ${file} (source) and ${FILENAME_NETCDF} (target)." 
         exit 1	
     fi
+
+    break
+
 done
 
-# Produce NetCDF file of remapping weights for ERA data.
-# This file is needed by CDO to remap ERA data onto
-# the preprocessing grid, and helps to double processing speed.
-# Do this only if file does not exist yet.
-if [[ ! -e ${FILENAME_REMAPWEIGHTS} ]] 
-then
-    FILENAME_NETCDF=`find $DATADIR -type f \( -iname "*.nc" ! -iname "*HR.nc" \) | head -n 1`
-    echo "Generating ERA-Interim remapping weights for ${DATE}"
-    echo "Input file = "${FILENAME_NETCDF}", output file = "${FILENAME_REMAPWEIGHTS}  
-    cdo gendis,${gridInfoFile} ${FILENAME_NETCDF} ${FILENAME_REMAPWEIGHTS}  
-    rc=$?
-    if [ ${rc} -eq 0 ]; then 
-        echo "Remapping weights successfully created for ${DATE}!" 
-    else
-	echo "ERROR: Creating remapping weights FAILED ${DATE}!" 
-	exit 1
-    fi
-fi
-
-set -A to_be_remapped `find $DATADIR -type f -iname "*00.nc"`
-nremap=`expr ${#to_be_remapped[*]} - 1`
-
-for f in {0..$nremap}; do 
-    echo ${to_be_remapped[$f]}
-    cdo remap,${gridInfoFile},${FILENAME_REMAPWEIGHTS} ${to_be_remapped[$f]} ${to_be_remapped[$f]}_temp    
-    rc=$?
-    if [ ${rc} -eq 0 ]; then 
-	echo "successfully remapped ${to_be_remapped[$f]}"
- 	mv ${to_be_remapped[$f]}_temp ${to_be_remapped[$f]}
-    else
-	echo "ERROR: Remapping file ${to_be_remapped[$f]}." 
-	exit 1	
-    fi
-done
