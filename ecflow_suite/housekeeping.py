@@ -268,6 +268,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("ECF_OUT", ecf_out_dir)
     # default value
     suite.add_variable("EC_TOTAL_SLAVES", 1)
+    suite.add_variable("EC_GET_ERA_SLAVES", 1)
     suite.add_variable("NDAYS_SATDATA", 1)
 
     # Miscellaneous:
@@ -287,6 +288,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("DUMMYRUN", dummycase)
     suite.add_variable("WRITE_MPMD_TASKFILE", write_mpmd_taskfile)
     suite.add_variable("WRITE_MPMD_CFGFILES", write_mpmd_cfgfiles)
+    suite.add_variable("WRITE_MPMD_REMAP_TASKFILE", write_mpmd_remap_taskfile)
     suite.add_variable("COUNT_AVHRR_ORBITS", count_avhrr_orbits)
     suite.add_variable("MPMD_SUBMITTER", mpmd_submitter)
 
@@ -315,6 +317,8 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("PROC2_ORAC_KSH", proc2_orac_ksh)
     suite.add_variable("SINGLE_DAY_KSH", single_day_ksh)
     suite.add_variable("RUN_L2TOL3_KSH", run_l2tol3_ksh)
+    suite.add_variable("REMAP_ERA_KSH", remap_era_ksh)
+    suite.add_variable("REMAP_ERA_SEQUENTIAL_KSH", remap_era_sequential_ksh)
     suite.add_variable("WRAPPER_EXE", wrapper_exe)
     suite.add_variable("BIG_FAM", big_fam)
     suite.add_variable("MAINPROC_FAM", mainproc_fam)
