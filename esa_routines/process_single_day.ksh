@@ -402,11 +402,12 @@ while [ $ifile -lt $nl1b ]; do
     # -- C. Schlundt, 2014-12-02
     aux_input_dir=${path_to_ecmwf}
     suffix=nc #grb
-    path_to_ecmwf=$(python $pick_aux_datafile \
+    set -A ecmwf_files $(python $pick_aux_datafile2 \
         --inpdir $aux_input_dir --suffix $suffix \
         --year $YEAR --month $MONTHS --day $DAYS \
         --hour $HOUR --minute $MINUTE)  >> ${daily_log}
-
+    ERA_before_satellite=${ecmwf_files[0]}
+    ERA_after_satellite=${ecmwf_files[1]}
 
     # --------------------------------------------------------------------- #
     #                                                                       #
