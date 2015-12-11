@@ -18,18 +18,20 @@ TYPE=an
 STEP=00
 
 DATE=$YEAR$MONTH
-
 ndays=`cal ${MONTH} ${YEAR} | egrep -v [a-z] | wc -w`
-dates=""
 
+# also get data from last day of previous month and first day of
+# following month for interpolation between successive ERA data
+previous_day=`date -d "$YEAR$MONTH"01" -1 day" +%Y%m%d`/
+following_day=`date -d "$YEAR$MONTH$ndays +1 day" +%Y%m%d`
+
+# build dates to be retrieved
+dates=${previous_day}
 for f in {1..$ndays}; do 
     ff=`expr $(printf %02d $f)`
-    if [[ ${f} == ${ndays} ]]; then
-	dates=${dates}${YEAR}${MONTH}${ff}
-    else
-	dates=${dates}${YEAR}${MONTH}${ff}/
-    fi
+    dates=${dates}${YEAR}${MONTH}${ff}/
 done
+dates=${dates}${following_day}
 
 FILENAME_GRIB='"'${DATADIR}/ERA_Interim_${TYPE}_[date]_[time]+${STEP}.grb'"'
 FILENAME_GRIB2='"'${DATADIR}/ERA_Interim_${TYPE}_[date]_[time]+${STEP}_HR.grb'"'
