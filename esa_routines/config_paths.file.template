@@ -55,6 +55,7 @@ TEMP_LIST_L2FILES=$SCRATCH_BASE/temp_list_l2files
 # ---------------------------------------------------------------
 create_cfg_files=$ESA_ROUT/create_config_files.py
 pick_aux_datafile=$ESA_ROUT/pick_aux_dir.py
+pick_aux_datafile2=$ESA_ROUT/pick_aux_dir2.py
 get_number_of_slaves=$ESA_ROUT/count_orbit_files.sh
 cleanup_scratch=$ESA_ROUT/cleanup_scratch.py
 archive_data=$ESA_ROUT/proc_4_archive_data.py
