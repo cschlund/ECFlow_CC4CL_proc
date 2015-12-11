@@ -11,7 +11,7 @@ if [ %DUMMYRUN% == 1 ]; then
 else
 
     days_per_month=`cal %START_MONTH% %START_YEAR% | awk 'NF {DAYS = $NF}; END {print DAYS}'`
-    new=`expr ${days_per_month} \* 4`
+    new=`expr ${days_per_month} \* 4 + 8`
     ecflow_client --alter add variable 'EC_GET_ERA_SLAVES' "$new" '/%SUITE%/%FAMILY%'
 
     mkdir -p %ESA_CONFIGDIR%
