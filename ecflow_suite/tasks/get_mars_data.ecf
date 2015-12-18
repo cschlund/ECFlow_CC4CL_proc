@@ -26,34 +26,39 @@ else
     # this will get all ERA data, but does not perform remapping
     %GET_MARS_KSH% %CFG_PATHS_FILE% ${cfg_fil} ${gridInfoFile} ${remapWeightsFile}
     
-    # -- remap low resolution ERA data onto preprocessing grid
-    # write taskfile
-    Rscript %WRITE_MPMD_REMAP_TASKFILE% --vanilla ${era_dir} ${gridInfoFile} ${remapWeightsFile} ${taskfile} %REMAP_ERA_PARALLEL_KSH%
+    n_grib_files=`exec ls ${era_dir}/*.grb | wc -l`
 
-    # To avoid creation of cores in case of abort, which takes ages...
-    module unload atp
+    if [ ${n_grib_files} -ne 0 ]; then
+        # -- remap low resolution ERA data onto preprocessing grid
+        # write taskfile
+	Rscript %WRITE_MPMD_REMAP_TASKFILE% --vanilla ${era_dir} ${gridInfoFile} ${remapWeightsFile} ${taskfile} %REMAP_ERA_PARALLEL_KSH%
 
-    # For OpenMP tasks
-    export OMP_NUM_THREADS=$EC_threads_per_task
+        # To avoid creation of cores in case of abort, which takes ages...
+	module unload atp
+
+        # For OpenMP tasks
+	export OMP_NUM_THREADS=$EC_threads_per_task
     
-    # -- call aprun using the MPMD submitter
-    echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${taskfile}
+        # -- call aprun using the MPMD submitter
+	echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${taskfile}
 
-    # -- extract and subsequently delete daily zip files
-    aprun -n $EC_total_tasks \
-	-N $EC_tasks_per_node \
-        -d $EC_threads_per_task \
-        -j $EC_hyperthreads \
-	%MPMD_SUBMITTER% ${taskfile}
-
-# -- do sequential remapping of all remaining GRIB files that were not processed
-    for file in ${era_dir}/*grb; do
-	[ -e "$file" ] && 
-	echo "Not all GRIB files have been converted/remapped." 
-	%REMAP_ERA_SEQUENTIAL_KSH% ${era_dir} ${gridInfoFile} ${remapWeightsFile} || 
-	echo "All GRIB files have been converted/remapped."
-	break
-    done
+        # -- extract and subsequently delete daily zip files
+	aprun -n $EC_total_tasks \
+	    -N $EC_tasks_per_node \
+            -d $EC_threads_per_task \
+            -j $EC_hyperthreads \
+	    %MPMD_SUBMITTER% ${taskfile}
+	
+        # -- do sequential remapping of all remaining GRIB files that were not processed
+	for file in ${era_dir}/*grb; do
+	    [ -e "$file" ] && 
+	    echo "Not all GRIB files have been converted/remapped." 
+	    %REMAP_ERA_SEQUENTIAL_KSH% ${era_dir} ${gridInfoFile} ${remapWeightsFile} || 
+	    echo "All GRIB files have been converted/remapped."
+	    break
+	done
+	
+    fi
     
 fi
 
