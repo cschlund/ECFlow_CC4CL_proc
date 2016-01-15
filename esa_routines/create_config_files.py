@@ -315,7 +315,10 @@ def l2tol3(args_l3):
         f.write("\n")
         f.write("# set here some details about the grid:\n")
         f.write("# produce global grid (F) or local grid (T)\n")
-        f.write("local=F\n")
+        if args_l3.local:
+            f.write("local=T\n")
+        else:
+            f.write("local=F\n")
         f.write("\n")
         f.write("# for global grid (local=F) the following parameters\n")
         f.write("# are set internally in the source-code\n")
@@ -430,6 +433,8 @@ if __name__ == '__main__':
                                help="Choices: \'l3a\' = L3U or \'l3b\' = L3S")
     l2tol3_parser.add_argument('-lfl', '--l2bsum_filelist', type=str,
                                help="String, /path/to/filelist/of/l2bsum/files")
+    l2tol3_parser.add_argument('-loc', '--local', action="store_true",
+                               help="Logical, TRUE if set, otherwise FALSE")
     l2tol3_parser.set_defaults(func=l2tol3)
 
     # Parse arguments

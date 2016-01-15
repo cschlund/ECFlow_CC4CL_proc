@@ -129,12 +129,22 @@ def l3(args_l3):
 
             # collect right subfolders
             for ad in alldirs:
-                if datestring in ad \
-                        and args_l3.instrument.upper() in ad \
-                        and args_l3.satellite.upper() in ad \
-                        and args_l3.prodtype.upper() in ad \
-                        and prodtype_name in ad: 
-                            getdirs.append(ad)
+                if args_l3.local:
+                    if datestring in ad \
+                            and args_l3.instrument.upper() in ad \
+                            and args_l3.satellite.upper() in ad \
+                            and args_l3.prodtype.upper() in ad \
+                            and "Europe" in ad \
+                            and prodtype_name in ad: 
+                        getdirs.append(ad)
+                else:
+                    if datestring in ad \
+                            and args_l3.instrument.upper() in ad \
+                            and args_l3.satellite.upper() in ad \
+                            and args_l3.prodtype.upper() in ad \
+                            and "Europe" not in ad \
+                            and prodtype_name in ad: 
+                        getdirs.append(ad)                    
 
             # sort list
             getdirs.sort()
@@ -147,7 +157,7 @@ def l3(args_l3):
 
             # make tarfile
             (tlist, tempdir) = tar_results(args_l3.prodtype.upper(), args_l3.inpdir, 
-                                           datestring, sensor, platform, idnumber)
+                                           datestring, sensor, platform, idnumber, args_l3.local)
 
             logger.info("Copy2ECFS: {0}".format(tlist))
             copy_into_ecfs(datestring, tlist, args_l3.ecfsdir)
@@ -212,7 +222,9 @@ if __name__ == '__main__':
     l3_parser.add_argument('--ecfsdir', type=str, required=True,
                            help='String, e.g. /ecfs/path/to/L3/data')
     l3_parser.add_argument('--prodtype', type=str, required=True,
-                            help="Choices: \'L3U\', \'L3C\', \'L3S\'")
+                           help="Choices: \'L3U\', \'L3C\', \'L3S\'")
+    l3_parser.add_argument('-loc', '--local', action="store_true",
+                           help="Logical, TRUE if set, otherwise FALSE")
     l3_parser.set_defaults(func=l3)
 
     # Parse arguments
