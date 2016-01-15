@@ -109,7 +109,7 @@
 	     sensor_version=${sensor_version_avhrr}
 	     #global/local
 	     if [ "${local}" = T ] ; then
-             prod_name=daily_samples_${area}
+             prod_name=daily_samples_Europe
              gridx=${gridxloc}
              gridy=${gridyloc}
 	     fi
@@ -119,7 +119,7 @@
 	     sensor_version=${sensor_version_modis}
 	     #global/local
 	     if [ "${local}" = T ] ; then
-	         prod_name=daily_samples_${area}
+	         prod_name=daily_samples_Europe
 	         gridx=${gridxloc}
 	         gridy=${gridyloc}
 	     fi
@@ -136,7 +136,7 @@
     if [ "${sensor}" = AVHRR ] ; then
       sensor_version=${sensor_version_avhrr}
       if [ "${local}" = T ] ; then
-         prod_name=monthly_means_${area}
+         prod_name=monthly_means_Europe
          gridx=${gridxloc}
          gridy=${gridyloc}
       fi
@@ -144,7 +144,7 @@
     if [ "${sensor}" = MODIS ] ; then
        sensor_version=${sensor_version_modis}
        if [ "${local}" = T ] ; then
-          prod_name=monthly_means_${area}
+          prod_name=monthly_means_Europe
           gridx=${gridxloc}
           gridy=${gridyloc}
        fi
@@ -162,7 +162,7 @@
     if [ "${sensor}" = AVHRR ] ; then
       sensor_version=${sensor_version_avhrr}
       if [ "${local}" = T ] ; then
-         prod_name=monthly_means_${area}
+         prod_name=monthly_means_Europe
          gridx=${gridxloc}
          gridy=${gridyloc}
       fi
@@ -170,7 +170,7 @@
     if [ "${sensor}" = MODIS ] ; then
        sensor_version=${sensor_version_modis}
        if [ "${local}" = T ] ; then
-          prod_name=monthly_means_${area}
+          prod_name=monthly_means_Europe
           gridx=${gridxloc}
           gridy=${gridyloc}
        fi
@@ -187,7 +187,7 @@
        platform=NOAAs_METOPs
        sensor_version=${sensor_version_avhrr}
        if [ "${local}" = T ] ; then
-          prod_name=monthly_means_${area}
+          prod_name=monthly_means_Europe
           gridx=${gridxloc}
           gridy=${gridyloc}
        fi
@@ -196,7 +196,7 @@
        platform=AQUA_TERRA
        sensor_version=${sensor_version_modis}
        if [ "${local}" = T ] ; then
-          prod_name=monthly_means_${area}
+          prod_name=monthly_means_Europe
           gridx=${gridxloc}
           gridy=${gridyloc}
        fi
@@ -212,7 +212,7 @@ if [ "$prodtype" = l3c ] ; then
     sensor_version=${sensor_version_modis}" and "${sensor_version_avhrr}
     prod_name=monthly_means_global
     if [ "${local}" = T ] ; then
-       prod_name=monthly_means_${area}
+       prod_name=monthly_means_Europe
        gridx=${gridxloc}
        gridy=${gridyloc}
     fi

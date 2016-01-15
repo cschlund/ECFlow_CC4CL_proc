@@ -237,10 +237,17 @@ def clear_l3(args_l3):
         last_day_of_month = calendar.monthrange(args_l3.year, args_l3.month)[1]
         for iday in range(last_day_of_month):
             iday += 1
-            cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
-                      platform.upper() + '_' + \
-                      str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
-                      str('%02d' % iday) + cfg_suffix 
+            if args_l3.local:
+                cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
+                    platform.upper() + '_' + \
+                    str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
+                    str('%02d' % iday) + "_Europe" + cfg_suffix 
+            else:
+                cfgbase = cfg_prefix + "3_make_" + args_l3.prodtype.lower() + '_' + \
+                    platform.upper() + '_' + \
+                    str(args_l3.year) + '_' + str('%02d' % args_l3.month) + '_' + \
+                    str('%02d' % iday) + cfg_suffix 
+
             cfgfile = os.path.join(args_l3.cfgdir, cfgbase)
             cfg_file_list.append(cfgfile)
 
@@ -267,7 +274,6 @@ def clear_l3(args_l3):
             logger.info("Nothing to delete: \'{0}\' doesn't exist!".
                     format(cfile))
 
-
     # date string
     datestr = str(args_l3.year) + str('%02d' % args_l3.month)
 
@@ -286,10 +292,18 @@ def clear_l3(args_l3):
                     getdirs.append( os.path.join(args_l3.inpdir, ad) )
             # L3C, L3U, L2B_SUM: sensor and platform in subdirectory_name
             else:
-                if datestr in ad and sensor in ad \
-                        and args_l3.prodtype.upper() in ad \
-                        and 'ORAC' in ad and platform in ad:
-                    getdirs.append( os.path.join(args_l3.inpdir, ad) )
+                if args_l3.local:
+                    if datestr in ad and sensor in ad \
+                            and args_l3.prodtype.upper() in ad \
+                            and 'ORAC' in ad and platform in ad \
+                            and 'Europe' in ad:
+                        getdirs.append( os.path.join(args_l3.inpdir, ad) )
+                else:
+                    if datestr in ad and sensor in ad \
+                            and args_l3.prodtype.upper() in ad \
+                            and 'ORAC' in ad and platform in ad \
+                            and not 'Europe' in ad:
+                        getdirs.append( os.path.join(args_l3.inpdir, ad) )
 
         # check if getdirs list is empty
         if len(getdirs) == 0:
@@ -440,6 +454,8 @@ if __name__ == '__main__':
                                  help="String, e.g. AVHRR, MODIS")
     clear_l3_parser.add_argument('--prodtype', type=str, required=True,
                                  help="Choices: \'L2B_SUM\', \'L3U\', \'L3C\', \'L3S\'")
+    clear_l3_parser.add_argument('-loc', '--local', action="store_true",
+                                 help="Logical, TRUE if set, otherwise FALSE")
     clear_l3_parser.set_defaults(func=clear_l3)
 
     # -> remove auxiliary dataset if month was successful
