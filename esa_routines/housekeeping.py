@@ -186,7 +186,7 @@ def copy_into_ecfs(datestring, file_list, ecfspath):
         logger.info("STDERR:{0}".format(stderr))
 
 
-def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber):
+def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber, local):
     """
     Creates L2, L3U or L3C tarfile.
     """
@@ -202,10 +202,13 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber):
         sys.exit(0)
 
     # -- create tarname
-    tarname = create_tarname(typ, datestring, sensor, platform)
+    tarname = create_tarname(typ, datestring, sensor, platform, local)
 
     # -- define temp. subfolder for tar creation
-    tempdir = os.path.join(inpdir, "tmp_tardir_" + typ.lower())
+    if local:
+        tempdir = os.path.join(inpdir, "tmp_tardir_" + typ.lower() + "_Europe")
+    else:
+        tempdir = os.path.join(inpdir, "tmp_tardir_" + typ.lower())
     create_dir(tempdir)
 
     # -- final tarfile to be copied into ECFS
@@ -475,7 +478,7 @@ def split_platform_string(platform):
     return m.group(1), m.group(2)
 
 
-def create_tarname(ctype, datestring, sensor, platform):
+def create_tarname(ctype, datestring, sensor, platform, local):
     """
     Create tar filename.
     Usage: create_tarname( "L3U", 200806, AVHRR, NOAA18 )
@@ -485,12 +488,15 @@ def create_tarname(ctype, datestring, sensor, platform):
     filver = get_file_version()
     esacci = "ESACCI"
     cloudp = "CLOUD-CLD_PRODUCTS"
-    suffix = "fv"+filver+".tar"
+    if local:
+        suffix = "fv"+filver+"_Europe.tar"
+    else:
+        suffix = "fv"+filver+".tar"
 
     tarname = datestring + '-' + esacci + '-' + ctype + \
               '_' + cloudp + '-' + sensor + '_' + \
               platform + '-' + suffix
-
+    
     return tarname
 
 

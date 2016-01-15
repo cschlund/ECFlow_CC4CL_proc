@@ -19,9 +19,8 @@ flist_l2_out = args[14]
 global_conf  = args[15]
 
 global_values = read.table( global_conf, as.is=T, col.names = "values")
-
-## base path of L2 output data
-#base_path ="/scratch/ms/de/sf7/esa_cci_c_proc/CCFLOW/ECFlow_CC4CL_proc/output"
+local = global_values$values[pmatch("local", global_values$values)]
+local = unlist(strsplit(local, "="))[2]
 
 # convert single digit months to double digits
 month_mm = ifelse( nchar( month ) == 1, paste( "0", month, sep="" ), month )
@@ -47,7 +46,7 @@ for (i in 1:ndays) {
     i_dd = ifelse(nchar(i_dd) == 1, paste("0", i_dd, sep=""), i_dd)
 
     # build config file name (consistent with write MPMD taskfile!)
-    config_file = paste(cfg_dir, "/", cfg_prefix, cfg_base, i_dd, cfg_suffix, sep="")
+    config_file = paste(cfg_dir, "/", cfg_prefix, cfg_base, i_dd, ifelse(local, "_Europe", ""), cfg_suffix, sep="")
 
     # open config file connection
     fileConn = file( config_file )

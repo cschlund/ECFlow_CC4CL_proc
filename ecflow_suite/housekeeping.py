@@ -409,7 +409,7 @@ def add_dearchiving_tasks(family, prefamily):
             'get_sat_data': get_sat_data }
 
 
-def add_main_proc_tasks(family, prefamily, month_trigger):
+def add_main_proc_tasks(family, prefamily, month_trigger, satellite):
     """
     Adds main processing specific tasks to the given family.
     :rtype : dictionary
@@ -423,6 +423,10 @@ def add_main_proc_tasks(family, prefamily, month_trigger):
     make_l3u_data = add_task(family, 'make_l3u_daily_composites')
     archive_l3u_data = add_task(family, 'archive_l3u_data')
     cleanup_l3u_data = add_task(family, 'cleanup_l3u_data')
+    if 'AQUA' in satellite or 'TERRA' in satellite:
+        make_l3u_data_Europe = add_task(family, 'make_l3u_daily_composites_Europe')
+        archive_l3u_data_Europe = add_task(family, 'archive_l3u_data_Europe')
+        cleanup_l3u_data_Europe = add_task(family, 'cleanup_l3u_data_Europe')
     make_l3c_data = add_task(family, 'make_l3c_monthly_averages')
     archive_l3c_data = add_task(family, 'archive_l3c_data')
     cleanup_l3c_data = add_task(family, 'cleanup_l3c_data')
@@ -446,23 +450,43 @@ def add_main_proc_tasks(family, prefamily, month_trigger):
     add_trigger(make_l3u_data, cleanup_l1_data)
     add_trigger(archive_l3u_data, make_l3u_data)
     add_trigger(cleanup_l3u_data, archive_l3u_data)
+    if 'AQUA' in satellite or 'TERRA' in satellite:
+        add_trigger(make_l3u_data_Europe, cleanup_l1_data)
+        add_trigger(archive_l3u_data_Europe, make_l3u_data_Europe)
+        add_trigger(cleanup_l3u_data_Europe, archive_l3u_data_Europe)
     add_trigger(make_l3c_data, prepare_l2b_sum)
     add_trigger(archive_l3c_data, make_l3c_data)
     add_trigger(cleanup_l3c_data, archive_l3c_data)
 
-    return {'extract_sat_data': extract_sat_data,
-            'set_cpu_number': set_cpu_number,
-            'retrieval': retrieval,
-            'cleanup_l1_data': cleanup_l1_data,
-            'archive_l2_data': archive_l2_data,
-            'prepare_l2b_sum': prepare_l2b_sum,
-            'make_l3u_data': make_l3u_data,
-            'archive_l3u_data': archive_l3u_data,
-            'cleanup_l3u_data': cleanup_l3u_data,
-            'make_l3c_data': make_l3c_data,
-            'archive_l3c_data': archive_l3c_data,
-            'cleanup_l3c_data': cleanup_l3c_data}
-
+    if 'AQUA' in satellite or 'TERRA' in satellite:
+        return {'extract_sat_data': extract_sat_data,
+                'set_cpu_number': set_cpu_number,
+                'retrieval': retrieval,
+                'cleanup_l1_data': cleanup_l1_data,
+                'archive_l2_data': archive_l2_data,
+                'prepare_l2b_sum': prepare_l2b_sum,
+                'make_l3u_data': make_l3u_data,
+                'make_l3u_data_Europe': make_l3u_data_Europe,
+                'archive_l3u_data': archive_l3u_data,
+                'archive_l3u_data_Europe': archive_l3u_data_Europe,
+                'cleanup_l3u_data': cleanup_l3u_data,
+                'cleanup_l3u_data_Europe': cleanup_l3u_data_Europe,
+                'make_l3c_data': make_l3c_data,
+                'archive_l3c_data': archive_l3c_data,
+                'cleanup_l3c_data': cleanup_l3c_data}
+    else:
+        return {'extract_sat_data': extract_sat_data,
+                'set_cpu_number': set_cpu_number,
+                'retrieval': retrieval,
+                'cleanup_l1_data': cleanup_l1_data,
+                'archive_l2_data': archive_l2_data,
+                'prepare_l2b_sum': prepare_l2b_sum,
+                'make_l3u_data': make_l3u_data,
+                'archive_l3u_data': archive_l3u_data,
+                'cleanup_l3u_data': cleanup_l3u_data,
+                'make_l3c_data': make_l3c_data,
+                'archive_l3c_data': archive_l3c_data,
+                'cleanup_l3c_data': cleanup_l3c_data}
 
 def add_trigger_expr(node, trigger1, trigger2):
     """
@@ -843,7 +867,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 fam_sat = add_fam(fam_avhrr, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
                 add_main_proc_tasks(fam_sat, [fam_sat_dearch], 
-                                    fam_month_previous)
+                                    fam_month_previous, satellite)
 
                 satellites_within_current_month.append(satellite)
                 l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
@@ -875,13 +899,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                     add_dearchiving_tasks(fam_sat_dearch, fam_aux)
                     #                  (family, prefamily (=trigger))
                     add_main_proc_tasks(fam_sat, [fam_avhrr, fam_sat_dearch], 
-                                        fam_month_previous)
+                                        fam_month_previous, satellite)
                     fam_avhrr = fam_sat
                 else:
                     add_dearchiving_tasks(fam_sat_dearch, fam_aux)
                     #                  (family, prefamily (=trigger))
                     add_main_proc_tasks(fam_sat, [fam_aux, fam_sat_dearch],
-                                        fam_month_previous)
+                                        fam_month_previous, satellite)
                     fam_aux = fam_sat
 
         # -- end of satellite loop
