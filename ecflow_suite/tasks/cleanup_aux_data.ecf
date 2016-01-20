@@ -22,17 +22,17 @@ else
          "--year %START_YEAR% --month %START_MONTH% " \
          "clear_aux --auxdata ERAinterim "
 
-    # python %CLEANUP_SCRATCH% \
-    #    --inpdir %ESA_INPUTDIR% \
-    #    --cfgdir %ESA_CONFIGDIR% \
-    #    --year %START_YEAR% --month %START_MONTH% \
-    #    clear_aux --auxdata aux
+    python %CLEANUP_SCRATCH% \
+       --inpdir %ESA_INPUTDIR% \
+       --cfgdir %ESA_CONFIGDIR% \
+       --year %START_YEAR% --month %START_MONTH% \
+       clear_aux --auxdata aux
     
-    # python %CLEANUP_SCRATCH% \
-    #    --inpdir %ESA_INPUTDIR% \
-    #    --cfgdir %ESA_CONFIGDIR% \
-    #    --year %START_YEAR% --month %START_MONTH% \
-    #    clear_aux --auxdata ERAinterim
+    python %CLEANUP_SCRATCH% \
+       --inpdir %ESA_INPUTDIR% \
+       --cfgdir %ESA_CONFIGDIR% \
+       --year %START_YEAR% --month %START_MONTH% \
+       clear_aux --auxdata ERAinterim
 
 fi
 
