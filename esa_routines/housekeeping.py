@@ -203,7 +203,7 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber, local):
 
     # -- create tarname
     tarname = create_tarname(typ, datestring, sensor, platform, local)
-
+    
     # -- define temp. subfolder for tar creation
     if local:
         tempdir = os.path.join(inpdir, "tmp_tardir_" + typ.lower() + "_Europe")
@@ -218,7 +218,7 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber, local):
     logger.info("Create \'%s\'" % ecfs_tarfile)
     if typ == "L3U":
         tarfile_list = create_l3u_tarball(inpdir, idnumber,
-                                          tempdir, ecfs_tarfile)
+                                          tempdir, ecfs_tarfile, local)
     elif typ == "L3C":
         tarfile_list = create_l3c_tarball(inpdir, idnumber,
                                           tempdir, ecfs_tarfile)
@@ -303,7 +303,7 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
     return tar_file_list
 
 
-def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
+def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local):
     """
     Create the final l3u tarball to be stored in ECFS.
     """
@@ -343,6 +343,9 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
             if f.endswith(".nc"):
                 # copy file
                 source = os.path.join(daily, f)
+                if local:
+                    index = f.find("-fv")
+                    f = f[:index] + "_Europe" + f[index:]
                 target = os.path.join(daily_tempdir, f)
                 ncbase = os.path.splitext(f)[0]
                 shutil.copy2(source, target)
@@ -400,7 +403,6 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile):
         delete_file(tfile)
 
     return [l3_tarfile]
-
 
 def create_l3c_tarball(inpdir, idnumber, tempdir, l3_tarfile):
     """

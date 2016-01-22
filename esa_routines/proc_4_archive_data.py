@@ -86,6 +86,7 @@ def l3(args_l3):
     """
     Subcommand for archiving l3 data into ECFS.
     """
+
     # -- create date string
     datestring = str(args_l3.year) + str('%02d' % args_l3.month)
 
