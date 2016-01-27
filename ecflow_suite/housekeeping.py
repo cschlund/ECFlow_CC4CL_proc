@@ -267,6 +267,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("ECF_INCLUDE", ecf_include_dir)
     suite.add_variable("ECF_OUT", ecf_out_dir)
     # default value
+    suite.add_variable("EC_FILTER_TASKFILE", "n/a")
     suite.add_variable("EC_TOTAL_SLAVES", 1)
     suite.add_variable("EC_GET_ERA_SLAVES", 1)
     suite.add_variable("NDAYS_SATDATA", 1)
