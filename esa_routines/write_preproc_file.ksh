@@ -48,5 +48,5 @@ echo "'${sensor}'
 '${rttov_version}'
 '${ecmwf_version}'
 '${svn_version}'
-ECMWF_PATH_FILE_2=${ERA_after_satellite}
+ECMWF_PATH_2=${ERA_after_satellite}
 #END">${preproc_driver}
