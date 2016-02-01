@@ -21,22 +21,21 @@ if [ %DUMMYRUN% == 1 ]; then
 else
 
 # filter noise of Ch3.7 data
-
     n_filter_tasks=`exec wc -l < %EC_FILTER_TASKFILE%`
-    aprun -n $n_filter_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE%
-
     lower_satellite=`exec echo %SATELLITE% | awk '{print tolower($0)}'`
     l1_dir=%ESA_INPUTDIR%/%SENSOR%/${lower_satellite}/%START_YEAR%/%START_MONTH%/
     length_prefix_avhrr=`expr length "ECC_GAC_sunsatangles_"`
     prefix_filter_avhrr="S_NWC_avhrr_"
     prefix_filter_sunsat="S_NWC_sunsatangles_"
     length_prefix_filter_sunsat=`expr length ${prefix_filter_sunsat}`
-
+    
     cd ${l1_dir}
+    # run MPMD filtering job only if source link files exist
     for f in ${l1_dir}/*/*/${prefix_filter_sunsat}*; do
-	[ -e "$f" ] && remaining_files=($(ls -R ${l1_dir}/*/*/${prefix_filter_sunsat}* ));
-	               n_remaining_files=${#remaining_files[*]}
-	[ ! -e "$f" ] && echo "No filter files remaining"
+	[ -e "$f" ] && remaining_files=($(ls -R ${l1_dir}/*/*/${prefix_filter_sunsat}* )) &&
+	               n_remaining_files=${#remaining_files[*]} &&
+		       aprun -n $n_filter_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE%		       
+	[ ! -e "$f" ] && echo "Filtering not applied. No filter files exist."
     break
     done
 
@@ -58,7 +57,6 @@ else
     fi
 
 # run retrieval
-
     date_sat_base="%START_YEAR%_%START_MONTH%_%SATELLITE%"
 
     # -- config file
