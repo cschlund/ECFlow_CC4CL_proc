@@ -50,7 +50,9 @@ else
 	    filter_avhrr=${prefix_filter_avhrr}"filtered_"${link_sunsat:${length_prefix_filter_sunsat}:${length_link_sunsat}}
 	    origin_avhrr="ECC_GAC_avhrr_"${link_sunsat:${length_prefix_filter_sunsat}:${length_link_sunsat}}	
 	    python /perm/ms/de/sf6/gac_2014/scr/ppsGacFilter37.py --gacfile ${link_sunsat}
-	    mv ${filter_avhrr} ${origin_avhrr}
+	    if [ -e ${filter_avhrr} ]; then 
+		mv ${filter_avhrr} ${origin_avhrr}
+	    fi
 	    rm -f ${link_sunsat} ${link_avhrr}
 	done
 	cd ${l1_dir}
