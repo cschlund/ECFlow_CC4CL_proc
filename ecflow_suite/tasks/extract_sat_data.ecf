@@ -10,6 +10,9 @@ export ATP_ENABLED=0
 # -- stacksize (keep it always that way)
 ulimit -s unlimited
 
+#source /perm/ms/de/sf2/sfinkens/pps_filter/modules.ksh
+source /perm/ms/de/sf2/sfinkens/pps_filter/environment.ksh
+
 echo "I am task %TASK% in family %FAMILY% responsible for extracting daily satellite data tarfiles"
 
 if [ %DUMMYRUN% == 1 ]; then 
@@ -29,7 +32,7 @@ else
     id=`date +%%s`
     sleep 3
     jid=ID${primary_id}_US${id}
-
+    
     # -- define path to taskfile
     taskfile="%ESA_CONFIGDIR%/extract_sat_data_${sat_date_base}_${jid}.txt"
     rm -f $taskfile
@@ -40,38 +43,38 @@ else
 
     if [ %SENSOR% == "AVHRR" ]
     then 
-	platform=`echo %SATELLITE% | tr '[:upper:]' '[:lower:]'`
-	tar_prefix="AVHRR_GAC_L1C_"
-	tar_suffix=".tar.bz2"
-	pattern="${tar_prefix}%SATELLITE%_%START_YEAR%%START_MONTH%*${tar_suffix}"
+    	platform=`echo %SATELLITE% | tr '[:upper:]' '[:lower:]'`
+    	tar_prefix="AVHRR_GAC_L1C_"
+    	tar_suffix=".tar.bz2"
+    	pattern="${tar_prefix}%SATELLITE%_%START_YEAR%%START_MONTH%*${tar_suffix}"
     elif [ %SATELLITE% == "AQUA" ]
     then
-	platform="MYD"
-	tar_prefix="MYD"
-	tar_suffix=".tar"
-	pattern="${tar_prefix}*_%START_YEAR%_%START_MONTH%*${tar_suffix}"
+    	platform="MYD"
+    	tar_prefix="MYD"
+    	tar_suffix=".tar"
+    	pattern="${tar_prefix}*_%START_YEAR%_%START_MONTH%*${tar_suffix}"
     elif [ %SATELLITE% == "TERRA" ]
     then
-	platform="MOD"
-	tar_prefix="MOD"
-	tar_suffix=".tar"
-	pattern="${tar_prefix}*_%START_YEAR%_%START_MONTH%*${tar_suffix}"
+    	platform="MOD"
+    	tar_prefix="MOD"
+    	tar_suffix=".tar"
+    	pattern="${tar_prefix}*_%START_YEAR%_%START_MONTH%*${tar_suffix}"
     fi
 
     download_dir="%ESA_INPUTDIR%/%SENSOR%/${platform}/%START_YEAR%/%START_MONTH%"
     cd ${download_dir}
     
     for f in `pwd`/${pattern}; do
-	if [ -e "$f" ]
-	then
-	    echo "Archives to be extracted available." 
-	else
-	    echo "No archives to be extracted available."
-	    ecflow_client --complete
-	    trap 0
-	    exit
-	fi
-	break
+    	if [ -e "$f" ]
+    	then
+    	    echo "Archives to be extracted available." 
+    	else
+    	    echo "No archives to be extracted available."
+    	    ecflow_client --complete
+    	    trap 0
+    	    exit
+    	fi
+    	break
     done
 
     # -- create list of daily zip files
@@ -85,21 +88,21 @@ else
          # -- extract day from zipfile
         fbase=`echo ${zipfile} | cut -d "/" -f14`
 
-	if [ %SENSOR% == "AVHRR" ]
-	then 
+    	if [ %SENSOR% == "AVHRR" ]
+    	then 
             split=`echo ${fbase} | cut -d "_" -f5`
             fday=`echo ${split} | cut -c 7-8`
             final_dir="${download_dir}/${fday}/%START_YEAR%%START_MONTH%${fday}"
             # -- write MPMD taskfile
-	    echo "tar xfj ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
-	elif [ %SENSOR% == "MODIS" ]
-	then
+    	    echo "tar xfj ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
+    	elif [ %SENSOR% == "MODIS" ]
+    	then
             split=`echo ${fbase} | cut -d "_" -f4`
             fday=`echo ${split} | cut -c 1-2`
             final_dir="${download_dir}/${fday}"
             # -- write MPMD taskfile
-	    echo "tar xf ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
-	fi
+    	    echo "tar xf ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
+    	fi
 
          # -- create final input directory
         mkdir -p ${final_dir}
@@ -118,6 +121,39 @@ else
     # -- extract and subsequently delete daily zip files
     aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% ${taskfile}
 
+    # do ch3.7 filtering of AVHRR data here
+    # -- define path to taskfile
+    taskfile="%ESA_CONFIGDIR%/extract_sat_data_${sat_date_base}_${jid}.txt"
+    rm -f $taskfile
+    touch $taskfile
+
+    length_prefix_avhrr=`expr length "ECC_GAC_sunsatangles_"`
+    prefix_filter_avhrr="S_NWC_avhrr_"
+    prefix_filter_sunsat="S_NWC_sunsatangles_"
+    days=`exec ls`
+    for d in ${days}
+    do
+	subfolder=`exec ls ${download_dir}/${d}`
+	workdir=${download_dir}/${d}/${subfolder}
+	cd ${workdir}
+	files=`exec ls ECC_GAC_sunsat*` #files=`exec ls ECC_GAC_{avhrr,sunsat}*`
+	for f in ${files}
+	do	
+	    length_f=`expr length ${f}`
+	    link_sunsat=${prefix_filter_sunsat}${f:${length_prefix_avhrr}:${length_f}}
+	    link_avhrr=${prefix_filter_avhrr}${f:${length_prefix_avhrr}:${length_f}}
+	    origin_avhrr="ECC_GAC_avhrr_"${f:${length_prefix_avhrr}:${length_f}}
+	    filter_avhrr=${prefix_filter_avhrr}"filtered_"${f:${length_prefix_avhrr}:${length_f}}
+	    origin_sunsat=$f
+	    ln -s ${origin_sunsat} ${link_sunsat}
+	    ln -s ${origin_avhrr} ${link_avhrr}
+	    echo "cd ${workdir} && python /perm/ms/de/sf6/gac_2014/scr/ppsGacFilter37.py --gacfile ${link_sunsat} && if [ -e ${filter_avhrr} ]; then mv ${filter_avhrr} ${origin_avhrr}; fi && rm -f ${link_sunsat} ${link_avhrr}" >> ${taskfile}
+	done	
+    done
+
+    cd ${download_dir}
+    ecflow_client --alter add variable 'EC_FILTER_TASKFILE' "$taskfile" '/%SUITE%/%FAMILY%'
+    
 fi
 
 %include <tail.h>
