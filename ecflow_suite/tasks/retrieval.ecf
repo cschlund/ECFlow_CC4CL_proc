@@ -36,9 +36,9 @@ else
     # run MPMD filtering job only if source link files exist
     for f in ${l1_dir}/*/*/${prefix_filter_sunsat}*; do
 	[ -e "$f" ] && n_filter_tasks=`exec wc -l < %EC_FILTER_TASKFILE%` &&
+		       aprun -n $n_filter_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE% &&		       
 	               remaining_files=($(ls -R ${l1_dir}/*/*/${prefix_filter_sunsat}* )) &&
 	               n_remaining_files=${#remaining_files[*]} &&
-		       aprun -n $n_filter_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE%		       
 	[ ! -e "$f" ] && echo "Filtering not applied. No filter files exist."
     break
     done
