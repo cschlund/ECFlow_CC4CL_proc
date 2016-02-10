@@ -121,39 +121,40 @@ else
     # -- extract and subsequently delete daily zip files
     aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% ${taskfile}
 
-    # do ch3.7 filtering of AVHRR data here
-    # -- define path to taskfile
-    taskfile="%ESA_CONFIGDIR%/extract_sat_data_${sat_date_base}_${jid}.txt"
-    rm -f $taskfile
-    touch $taskfile
+    if [ %SENSOR% == "AVHRR" ]
+    then 
+        # do ch3.7 filtering of AVHRR data here
+        # -- define path to taskfile
+	taskfile="%ESA_CONFIGDIR%/extract_sat_data_${sat_date_base}_${jid}.txt"
+	rm -f $taskfile
+	touch $taskfile
 
-    length_prefix_avhrr=`expr length "ECC_GAC_sunsatangles_"`
-    prefix_filter_avhrr="S_NWC_avhrr_"
-    prefix_filter_sunsat="S_NWC_sunsatangles_"
-    days=`exec ls`
-    for d in ${days}
-    do
-	subfolder=`exec ls ${download_dir}/${d}`
-	workdir=${download_dir}/${d}/${subfolder}
-	cd ${workdir}
-	files=`exec ls ECC_GAC_sunsat*` #files=`exec ls ECC_GAC_{avhrr,sunsat}*`
-	for f in ${files}
-	do	
-	    length_f=`expr length ${f}`
-	    link_sunsat=${prefix_filter_sunsat}${f:${length_prefix_avhrr}:${length_f}}
-	    link_avhrr=${prefix_filter_avhrr}${f:${length_prefix_avhrr}:${length_f}}
-	    origin_avhrr="ECC_GAC_avhrr_"${f:${length_prefix_avhrr}:${length_f}}
-	    filter_avhrr=${prefix_filter_avhrr}"filtered_"${f:${length_prefix_avhrr}:${length_f}}
-	    origin_sunsat=$f
-	    ln -s ${origin_sunsat} ${link_sunsat}
-	    ln -s ${origin_avhrr} ${link_avhrr}
-	    echo "cd ${workdir} && python /perm/ms/de/sf6/gac_2014/scr/ppsGacFilter37.py --gacfile ${link_sunsat} && if [ -e ${filter_avhrr} ]; then mv ${filter_avhrr} ${origin_avhrr}; fi && rm -f ${link_sunsat} ${link_avhrr}" >> ${taskfile}
-	done	
-    done
-
-    cd ${download_dir}
-    ecflow_client --alter add variable 'EC_FILTER_TASKFILE' "$taskfile" '/%SUITE%/%FAMILY%'
-    
+	length_prefix_avhrr=`expr length "ECC_GAC_sunsatangles_"`
+	prefix_filter_avhrr="S_NWC_avhrr_"
+	prefix_filter_sunsat="S_NWC_sunsatangles_"
+	days=`exec ls`
+	for d in ${days}
+	do
+	    subfolder=`exec ls ${download_dir}/${d}`
+	    workdir=${download_dir}/${d}/${subfolder}
+	    cd ${workdir}
+	    files=`exec ls ECC_GAC_sunsat*` #files=`exec ls ECC_GAC_{avhrr,sunsat}*`
+	    for f in ${files}
+	    do	
+		length_f=`expr length ${f}`
+		link_sunsat=${prefix_filter_sunsat}${f:${length_prefix_avhrr}:${length_f}}
+		link_avhrr=${prefix_filter_avhrr}${f:${length_prefix_avhrr}:${length_f}}
+		origin_avhrr="ECC_GAC_avhrr_"${f:${length_prefix_avhrr}:${length_f}}
+		filter_avhrr=${prefix_filter_avhrr}"filtered_"${f:${length_prefix_avhrr}:${length_f}}
+		origin_sunsat=$f
+		ln -s ${origin_sunsat} ${link_sunsat}
+		ln -s ${origin_avhrr} ${link_avhrr}
+		echo "cd ${workdir} && python /perm/ms/de/sf6/gac_2014/scr/ppsGacFilter37.py --gacfile ${link_sunsat} && if [ -e ${filter_avhrr} ]; then mv ${filter_avhrr} ${origin_avhrr}; fi && rm -f ${link_sunsat} ${link_avhrr}" >> ${taskfile}
+	    done	
+	done
+	cd ${download_dir}
+	ecflow_client --alter add variable 'EC_FILTER_TASKFILE' "$taskfile" '/%SUITE%/%FAMILY%'	
+    fi
 fi
 
 %include <tail.h>
