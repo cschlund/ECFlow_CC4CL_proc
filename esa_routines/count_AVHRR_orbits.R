@@ -39,7 +39,8 @@ previous.yyyymm = paste(previous.year, previous.month, sep="")
 # get number of days in month to be processed
 ndays = numberOfDays( as.Date(paste(year, month, "01", sep="-"), "%Y-%m-%d") )
 
-daily_list = paste( work_dir, "daily_list.txt" , sep="" )
+date_sat_base = paste(year, month, satellite, sep="_")
+daily_list = paste( work_dir, "/daily_list_", date_sat_base, ".txt" , sep="" )
       
 # loop over each day of month
 for ( day in 1:ndays ){
