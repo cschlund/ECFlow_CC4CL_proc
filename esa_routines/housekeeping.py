@@ -206,9 +206,9 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber, local):
     
     # -- define temp. subfolder for tar creation
     if local:
-        tempdir = os.path.join(inpdir, "tmp_tardir_" + typ.lower() + "_Europe")
+        tempdir = os.path.join(inpdir, "tmp_tardir_" + sensor + "_" + typ.lower() + "_Europe")
     else:
-        tempdir = os.path.join(inpdir, "tmp_tardir_" + typ.lower())
+        tempdir = os.path.join(inpdir, "tmp_tardir_" + sensor + "_" + typ.lower())
     create_dir(tempdir)
 
     # -- final tarfile to be copied into ECFS
