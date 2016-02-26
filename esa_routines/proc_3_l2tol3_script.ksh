@@ -18,6 +18,9 @@
  #source actual config file
  . $4
 
+ #overwrite ncdf_version from config with actual
+ ncdf_version=`nc-config --version`
+
  algo=${l2processor}
 
  DOM=`cal ${MONTH} ${YEAR}  |tr -s " " "\n"|tail -1`
@@ -53,7 +56,10 @@
  fi
 
  #present date and time for output file name
- exec_time=`exec date +%Y%m%d%H%M%S`
+# exec_time=`exec date +%Y%m%d%H%M%S`
+ #create UTC ISO time stamp
+ exec_time=`date -u -I'seconds'`
+
 
  #set $area
  if [ "${slon}" -lt 0 ] ; then
@@ -256,7 +262,7 @@ echo `date` 'preparation of names and lists finished, execute now l2->l3 process
 echo ''
 echo ${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}"
 echo ''
-${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}"
+${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}" "${cdm_data_type_L3}" "${naming_authority}" "${keywords_vocabulary}"
 
 if [ "${?}" -eq 0  ] ; then
    echo 'done L2->L3 finished, results written to: ' $outputdir/$outputfile
