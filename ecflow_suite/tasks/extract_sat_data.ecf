@@ -85,7 +85,7 @@ else
     # directory for each day, disregarding availability of daily data
     for (( i=1; i<=${ndays}; i++ ))
     do
-	ii=$(printf %02d $i)
+	ii=$(printf %%02d $i)
     	if [ %SENSOR% == "AVHRR" ]
     	then 	
             final_dir="${download_dir}/${ii}/%START_YEAR%%START_MONTH%${ii}"
