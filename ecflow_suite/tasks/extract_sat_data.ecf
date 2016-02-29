@@ -79,7 +79,24 @@ else
 
     # -- create list of daily zip files
     zip_files=$(ls `pwd`/${pattern})
-    
+    ndays=`cal ${START_MONTH} ${START_YEAR} | egrep -v [a-z] | wc -w`
+
+    # make L1 directories for each day: subsequent scripts depend on availablility of
+    # directory for each day, disregarding availability of daily data
+    for (( i=1; i<=${ndays}; i++ ))
+    do
+	ii=$(printf %02d $i)
+    	if [ %SENSOR% == "AVHRR" ]
+    	then 	
+            final_dir="${download_dir}/${ii}/%START_YEAR%%START_MONTH%${ii}"
+    	elif [ %SENSOR% == "MODIS" ]
+    	then
+            final_dir="${download_dir}/${ii}"
+	fi
+        # -- create final input directory
+	mkdir -p ${final_dir}
+    done
+
     # -- for each daily zip file, create output folder and add entry to taskfile
     for zipfile in ${zip_files}
     do
@@ -104,9 +121,6 @@ else
     	    echo "tar xf ${zipfile} -C ${final_dir} && rm -f ${zipfile}" >> $taskfile	
     	fi
 
-         # -- create final input directory
-        mkdir -p ${final_dir}
-	
     done
 
     # To avoid creation of cores in case of abort, which takes ages...
