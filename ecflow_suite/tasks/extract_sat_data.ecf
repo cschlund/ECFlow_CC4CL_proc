@@ -10,6 +10,8 @@ export ATP_ENABLED=0
 # -- stacksize (keep it always that way)
 ulimit -s unlimited
 
+set -x
+
 #source /perm/ms/de/sf2/sfinkens/pps_filter/modules.ksh
 source /perm/ms/de/sf2/sfinkens/pps_filter/environment.ksh
 
@@ -152,19 +154,23 @@ else
 	    subfolder=`exec ls ${download_dir}/${d}`
 	    workdir=${download_dir}/${d}/${subfolder}
 	    cd ${workdir}
-	    files=`exec ls ECC_GAC_sunsat*` #files=`exec ls ECC_GAC_{avhrr,sunsat}*`
-	    for f in ${files}
-	    do	
-		length_f=`expr length ${f}`
-		link_sunsat=${prefix_filter_sunsat}${f:${length_prefix_avhrr}:${length_f}}
-		link_avhrr=${prefix_filter_avhrr}${f:${length_prefix_avhrr}:${length_f}}
-		origin_avhrr="ECC_GAC_avhrr_"${f:${length_prefix_avhrr}:${length_f}}
-		filter_avhrr=${prefix_filter_avhrr}"filtered_"${f:${length_prefix_avhrr}:${length_f}}
-		origin_sunsat=$f
-		ln -s ${origin_sunsat} ${link_sunsat}
-		ln -s ${origin_avhrr} ${link_avhrr}
-		echo "cd ${workdir} && python /perm/ms/de/sf6/gac_2014/scr/ppsGacFilter37.py --gacfile ${link_sunsat} && if [ -e ${filter_avhrr} ]; then mv ${filter_avhrr} ${origin_avhrr}; fi && rm -f ${link_sunsat} ${link_avhrr}" >> ${taskfile}
-	    done	
+	    for f in "ECC_GAC_sunsat*"; do
+    		if [ -e "$f" ]
+    		then
+		    length_f=`expr length ${f}`
+		    link_sunsat=${prefix_filter_sunsat}${f:${length_prefix_avhrr}:${length_f}}
+		    link_avhrr=${prefix_filter_avhrr}${f:${length_prefix_avhrr}:${length_f}}
+		    origin_avhrr="ECC_GAC_avhrr_"${f:${length_prefix_avhrr}:${length_f}}
+		    filter_avhrr=${prefix_filter_avhrr}"filtered_"${f:${length_prefix_avhrr}:${length_f}}
+		    origin_sunsat=$f
+		    ln -s ${origin_sunsat} ${link_sunsat}
+		    ln -s ${origin_avhrr} ${link_avhrr}
+		    echo "cd ${workdir} && python /perm/ms/de/sf6/gac_2014/scr/ppsGacFilter37.py --gacfile ${link_sunsat} && if [ -e ${filter_avhrr} ]; then mv ${filter_avhrr} ${origin_avhrr}; fi && rm -f ${link_sunsat} ${link_avhrr}" >> ${taskfile}
+    		else
+		    echo "No satellite data available for this day."
+		    continue
+    		fi
+	    done
 	done
 	cd ${download_dir}
 	ecflow_client --alter add variable 'EC_FILTER_TASKFILE' "$taskfile" '/%SUITE%/%FAMILY%'	
