@@ -130,7 +130,7 @@ def get_avhrr_list():
     Returns a list of avhrr satellites.
     :rtype: list
     """
-    avhrr_list = ['NOAA7', 'NOAA9', 'NOAA11', 'NOAA12',
+    avhrr_list = ['NOAA6', 'NOAA7', 'NOAA8', 'NOAA9', 'NOAA10', 'NOAA11', 'NOAA12',
                   'NOAA14', 'NOAA15', 'NOAA16', 'NOAA17',
                   'NOAA18', 'NOAA19', 'METOPA', 'METOPB']
     return avhrr_list
@@ -603,7 +603,8 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
     """
 
     # ignored satellites
-    default_ignore_sats = ['TIROSN', 'NOAA6', 'NOAA8', 'NOAA10']
+    default_ignore_sats = ['']
+#['TIROSN', 'NOAA6', 'NOAA8', 'NOAA10']
     if ignoresats_list:
         add_ignore_sats = ignoresats_list
         ignore_list = default_ignore_sats + add_ignore_sats
