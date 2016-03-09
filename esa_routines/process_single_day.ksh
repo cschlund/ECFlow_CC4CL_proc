@@ -74,7 +74,14 @@ if [[ ${INSTRUMENT} = "AVHRR" ]]; then
     
     l1_dirbase=${INPUTDIR}/${INSTRUMENT}/${PLATFORM}
     l1_dirname=${l1_dirbase}/${YEAR}/${MONTHS}/${DAYS}/${YEAR}${MONTHS}${DAYS}
-    l1_filename=$(ls ${l1_dirname}/*.h5 | head -1)
+
+    set -A l1_filename `ls ${l1_dirname}/*.h5 | head -1`
+    nl1_filename=${#l1_filename[*]}
+    if [ $nl1_filename -eq 0 ]; then
+	echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
+	echo "nl1_filename == 0" >> ${daily_log}
+	exit
+    fi
     l1_filebase=`exec basename ${l1_filename} .h5`
 
     SPLATFORM=${PLATFORM}
