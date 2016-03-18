@@ -1,0 +1,64 @@
+%include <pbs_serial_mars.h>
+%include <head.h>
+%include <export.h>
+
+echo "I am task %TASK% in family %FAMILY% responsible for remapping and converting remaining era interim data"
+
+if [ %DUMMYRUN% == 1 ]; then 
+
+    python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+
+else
+
+    date_base="%START_YEAR%_%START_MONTH%"
+
+    cfg_typ="1_getdata_era_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
+    era_dir="%ESA_INPUTDIR%/ERAinterim/%START_YEAR%/%START_MONTH%"
+    gridInfoFile="${era_dir}/gridinfo.txt"
+    remapWeightsFile="${era_dir}/remapweights.nc"
+    taskfile="${era_dir}/MPMD_tasks_remap_ERA_${date_base}.txt"
+    #rm -f ${gridInfoFile} ${remapWeightsFile} ${taskfile}
+
+    # -- execute ksh script
+    # this will get all ERA data, but does not perform remapping
+    #%GET_MARS_KSH% %CFG_PATHS_FILE% ${cfg_fil} ${gridInfoFile} ${remapWeightsFile}
+    
+    n_grib_files=`exec ls ${era_dir}/*.grb | wc -l`
+
+#    if [ ${n_grib_files} -ne 0 ]; then
+        # -- remap low resolution ERA data onto preprocessing grid
+        # write taskfile
+#	Rscript %WRITE_MPMD_REMAP_TASKFILE% --vanilla ${era_dir} ${gridInfoFile} ${remapWeightsFile} ${taskfile} %REMAP_ERA_PARALLEL_KSH%
+
+        # To avoid creation of cores in case of abort, which takes ages...
+#	module unload atp
+
+        # For OpenMP tasks
+#	export OMP_NUM_THREADS=$EC_threads_per_task
+    
+        # -- call aprun using the MPMD submitter
+#	echo "Now start MPMD Job using "%MPMD_SUBMITTER%" and "${taskfile}
+
+        # -- extract and subsequently delete daily zip files
+	# aprun -n $EC_total_tasks \
+	#     -N $EC_tasks_per_node \
+        #     -d $EC_threads_per_task \
+        #     -j $EC_hyperthreads \
+	#     %MPMD_SUBMITTER% ${taskfile}
+	
+        # -- do sequential remapping of all remaining GRIB files that were not processed
+	for file in ${era_dir}/*grb; do
+	    [ -e "$file" ] && 
+	    echo "Not all GRIB files have been converted/remapped." 
+	    %REMAP_ERA_SEQUENTIAL_KSH% ${era_dir} ${gridInfoFile} ${remapWeightsFile} || 
+	    echo "All GRIB files have been converted/remapped."
+	    break
+	done	
+#    fi
+    
+fi
+
+%include <tail.h>
