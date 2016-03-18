@@ -448,13 +448,7 @@ program mpi_wrapper
         chunk=int(nfiles/float(ntasks))
      endif
      !if more CPUs available than files
-     if((ntasks-1) .gt. nfiles) then
-        !call OMP_SET_NUM_THREADS(num_threads) !could shovel those abundant cpus into threads?
-        write(11,*) 'PROCESSING FAILED!!!! TOO MANY CPUS'
-        call flush(11)
-        close(11)
-        call mpi_abort(mpi_comm_world,rc,ierror)
-     endif
+     if((ntasks-1) .gt. nfiles) write(11,*) "ntasks-1 gt nfiles: ", ntasks-1, nfiles
      chunk=max(chunk,1)
      write(11,*) 'Chunk set statically to: ',chunk
 
