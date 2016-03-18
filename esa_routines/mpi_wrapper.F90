@@ -550,7 +550,7 @@ program mpi_wrapper
      !now each cpu has its work in terms of a loop chunk assigned
      !start looping now
      !do some work 
-     do ifile=lower_bound,upper_bound
+!     do ifile=lower_bound,upper_bound
 
         !        write(11,*) 'RUNNING PREPROC'
         !        write(11,*) chunk,mytask,ifile,trim(adjustl(file_inventory_pre(ifile)))
@@ -564,7 +564,7 @@ program mpi_wrapper
         !        call post_process_level2
 
 
-     enddo
+!     enddo
 
      !use this if dynamic work assignment is desired
   else
