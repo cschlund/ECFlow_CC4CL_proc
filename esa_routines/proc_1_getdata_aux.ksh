@@ -416,65 +416,65 @@ while [ $unix_counter -le $unix_stop ]; do
     fi
 
 
-    # -- (4) get ice_snow --
+    # # -- (4) get ice_snow --
 
-    # required for unpacking source data on $TEMP
-    TYPE=2
+    # # required for unpacking source data on $TEMP
+    # TYPE=2
 
-    # NRT data
-    SOURCEPATH=${source_ice_snow}
-    TARGETPATH=${target_ice_snow}
-    SEARCHSTRING=${ice_snow_type}_${YEAR}${MONS}${DAYS}
-    SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${ice_snow_suffix}
-    SOURCENAME=$(els $SOURCEFILE)
-    if [ ${?} -ne 0 ]; then
-	printf " --- FAILED: els $SOURCEFILE\n"
-	SOURCENAME=$(basename $SOURCEFILE)
-    else
-	printf "SUCCESS: $SOURCENAME\n"
-    fi
-    TARGETFILE=${TARGETPATH}/${SOURCENAME} #`basename ${SOURCEFILE}`
+    # # NRT data
+    # SOURCEPATH=${source_ice_snow}
+    # TARGETPATH=${target_ice_snow}
+    # SEARCHSTRING=${ice_snow_type}_${YEAR}${MONS}${DAYS}
+    # SOURCEFILE=${SOURCEPATH}/${SEARCHSTRING}${ice_snow_suffix}
+    # SOURCENAME=$(els $SOURCEFILE)
+    # if [ ${?} -ne 0 ]; then
+    # 	printf " --- FAILED: els $SOURCEFILE\n"
+    # 	SOURCENAME=$(basename $SOURCEFILE)
+    # else
+    # 	printf "SUCCESS: $SOURCENAME\n"
+    # fi
+    # TARGETFILE=${TARGETPATH}/${SOURCENAME} #`basename ${SOURCEFILE}`
 
-    # temp. solution
-    printf "\nNo NISE data available before 1995-05-04\n"
-    MINUNIX=`${ESA_ROUT}/ymdhms2unix.ksh 1995 05 04`
-    ACTUNIX=`${ESA_ROUT}/ymdhms2unix.ksh $YEAR $MONS $DAYS`
+    # # temp. solution
+    # printf "\nNo NISE data available before 1995-05-04\n"
+    # MINUNIX=`${ESA_ROUT}/ymdhms2unix.ksh 1995 05 04`
+    # ACTUNIX=`${ESA_ROUT}/ymdhms2unix.ksh $YEAR $MONS $DAYS`
 
-    if [ "${ACTUNIX}" -lt "${MINUNIX}" ]; then
-	TMPYEAR=1996
-    fi
+    # if [ "${ACTUNIX}" -lt "${MINUNIX}" ]; then
+    # 	TMPYEAR=1996
+    # fi
 
-    # NRT before 19950504
-    printf "\nThus: take TMPYEAR: $TMPYEAR (fake_climatology!) instead of $YEAR"
-    source_ice_snow_fake=${toplevel_aux}/${ice_snow_ecfs}/${TMPYEAR}/${MONS}/${DAYS}
-    target_ice_snow_fake=${temp_aux}/${ice_snow_temp}/${YEAR}/${MONS}/${DAYS}
-    SOURCEPATH=${source_ice_snow_fake}
-    TARGETPATH=${target_ice_snow_fake}
-    SEARCHSTRING_CLIMAT=${ice_snow_type}_${TMPYEAR}${MONS}${DAYS}
-    SOURCEFILE_CLIMAT=${SOURCEPATH}/${SEARCHSTRING_CLIMAT}${ice_snow_suffix}
-    SOURCENAME_CLIMAT=$(els $SOURCEFILE_CLIMAT)
-    if [ ${?} -ne 0 ]; then
-	printf " --- FAILED: els $SOURCEFILE_CLIMAT\n"
-	SOURCENAME_CLIMAT=$(basename $SOURCEFILE_CLIMAT)
-    else
-	printf "\nSUCCESS: $SOURCENAME_CLIMAT\n"
-    fi
-    TARGETFILE_CLIMAT=${TARGETPATH}/${SOURCENAME_CLIMAT} #`basename ${SOURCEFILE}`
+    # # NRT before 19950504
+    # printf "\nThus: take TMPYEAR: $TMPYEAR (fake_climatology!) instead of $YEAR"
+    # source_ice_snow_fake=${toplevel_aux}/${ice_snow_ecfs}/${TMPYEAR}/${MONS}/${DAYS}
+    # target_ice_snow_fake=${temp_aux}/${ice_snow_temp}/${YEAR}/${MONS}/${DAYS}
+    # SOURCEPATH=${source_ice_snow_fake}
+    # TARGETPATH=${target_ice_snow_fake}
+    # SEARCHSTRING_CLIMAT=${ice_snow_type}_${TMPYEAR}${MONS}${DAYS}
+    # SOURCEFILE_CLIMAT=${SOURCEPATH}/${SEARCHSTRING_CLIMAT}${ice_snow_suffix}
+    # SOURCENAME_CLIMAT=$(els $SOURCEFILE_CLIMAT)
+    # if [ ${?} -ne 0 ]; then
+    # 	printf " --- FAILED: els $SOURCEFILE_CLIMAT\n"
+    # 	SOURCENAME_CLIMAT=$(basename $SOURCEFILE_CLIMAT)
+    # else
+    # 	printf "\nSUCCESS: $SOURCENAME_CLIMAT\n"
+    # fi
+    # TARGETFILE_CLIMAT=${TARGETPATH}/${SOURCENAME_CLIMAT} #`basename ${SOURCEFILE}`
 
-    # availability check
-    printf "\nData already on scratch for NISE ${CURRENT_DATE}?\n"
-    data_on_scratch ${target_ice_snow} ${target_ice_snow_fake}
+    # # availability check
+    # printf "\nData already on scratch for NISE ${CURRENT_DATE}?\n"
+    # data_on_scratch ${target_ice_snow} ${target_ice_snow_fake}
 
-    if [ $aflag -ne 0 ]; then
-	printf "\nGet NISE data from ECFS for $CURRENT_DATE\n"
-	get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR} ${MONS} ${DAYS}
-    fi
+    # if [ $aflag -ne 0 ]; then
+    # 	printf "\nGet NISE data from ECFS for $CURRENT_DATE\n"
+    # 	get_aux ${SOURCEFILE} ${TARGETFILE} ${TYPE} ${SOURCEFILE_CLIMAT} ${TARGETFILE_CLIMAT} ${YEAR} ${MONS} ${DAYS}
+    # fi
 
-    #echo "DAY=$DAYS"
-    #if [ "$DAYS" -eq "02" ]; then exit; fi
+    # #echo "DAY=$DAYS"
+    # #if [ "$DAYS" -eq "02" ]; then exit; fi
 
-    # go to next day
-    (( unix_counter += 86400 ))
+    # # go to next day
+    # (( unix_counter += 86400 ))
 
 done
 #----------------------------------------------------------------------------------------------
