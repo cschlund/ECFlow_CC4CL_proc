@@ -36,9 +36,9 @@ function doy {
 
   if [ $2 -ne 1 ] 
   then 
-    for i in `seq 1 $(($2 -1))`
+    for i in $(seq 1 $(($2 -1)))
     do
-      (( days += `cal $i $1  |tr -s " " "\n"|tail -1`)) #nr days of month
+      (( days += $(cal $i $1  |tr -s " " "\n"|tail -1))) #nr days of month
     done
   fi
   (( days += $3 ))

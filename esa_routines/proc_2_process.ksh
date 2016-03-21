@@ -72,11 +72,11 @@ DAILY_OUTP=${OUTPUTDIR}/${DAILY_PATH}
 # create logfile name for each day
 daily_log=${logs_monthly}/process_single_day_${DAILY_PATH}.log
 
-cinstr_channel_num=`echo '"'${instr_channel_num[*]}'"'`
-cabs_channel_num=`echo '"'${abs_channel_num[*]}'"'`
-cproc_flag=`echo '"'${proc_flag[*]}'"'`
-cnchannels=`echo '"'${nchannels[*]}'"'`
-cprod_name=`echo '"'${prod_name}'"'`
+cinstr_channel_num=$(echo '"'${instr_channel_num[*]}'"')
+cabs_channel_num=$(echo '"'${abs_channel_num[*]}'"')
+cproc_flag=$(echo '"'${proc_flag[*]}'"')
+cnchannels=$(echo '"'${nchannels[*]}'"')
+cprod_name=$(echo '"'${prod_name}'"')
 
 aatsr_drift="n/a"
 ecmwf_path2="n/a"

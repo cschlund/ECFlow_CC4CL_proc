@@ -78,7 +78,7 @@ copy_file()
 
     echo "COPY_FILE: Make Copy " ${SOURCE} " TO " ${TARGET}
 
-    TARGETDIR=`dirname ${TARGET}`
+    TARGETDIR=$(dirname ${TARGET})
     mkdir -p ${TARGETDIR}
     retcmk=${?}
 
@@ -124,7 +124,7 @@ copy_file()
 	fi
 
     else
-	echo "ERROR: COPY_FILE:"  `dirname ${TARGET}`  "NOT CREATED (FAILED)"
+	echo "ERROR: COPY_FILE:"  $(dirname ${TARGET})  "NOT CREATED (FAILED)"
     fi
 
 }
@@ -187,14 +187,14 @@ get_aux()
 	    if [ "${TYPE}" -eq 2  ]; then
 
 		echo "REPLACE 1996 to $YEAR"
-		targetdir=`dirname ${TARGET_CLIMAT}`
+		targetdir=$(dirname ${TARGET_CLIMAT})
 		files=$(ls ${targetdir}/*1996*)
 		retlst=${?}
 
 		if [ "${retlst}" -eq 0 ]; then
 
 		    for file in $files; do
-			filebase=`basename $file`
+			filebase=$(basename $file)
 			newfilebase=${filebase/1996/$YEAR}
 			newfilename=$targetdir/$newfilebase
 			mv $file $newfilename
@@ -215,14 +215,14 @@ get_aux()
 	    else
 
 		echo "REPLACE XXXX to $YEAR"
-		targetdir=`dirname ${TARGET_CLIMAT}`
+		targetdir=$(dirname ${TARGET_CLIMAT})
 		files=$(ls ${targetdir}/*AXXXX*)
 		retlst=${?}
 
 		if [ "${retlst}" -eq 0 ]; then
 
 		    for file in $files; do
-			filebase=`basename $file`
+			filebase=$(basename $file)
 			newfilebase=${filebase/AXXXX/A$YEAR}
 			newfilename=$targetdir/$newfilebase
 			mv $file $newfilename
@@ -263,20 +263,20 @@ set -v
 # source proc 1 configfile
 . $2
 
-unix_start=`${ESA_ROUT}/ymdhms2unix.ksh $STARTYEAR $STARTMONTH $STARTDAY`
+unix_start=$(${ESA_ROUT}/ymdhms2unix.ksh $STARTYEAR $STARTMONTH $STARTDAY)
 
 if [ $STOPDAY -eq 0 ] ; then
-    STOPDAY=`cal $STOPMONTH $STOPYEAR | tr -s " " "\n" | tail -1` # nr days of month
+    STOPDAY=$(cal $STOPMONTH $STOPYEAR | tr -s " " "\n" | tail -1) # nr days of month
 fi
 
-unix_stop=`${ESA_ROUT}/ymdhms2unix.ksh $STOPYEAR $STOPMONTH $STOPDAY`
+unix_stop=$(${ESA_ROUT}/ymdhms2unix.ksh $STOPYEAR $STOPMONTH $STOPDAY)
 unix_counter=$unix_start
 
 while [ $unix_counter -le $unix_stop ]; do
 
-    YEAR=`perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');'`
-    MONS=`perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');'`
-    DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'`
+    YEAR=$(perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');')
+    MONS=$(perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');')
+    DAYS=$(perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');')
 
     CURRENT_DATE=${YEAR}${MONS}${DAYS}
     echo ""
@@ -367,11 +367,11 @@ while [ $unix_counter -le $unix_stop ]; do
     TYPE=3
 
     #convert date to DOY for emissivity filename
-    DOY=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS}`
+    DOY=$(exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS})
     DOY_CLIMAT=$DOY
-    DOYMAX=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} 12 31`
+    DOYMAX=$(exec ${ESA_ROUT}/date2doy.ksh ${YEAR} 12 31)
     if [ $DOYMAX -eq 366 ] && [ $MONS -gt 02 ]; then
-	DOY_CLIMAT=`expr ${DOY_CLIMAT} - 1` # account for leap year
+	DOY_CLIMAT=$(expr ${DOY_CLIMAT} - 1) # account for leap year
     fi
 
     DDOY=${DOY}
@@ -433,12 +433,12 @@ while [ $unix_counter -le $unix_stop ]; do
     # else
     # 	printf "SUCCESS: $SOURCENAME\n"
     # fi
-    # TARGETFILE=${TARGETPATH}/${SOURCENAME} #`basename ${SOURCEFILE}`
+    # TARGETFILE=${TARGETPATH}/${SOURCENAME} #$(basename ${SOURCEFILE})
 
     # # temp. solution
     # printf "\nNo NISE data available before 1995-05-04\n"
-    # MINUNIX=`${ESA_ROUT}/ymdhms2unix.ksh 1995 05 04`
-    # ACTUNIX=`${ESA_ROUT}/ymdhms2unix.ksh $YEAR $MONS $DAYS`
+    # MINUNIX=$(${ESA_ROUT}/ymdhms2unix.ksh 1995 05 04)
+    # ACTUNIX=$(${ESA_ROUT}/ymdhms2unix.ksh $YEAR $MONS $DAYS)
 
     # if [ "${ACTUNIX}" -lt "${MINUNIX}" ]; then
     # 	TMPYEAR=1996
@@ -459,7 +459,7 @@ while [ $unix_counter -le $unix_stop ]; do
     # else
     # 	printf "\nSUCCESS: $SOURCENAME_CLIMAT\n"
     # fi
-    # TARGETFILE_CLIMAT=${TARGETPATH}/${SOURCENAME_CLIMAT} #`basename ${SOURCEFILE}`
+    # TARGETFILE_CLIMAT=${TARGETPATH}/${SOURCENAME_CLIMAT} #$(basename ${SOURCEFILE})
 
     # # availability check
     # printf "\nData already on scratch for NISE ${CURRENT_DATE}?\n"
@@ -473,8 +473,8 @@ while [ $unix_counter -le $unix_stop ]; do
     # #echo "DAY=$DAYS"
     # #if [ "$DAYS" -eq "02" ]; then exit; fi
 
-    # # go to next day
-    # (( unix_counter += 86400 ))
+    # go to next day
+    (( unix_counter += 86400 ))
 
 done
 #----------------------------------------------------------------------------------------------

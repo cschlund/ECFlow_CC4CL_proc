@@ -55,19 +55,19 @@ touch ${daily_log}
 if [ ${?} -ne 0 ]; then
     echo "#------------------------------------------#" >> ${daily_log}
     echo "#------------------------------------------#" >> ${daily_log}
-    echo `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF DATE" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} "FAILED TO START" >> ${daily_log}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) "PROCESSING OF DATE" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} "FAILED TO START" >> ${daily_log}
     echo "#------------------------------------------#" >> ${daily_log}
     echo "#------------------------------------------#" >> ${daily_log}
     exit
 else
     echo "#------------------------------------------#" >> ${daily_log}
     echo "#------------------------------------------#" >> ${daily_log}
-    echo `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF DATE" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} "STARTED SUCCESSFULLY ON" ${HOST} "AND" ${itask} >> ${daily_log}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) "PROCESSING OF DATE" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} "STARTED SUCCESSFULLY ON" ${HOST} "AND" ${itask} >> ${daily_log}
     echo "#------------------------------------------#" >> ${daily_log}
     echo "#------------------------------------------#" >> ${daily_log}
 fi
 
-echo `exec date +%Y/%m/%d:%H:%M:%S` "SET PLATFORMS" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "SET PLATFORMS" >> ${daily_log}
 
 # -- now fill them with the paths to the files to be processed
 if [[ ${INSTRUMENT} = "AVHRR" ]]; then
@@ -75,14 +75,14 @@ if [[ ${INSTRUMENT} = "AVHRR" ]]; then
     l1_dirbase=${INPUTDIR}/${INSTRUMENT}/${PLATFORM}
     l1_dirname=${l1_dirbase}/${YEAR}/${MONTHS}/${DAYS}/${YEAR}${MONTHS}${DAYS}
 
-    set -A l1_filename `ls ${l1_dirname}/*.h5 | head -1`
+    set -A l1_filename $(ls ${l1_dirname}/*.h5 | head -1)
     nl1_filename=${#l1_filename[*]}
     if [ $nl1_filename -eq 0 ]; then
         echo "NO DATA TO PROCESS AVAILABLE! EXITING, PROCESSING FAILED FOR" ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} >> ${daily_log}
         echo "nl1_filename == 0" >> ${daily_log}
         exit
     fi
-    l1_filebase=`exec basename ${l1_filename} .h5`
+    l1_filebase=$(exec basename ${l1_filename} .h5)
 
     SPLATFORM=${PLATFORM}
 
@@ -138,7 +138,7 @@ elif [[ ${INSTRUMENT} = "MODIS" ]]; then
 fi
 
 
-echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE DIRS/FILES" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "MAKE DIRS/FILES" >> ${daily_log}
 
 inputdir_instr=${INPUTDIR}/${INSTRUMENT}
 
@@ -160,7 +160,7 @@ if [ ${?} -ne 0 ]; then
     echo "CREATION OF" ${checkfile} "FAILED" >> ${daily_log}
     exit
 else
-    echo `exec date +%Y/%m/%d:%H:%M:%S` ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} 'and'  ${itask} >> ${checkfile}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} 'Running on' ${HOST} 'and'  ${itask} >> ${checkfile}
 fi
 
 
@@ -188,18 +188,18 @@ fi
 il1b=0
 igeo=0
 
-echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE FILE LISTS" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "MAKE FILE LISTS" >> ${daily_log}
 
 # --  Build the directory where the input data is staged by proc1
 if [[ ${INSTRUMENT} = "AVHRR" ]]; then
 
     yyyymmdd=${YEAR}${MONTHS}${DAYS}
-    set -A l1b_list_temp `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} avhrr`
-    set -A geo_list `python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} sunsatangles`
+    set -A l1b_list_temp $(python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} avhrr)
+    set -A geo_list $(python ${list_orbits_script_py} ${dbfile} ${yyyymmdd} ${PLATFORM} ${l1_dirbase} sunsatangles)
 
     nl1b_temp=${#l1b_list_temp[*]}
-    nl1b=`expr $nl1b_temp / 4`
-    nl1b_loop=`expr $nl1b - 1`
+    nl1b=$(expr $nl1b_temp / 4)
+    nl1b_loop=$(expr $nl1b - 1)
 
     l1b_list={1..$nl1b}
     starty_list={1..$nl1b}
@@ -209,11 +209,11 @@ if [[ ${INSTRUMENT} = "AVHRR" ]]; then
 elif [[ ${INSTRUMENT} = "MODIS" ]]; then
 
     inputdir_instr_date=${inputdir_instr}/${SPLATFORM}/${YEAR}/${MONTHS}/${DAYS}
-    set -A l1b_list `ls ${inputdir_instr_date}/${searchl1b}`
-    set -A geo_list `ls ${inputdir_instr_date}/${searchgeo}`
+    set -A l1b_list $(ls ${inputdir_instr_date}/${searchl1b})
+    set -A geo_list $(ls ${inputdir_instr_date}/${searchgeo})
 
     nl1b=${#l1b_list[*]}
-    nl1b_loop=`expr $nl1b - 1`
+    nl1b_loop=$(expr $nl1b - 1)
 
 fi
 
@@ -227,7 +227,7 @@ fi
 index=0
 for f in {0..$nl1b_loop}; do
     if [[ ${INSTRUMENT} = "AVHRR" ]]; then
-        index=`expr $f + $f \* 3`
+        index=$(expr $f + $f \* 3)
         l1b_list[$f]=${l1b_list_temp[$index]}
         starty_list[$f]=${l1b_list_temp[$index+1]}
         endy_list[$f]=${l1b_list_temp[$index+2]}
@@ -238,7 +238,7 @@ for f in {0..$nl1b_loop}; do
 done
 
 ngeo=${#geo_list[*]}
-ngeo_loop=`expr $ngeo - 1`
+ngeo_loop=$(expr $ngeo - 1)
 
 # -- check if numbers are equal and greater zero:
 if [ $nl1b -ne $ngeo ]; then
@@ -255,7 +255,7 @@ for f in {0..$ngeo_loop}; do
 
 done
 
-echo `exec date +%Y/%m/%d:%H:%M:%S` "A TOTAL OF"  $nl1b " FILES WILL BE PROCESSED" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "A TOTAL OF"  $nl1b " FILES WILL BE PROCESSED" >> ${daily_log}
 
 # -- now loop over the files and process them step by step
 ifile=0
@@ -269,11 +269,11 @@ path_to_emissivity=${temp_aux}/${emissivity_temp}
 
 
 # -- get days (directories) for ice_snow, albedo, BRDF (emissivity to be implemented)
-echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK AUX FILES" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "PICK AUX FILES" >> ${daily_log}
 
 
 # -- modis albedo
-echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK ALBEDO" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "PICK ALBEDO" >> ${daily_log}
 aux_input_dir=${path_to_albedo}
 suffix=hdf
 type=alb
@@ -286,7 +286,7 @@ path_and_file_to_albedo=$(python $pick_aux_datafile \
 
 
 # -- modis brdf
-echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK BRDF" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "PICK BRDF" >> ${daily_log}
 aux_input_dir=${path_to_brdf}
 suffix=hdf
 type=brdf
@@ -298,7 +298,7 @@ path_and_file_to_brdf=$(python $pick_aux_datafile \
                                --year $YEAR --month $MONTHS --day $DAYS)
 
 # -- ice_snow
-echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK SNOW" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "PICK SNOW" >> ${daily_log}
 aux_input_dir=${path_to_ice}
 suffix=HDFEOS
 type=is
@@ -312,7 +312,7 @@ type=is
 path_and_file_to_ice=""
 
 # -- emissivity
-echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK EMIS" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "PICK EMIS" >> ${daily_log}
 aux_input_dir=${path_to_emissivity}
 suffix=nc
 type=em
@@ -326,11 +326,11 @@ path_and_file_to_emissivity=$(python $pick_aux_datafile \
 
 lpick=1
 
-echo `exec date +%Y/%m/%d:%H:%M:%S` "START LOOP OVER FILES" >> ${daily_log}
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "START LOOP OVER FILES" >> ${daily_log}
 
 while [ $ifile -lt $nl1b ]; do
 
-    echo `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "STARTED" >> ${daily_log}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) "PROCESSING OF ITEM" ${l1b_list[$ifile]} "STARTED" >> ${daily_log}
     echo "FILE" $((${ifile}+1)) "OF" ${nl1b} "IS IN WORK" >> ${daily_log}
 
     # --------------------------------------------------------------------- #
@@ -339,9 +339,9 @@ while [ $ifile -lt $nl1b ]; do
     #                                                                       #
     # --------------------------------------------------------------------- #
 
-    uuid_tag=`exec $uuid_path`
-    exec_time_pre_d=`exec date +%Y%m%d`
-    exec_time_pre_h=`exec date +%H%M%S`
+    uuid_tag=$(exec $uuid_path)
+    exec_time_pre_d=$(exec date +%Y%m%d)
+    exec_time_pre_h=$(exec date +%H%M%S)
     exec_time_pre=${exec_time_pre_d}T${exec_time_pre_h}Z
     sensor=${INSTRUMENT}
     path_to_l1b=${l1b_list[$ifile]}
@@ -350,13 +350,13 @@ while [ $ifile -lt $nl1b ]; do
     path_to_ecmwf=${INPUTDIR}/ERAinterim/${YEAR}/${MONTHS}
     path_to_coeffs=${perm_aux}/coeffs
 
-    echo `exec date +%Y/%m/%d:%H:%M:%S` "MAKE OUTPUT DIRS" >> ${daily_log}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) "MAKE OUTPUT DIRS" >> ${daily_log}
 
     # -- make output directory for that given orbit/granule
     if [[ ${INSTRUMENT} = "AVHRR" ]]; then
 
         # -- setting hour and minute from AVHRR filename
-        l1b_file=`exec basename ${l1b_list[ifile]} .h5`
+        l1b_file=$(exec basename ${l1b_list[ifile]} .h5)
 
         if [[ ${l1_filebase} == ECC_GAC* ]]; then
 
@@ -365,9 +365,9 @@ while [ $ifile -lt $nl1b ]; do
             fsplit=$(echo ${l1b_file} | tr "_" "\n")
             for x in ${fsplit}; do
                 if [[ ${x} == *T*Z ]]; then
-                    DAYCUT=`exec echo ${x} | cut -c 7-8`
-                    HOUR=`exec echo ${x} | cut -c 10-11`
-                    MINUTE=`exec echo ${x} | cut -c 12-13`
+                    DAYCUT=$(exec echo ${x} | cut -c 7-8)
+                    HOUR=$(exec echo ${x} | cut -c 10-11)
+                    MINUTE=$(exec echo ${x} | cut -c 12-13)
                     break
                 fi
             done
@@ -376,9 +376,9 @@ while [ $ifile -lt $nl1b ]; do
 
             # -- old avhrr file nomenclature
             #noaa18_20080101_2228_99999_satproj_11018_12302_avhrr.h5
-            HOUR=`exec echo ${l1b_file} | rev | cut -c 35-36 | rev`
-            MINUTE=`exec echo ${l1b_file} | rev | cut -c 33-34 | rev`
-            DAYCUT=`exec echo ${l1b_file} | rev | cut -c 31-32 | rev`
+            HOUR=$(exec echo ${l1b_file} | rev | cut -c 35-36 | rev)
+            MINUTE=$(exec echo ${l1b_file} | rev | cut -c 33-34 | rev)
+            DAYCUT=$(exec echo ${l1b_file} | rev | cut -c 31-32 | rev)
 
         fi
 
@@ -386,9 +386,9 @@ while [ $ifile -lt $nl1b ]; do
     elif [[ ${INSTRUMENT} = "MODIS" ]]; then
 
         # -- setting hour and minute from MODIS filename
-        l1b_file=`exec basename ${l1b_list[ifile]} .hdf`
-        HOUR=`exec echo ${l1b_file} | cut -f 3-3 -d . | cut -c 1-2`
-        MINUTE=`exec echo ${l1b_file} | cut -f 3-3 -d . | cut -c 3-4`
+        l1b_file=$(exec basename ${l1b_list[ifile]} .hdf)
+        HOUR=$(exec echo ${l1b_file} | cut -f 3-3 -d . | cut -c 1-2)
+        MINUTE=$(exec echo ${l1b_file} | cut -f 3-3 -d . | cut -c 3-4)
         DAYCUT=${DAYS}
 
     fi
@@ -398,11 +398,11 @@ while [ $ifile -lt $nl1b ]; do
     mkdir -p ${l2_outp}
     if [ ${?} -ne 0 ]; then
         echo "CREATION OF" ${l2_outp} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         continue
     fi
 
-    echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK ECMWF FILE" >> ${daily_log}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) "PICK ECMWF FILE" >> ${daily_log}
 
     # -- pick ecmwf file
     #. ${ESA_ROUT}/pick_ecmwf_dir.ksh
@@ -429,7 +429,7 @@ while [ $ifile -lt $nl1b ]; do
     mkdir -p ${l2_outp_pre}
     if [ ${?} -ne 0 ]; then
         echo "CREATION OF PREPROCDIR " ${l2_outp_pre} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     fi
@@ -451,8 +451,8 @@ while [ $ifile -lt $nl1b ]; do
         if [[ ${INSTRUMENT} = "AVHRR" ]]; then
             startx=1
             endx=${endx_list[$ifile]}
-            starty=`expr ${starty_list[$ifile]} + 1`
-            endy=`expr ${endy_list[$ifile]} + 1`
+            starty=$(expr ${starty_list[$ifile]} + 1)
+            endy=$(expr ${endy_list[$ifile]} + 1)
         elif [[ ${INSTRUMENT} = "MODIS" ]]; then
             startx=-1
             endx=-1
@@ -466,21 +466,21 @@ while [ $ifile -lt $nl1b ]; do
 
     if [ ${?} -ne 0 ]; then
         echo "WRITING OF PREPROCDRIVER" ${preproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     fi
 
 
-    echo `exec date +%Y/%m/%d:%H:%M:%S` "STARTING  PREPROCESSING" ${preproc_driver} "ON" ${OMP_NUM_THREADS} "THREADS" >> ${daily_log}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) "STARTING  PREPROCESSING" ${preproc_driver} "ON" ${OMP_NUM_THREADS} "THREADS" >> ${daily_log}
 
     if [ ${?} -ne 0 ]; then
         echo "RUNNING OF PREPROCESSING" ${preproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     else
-        echo `exec date +%Y/%m/%d:%H:%M:%S` "RUNNING OF PREPROCESSING" ${preproc_driver} "SUCCESSFUL" >> ${daily_log}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) "RUNNING OF PREPROCESSING" ${preproc_driver} "SUCCESSFUL" >> ${daily_log}
     fi
 
 
@@ -494,7 +494,7 @@ while [ $ifile -lt $nl1b ]; do
     # -- set stuff for main processing (ORAC)
     # -- set back again on maximum threads from LL
 
-    echo `exec date +%Y/%m/%d:%H:%M:%S` "STARTING  PROCESSING" ${preproc_driver} "ON" ${OMP_NUM_THREADS} "THREADS" >> ${daily_log}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) "STARTING  PROCESSING" ${preproc_driver} "ON" ${OMP_NUM_THREADS} "THREADS" >> ${daily_log}
 
     # -- make main proc output directory
     l2_outp_main=${l2_outp}/main
@@ -502,13 +502,13 @@ while [ $ifile -lt $nl1b ]; do
     mkdir -p ${l2_outp_main}
     if [ ${?} -ne 0 ]; then
         echo "CREATION OF PROCDIR " ${l2_outp_main} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     fi
 
-    uuid_tag=`exec $uuid_path`
-    exec_time_main=`exec date +%Y%m%d:%H%M%S`
+    uuid_tag=$(exec $uuid_path)
+    exec_time_main=$(exec date +%Y%m%d:%H%M%S)
     path_to_sads=${perm_aux}/sad_dir
 
     # -- determine here platform part of tag
@@ -561,7 +561,7 @@ while [ $ifile -lt $nl1b ]; do
 
     if [ ${?} -ne 0 ]; then
         echo "WRITING OF PROCDRIVER FOR" ${mainproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     fi
@@ -570,11 +570,11 @@ while [ $ifile -lt $nl1b ]; do
     # -- run main processing, pass path and filename of ORAC driver file to it.
     if [ ${?} -ne 0 ]; then
         echo "RUNNING OF PROCESSING" ${mainproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     else
-        echo `exec date +%Y/%m/%d:%H:%M:%S` "RUNNING OF PROCESSING" ${mainproc_driver} "SUCCESSFUL" >> ${daily_log}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) "RUNNING OF PROCESSING" ${mainproc_driver} "SUCCESSFUL" >> ${daily_log}
     fi
 
 
@@ -591,7 +591,7 @@ while [ $ifile -lt $nl1b ]; do
 
     if [ ${?} -ne 0 ]; then
         echo "WRITING OF PROCDRIVER FOR" ${mainproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     fi
@@ -600,11 +600,11 @@ while [ $ifile -lt $nl1b ]; do
     # -- run main processing, pass path and filename of ORAC driver file to it.
     if [ ${?} -ne 0 ]; then
         echo "RUNNING OF PROCESSING" ${mainproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     else
-        echo `exec date +%Y/%m/%d:%H:%M:%S` "RUNNING OF PROCESSING" ${mainproc_driver} "SUCCESSFUL" >> ${daily_log}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) "RUNNING OF PROCESSING" ${mainproc_driver} "SUCCESSFUL" >> ${daily_log}
     fi
 
 
@@ -628,25 +628,25 @@ while [ $ifile -lt $nl1b ]; do
     mkdir -p ${l2_outp_post}
     if [ ${?} -ne 0 ]; then
         echo "CREATION OF POSTPROCDIR " ${l2_outp_post} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     fi
 
-    uuid_tag_primary=`exec $uuid_path`
-    uuid_tag_secondary=`exec $uuid_path`
-    exec_time_post=`exec date +%Y%m%d:%H%M%S`
+    uuid_tag_primary=$(exec $uuid_path)
+    uuid_tag_secondary=$(exec $uuid_path)
+    exec_time_post=$(exec date +%Y%m%d:%H%M%S)
     source=${sensor}_${CPLATFORM}_${sensor_version}
     file_name=${l1b_file}.nc
-    cstandard_name_voc=`echo "'"${standard_name_voc}"'"`
-    cprod_name=`echo "'"${prod_name}"'"`
-    chistory=`echo "'"${history}"'"`
-    ccomment=`echo "'"${comment}"'"`
-    clicense=`echo "'"${license}"'"`
-    csummary=`echo "'"${summary}"'"`
-    ckeywords=`echo "'"${keywords}"'"`
-    cprocessing_inst=`echo "'"${processing_inst}"'"`
-    cproject=`echo "'"${project}"'"`
+    cstandard_name_voc=$(echo "'"${standard_name_voc}"'")
+    cprod_name=$(echo "'"${prod_name}"'")
+    chistory=$(echo "'"${history}"'")
+    ccomment=$(echo "'"${comment}"'")
+    clicense=$(echo "'"${license}"'")
+    csummary=$(echo "'"${summary}"'")
+    ckeywords=$(echo "'"${keywords}"'")
+    cprocessing_inst=$(echo "'"${processing_inst}"'")
+    cproject=$(echo "'"${project}"'")
 
     switch_phases='.false.'
     if [[ ${ntypes_to_process_ICE} -eq 10 && ${ntypes_to_process_WAT} -eq 10 ]]; then
@@ -659,7 +659,7 @@ while [ $ifile -lt $nl1b ]; do
 
     if [ ${?} -ne 0 ]; then
         echo "WRITING OF POSTPROCDRIVER FOR" ${postproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
     fi
@@ -669,13 +669,13 @@ while [ $ifile -lt $nl1b ]; do
     if [ ${?} -ne 0 ]; then
 
         echo "RUNNING OF POSTPROCESSING" ${postproc_driver} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
-        echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
         ((ifile=$ifile+1))
         continue
 
     else
 
-        echo `exec date +%Y/%m/%d:%H:%M:%S` "RUNNING OF POSTPROCESSING" ${postproc_driver} "SUCCESSFUL" >> ${daily_log}
+        echo $(exec date +%Y/%m/%d:%H:%M:%S) "RUNNING OF POSTPROCESSING" ${postproc_driver} "SUCCESSFUL" >> ${daily_log}
 
         if [[ ${INSTRUMENT} = "AVHRR" ]]; then
 
@@ -697,9 +697,9 @@ while [ $ifile -lt $nl1b ]; do
     fi
 
 
-    echo  `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
+    echo  $(exec date +%Y/%m/%d:%H:%M:%S) "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
     echo " " >> ${daily_log}
-    echo `exec date +%Y/%m/%d:%H:%M:%S` ${l1b_list[$ifile]} ' _S_' >> ${checkfile}
+    echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _S_' >> ${checkfile}
 
 
     # -- if one element was processed go to next
@@ -709,7 +709,7 @@ done
 
 echo "#------------------------------------------#" >> ${daily_log}
 echo "#------------------------------------------#" >> ${daily_log}
-echo `exec date +%Y/%m/%d:%H:%M:%S` "PROCESSING OF DATE" \
+echo $(exec date +%Y/%m/%d:%H:%M:%S) "PROCESSING OF DATE" \
      ${YEAR}${MONTHS}${DAYS} "OF" ${INSTRUMENT} "ON" ${PLATFORM} "WITH ID" ${ID} "FINISHED" \
      >> ${daily_log}
 echo "A TOTAL OF" ${ifile} "FILES OUT OF" ${nl1b} "WERE COMPLETED" >> ${daily_log}
