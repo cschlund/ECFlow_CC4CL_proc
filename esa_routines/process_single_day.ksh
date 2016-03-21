@@ -305,10 +305,11 @@ type=is
 #. ${ESA_ROUT}/pick_aux_dir.new.ksh
 #path_and_file_to_ice=${pickfile}
 # -- C. Schlundt, 2014-12-02
-path_and_file_to_ice=$(python $pick_aux_datafile \
-                              --inpdir $aux_input_dir --suffix $suffix \
-                              --year $YEAR --month $MONTHS --day $DAYS)
-
+# path_and_file_to_ice=$(python $pick_aux_datafile \
+#                               --inpdir $aux_input_dir --suffix $suffix \
+#                               --year $YEAR --month $MONTHS --day $DAYS)
+# deactivated as we do not read NISE data anymore
+path_and_file_to_ice=""
 
 # -- emissivity
 echo `exec date +%Y/%m/%d:%H:%M:%S` "PICK EMIS" >> ${daily_log}
