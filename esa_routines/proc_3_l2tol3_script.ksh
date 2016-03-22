@@ -19,11 +19,11 @@
  . $4
 
  #overwrite ncdf_version from config with actual
- ncdf_version=`nc-config --version`
+ ncdf_version=$(nc-config --version)
 
  algo=${l2processor}
 
- DOM=`cal ${MONTH} ${YEAR}  |tr -s " " "\n"|tail -1`
+ DOM=$(cal ${MONTH} ${YEAR}  |tr -s " " "\n"|tail -1)
 
  MONTH=$(printf %02d $MONTH)
 
@@ -56,9 +56,9 @@
  fi
 
  #present date and time for output file name
-# exec_time=`exec date +%Y%m%d%H%M%S`
+# exec_time=$(exec date +%Y%m%d%H%M%S)
  #create UTC ISO time stamp
- exec_time=`date -u -I'seconds'`
+ exec_time=$(date -u -I'seconds')
 
 
  #set $area
@@ -99,7 +99,7 @@
  area=${abs_slat}${lat_bot}${abs_elat}${lat_top}${abs_slon}${lon_left}${abs_elon}${lon_right}
 
  # loop for l2b days (use parallel instead)
- for DAY in `seq ${loop_start} ${loop_count}` ; do
+ for DAY in $(seq ${loop_start} ${loop_count}) ; do
 
  DAY=$(printf %02d $DAY)
 
@@ -233,8 +233,8 @@ platform_fn=${platform}
 #for avhrr overwrite to make conform with ds-wg req.
 if [ "${sensor}" = AVHRR ] ; then
     case ${platform} in
-    *"NOAA"*) plat=`exec echo ${platform} | cut -c1-4`
-    num=`exec echo ${platform} | cut -c5-`
+    *"NOAA"*) plat=$(exec echo ${platform} | cut -c1-4)
+    num=$(exec echo ${platform} | cut -c5-)
     platform_fn=${plat}-${num}
     ;;
     *) platform_fn=${platform} ;;
@@ -256,9 +256,9 @@ if [ "${prodtype}" = l3a ] ; then
 else
     cat ${l2info_dum} | grep output/${datum} > ${l2info}
 fi
-uuid_tag=`/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/ossp_uuid-1.6.2/bin/uuid -v 4`
+uuid_tag=$(/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/ossp_uuid-1.6.2/bin/uuid -v 4)
 
-echo `date` 'preparation of names and lists finished, execute now l2->l3 processing for' ${datum}
+echo $(date) 'preparation of names and lists finished, execute now l2->l3 processing for' ${datum}
 echo ''
 echo ${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}"
 echo ''

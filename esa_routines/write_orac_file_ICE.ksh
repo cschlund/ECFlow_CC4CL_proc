@@ -14,4 +14,3 @@ CTRL%NTYPES_TO_PROCESS=${ntypes_to_process_ICE}
 CTRL%TYPES_TO_PROCESS=${types_to_process_ICE}
 CTRL%RS%USE_FULL_BRDF=${cfullbrdf}
 #END">${mainproc_driver}
-
