@@ -18,17 +18,17 @@ TYPE=an
 STEP=00
 
 DATE=$YEAR$MONTH
-ndays=`cal ${MONTH} ${YEAR} | egrep -v [a-z] | wc -w`
+ndays=$(cal ${MONTH} ${YEAR} | egrep -v [a-z] | wc -w)
 
 # also get data from last day of previous month and first day of
 # following month for interpolation between successive ERA data
-previous_day=`date -d "$YEAR$MONTH"01" -1 day" +%Y%m%d`/
-following_day=`date -d "$YEAR$MONTH$ndays +1 day" +%Y%m%d`
+previous_day=$(date -d "$YEAR$MONTH"01" -1 day" +%Y%m%d)/
+following_day=$(date -d "$YEAR$MONTH$ndays +1 day" +%Y%m%d)
 
 # build dates to be retrieved
 dates=${previous_day}
 for f in {1..$ndays}; do 
-    ff=`expr $(printf %02d $f)`
+    ff=$(expr $(printf %02d $f))
     dates=${dates}${YEAR}${MONTH}${ff}/
 done
 dates=${dates}${following_day}
@@ -95,10 +95,10 @@ fi
 
 sep="+"
 for file in ${DATADIR}/*grb; do 
-    base=`exec echo "${file}" | awk '{ print $1 }' | cut -f1 -d${sep}`
-    end=`exec basename "${file}" .grb | awk '{ print $1 }' | cut -f2 -d${sep}`
-    cutoff=`expr length ${base} - 2`
-    basecut=`expr ${base} | cut -c -${cutoff}`
+    base=$(exec echo "${file}" | awk '{ print $1 }' | cut -f1 -d${sep})
+    end=$(exec basename "${file}" .grb | awk '{ print $1 }' | cut -f2 -d${sep})
+    cutoff=$(expr length ${base} - 2)
+    basecut=$(expr ${base} | cut -c -${cutoff})
     FILENAME_NETCDF=${basecut}${sep}${end}.nc
     cdo -t ecmwf -f nc copy "${file}" ${FILENAME_NETCDF}
     rc=$?
@@ -111,7 +111,7 @@ for file in ${DATADIR}/*grb; do
         # Do this only if file does not exist yet.
 	if [[ ! -e ${FILENAME_REMAPWEIGHTS} ]] 
 	then
-	    # FILENAME_NETCDF=`find $DATADIR -type f \( -iname "*.nc" ! -iname "*HR.nc" \) | head -n 1`
+	    # FILENAME_NETCDF=$(find $DATADIR -type f \( -iname "*.nc" ! -iname "*HR.nc" \) | head -n 1)
 	    echo "Generating ERA-Interim remapping weights for ${DATE}"
 	    echo "Input file = "${FILENAME_NETCDF}", output file = "${FILENAME_REMAPWEIGHTS}  
 	    cdo gendis,${gridInfoFile} ${FILENAME_NETCDF} ${FILENAME_REMAPWEIGHTS}  
@@ -132,4 +132,3 @@ for file in ${DATADIR}/*grb; do
     break
 
 done
-

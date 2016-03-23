@@ -40,7 +40,7 @@ get_avhrr_data()
 {
  YEAR=${1}
  MONTH=$(printf %02d ${2})
- SAT=`echo ${3} | awk '{ print toupper($0)}'`
+ SAT=$(echo ${3} | awk '{ print toupper($0)}')
  ecfs_dir=${4}
 
  tar_prefix="AVHRR_GAC_L1C_"
@@ -59,12 +59,12 @@ get_avhrr_data()
      download_dir="${INPUTDIR}/AVHRR/${platform}/${YEAR}/${MONTH}"
      mkdir -p ${download_dir}
 
-     print Start of dearchiving: `date`
+     print Start of dearchiving: $(date)
 
      # -- download file
      ecp ${ecfs_file} ${download_dir}
 
-     print End of dearchiving: `date`
+     print End of dearchiving: $(date)
 
      if [ ${?} -ne 0 ]; then
          print " --- FAILED: Download of ${ecfs_file} ! "
@@ -75,11 +75,11 @@ get_avhrr_data()
      #    e.g. AVHRR_GAC_L1C_NOAA15_200801.tar
      cd ${download_dir}
 
-     print Start of monthly tar file extraction: `date`
+     print Start of monthly tar file extraction: $(date)
 
      tar xf ${tarfile} && rm -f ${tarfile}
 
-     print End of monthly tar file extraction: `date`
+     print End of monthly tar file extraction: $(date)
  else
      print " * no file available for $YEAR, $MONTH, $SAT"
      return 1
@@ -103,9 +103,9 @@ set -xv
 . $2
 
 # 2014-11-12 C. Schlundt: added
-for year in `seq $STARTYEAR $STOPYEAR`
+for year in $(seq $STARTYEAR $STOPYEAR)
 do
-    for month in `seq $STARTMONTH $STOPMONTH`
+    for month in $(seq $STARTMONTH $STOPMONTH)
     do 
         # availability flag
         aflag=-1

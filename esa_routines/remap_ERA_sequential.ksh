@@ -12,10 +12,10 @@ FILENAME_REMAPWEIGHTS=${3}
 
 sep="+"
 for file in ${DATADIR}/*00.grb; do 
-    base=`exec echo "${file}" | awk '{ print $1 }' | cut -f1 -d${sep}`
-    end=`exec basename "${file}" .grb | awk '{ print $1 }' | cut -f2 -d${sep}`
-    cutoff=`expr length ${base} - 2`
-    basecut=`expr ${base} | cut -c -${cutoff}`
+    base=$(exec echo "${file}" | awk '{ print $1 }' | cut -f1 -d${sep})
+    end=$(exec basename "${file}" .grb | awk '{ print $1 }' | cut -f2 -d${sep})
+    cutoff=$(expr length ${base} - 2)
+    basecut=$(expr ${base} | cut -c -${cutoff})
     file_HR=${base}${sep}${end}_HR.grb
     FILENAME_NETCDF=${basecut}${sep}${end}.nc
     FILENAME_NETCDF_HR=${basecut}${sep}${end}_HR.nc
