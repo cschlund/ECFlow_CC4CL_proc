@@ -314,6 +314,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("GET_AVHRR_KSH", get_avhrr_ksh)
     suite.add_variable("GET_MODIS_KSH", get_modis_ksh)
     suite.add_variable("GET_MARS_KSH", get_mars_ksh)
+    suite.add_variable("GET_MARS_SEQUENTIAL_KSH", get_mars_sequential_ksh)
     suite.add_variable("GET_AUX_KSH", get_aux_ksh)
     suite.add_variable("PROC2_ORAC_KSH", proc2_orac_ksh)
     suite.add_variable("SINGLE_DAY_KSH", single_day_ksh)
@@ -366,16 +367,18 @@ def add_aux_tasks(family, prefamily):
     wrt_aux_cfgs = add_task(family, 'write_aux_cfg_files')
     get_aux_data = add_task(family, 'get_aux_data')
     get_mars_data = add_task(family, 'get_mars_data')
+    get_mars_data_sequential = add_task(family, 'get_mars_data_sequential')
 
     if prefamily: 
         add_trigger_dearch(wrt_aux_cfgs, prefamily)
     add_trigger(get_aux_data, wrt_aux_cfgs)
     add_trigger(get_mars_data, wrt_aux_cfgs)
+    add_trigger(get_mars_data_sequential, get_mars_data)
 
     return {'wrt_aux_cfgs': wrt_aux_cfgs,
             'get_aux_data': get_aux_data,
-            'get_mars_data': get_mars_data}
-
+            'get_mars_data': get_mars_data,
+            'get_mars_data_sequential': get_mars_data_sequential}
 
 def add_l3s_product_tasks(family, prefamily):
     """
