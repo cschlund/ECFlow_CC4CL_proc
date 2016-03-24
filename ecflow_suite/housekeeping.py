@@ -314,7 +314,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("GET_AVHRR_KSH", get_avhrr_ksh)
     suite.add_variable("GET_MODIS_KSH", get_modis_ksh)
     suite.add_variable("GET_MARS_KSH", get_mars_ksh)
-    suite.add_variable("GET_MARS_SEQUENTIAL_KSH", get_mars_sequential_ksh)
+    #suite.add_variable("GET_MARS_SEQUENTIAL_KSH", get_mars_sequential_ksh)
     suite.add_variable("GET_AUX_KSH", get_aux_ksh)
     suite.add_variable("PROC2_ORAC_KSH", proc2_orac_ksh)
     suite.add_variable("SINGLE_DAY_KSH", single_day_ksh)
