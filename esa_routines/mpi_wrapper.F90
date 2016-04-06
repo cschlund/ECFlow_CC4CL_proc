@@ -75,7 +75,7 @@ program mpi_wrapper
   character(len=4) :: year
   character(len=2) :: month
   character(len=512) :: jid,log_dir,out_dir,L2_file_list_dir
-  character(len=1024) :: logfile,ilogfile,L2_file_list,L2_sum_file_list
+  character(len=1024) :: logfile,ilogfile,L2_file_list,L2_secondary_file_list,L2_sum_file_list
   !character(len=256) :: to_upper
 
 
@@ -151,21 +151,24 @@ program mpi_wrapper
      !open file for stdout   
      logfile=trim(adjustl(trim(adjustl(log_dir))//'/'//'proc_2_logfile_'&
           &//trim(adjustl(jid))//'.log'))
-
      open(11,file=trim(adjustl(logfile)),status='replace')
 
      !open file for L2 output list
      L2_file_list=trim(adjustl(trim(adjustl(L2_file_list_dir))//'/'//'L2_ncfile_list_l2b_' &
           & // trim(instrument) // '_' // to_upper(trim(platform)) // '_' // &
           & trim(year) // '_' // trim(month) //'.txt'))
-
      open(12,file=trim(adjustl(L2_file_list)),status='replace')
+     
+     !open file for L2 secondary output list
+     L2_secondary_file_list=trim(adjustl(trim(adjustl(L2_file_list_dir))//'/'//'L2_secondary_ncfile_list_l2b_' &
+          & // trim(instrument) // '_' // to_upper(trim(platform)) // '_' // &
+          & trim(year) // '_' // trim(month) //'.txt'))
+     open(13,file=trim(adjustl(L2_secondary_file_list)),status='replace')
 
      L2_sum_file_list=trim(adjustl(trim(adjustl(L2_file_list_dir))//'/'//'L2_ncfile_list_l2b_sum_'&
           & // trim(instrument) // '_' // to_upper(trim(platform)) // '_' // &
           & trim(year) // '_' // trim(month) //'.txt'))
-
-     open(13,file=trim(adjustl(L2_sum_file_list)),status='replace')
+     open(14,file=trim(adjustl(L2_sum_file_list)),status='replace')
 
 
      !set threadnumber to default=single-threaded
@@ -501,6 +504,7 @@ program mpi_wrapper
 
      close(12)
      close(13)
+     close(14)
      close(15)
      close(16)
      close(17)
