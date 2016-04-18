@@ -14,52 +14,52 @@ source /perm/ms/de/sf2/sfinkens/pps_filter/environment.ksh
 
 echo "I am task %TASK% in family %FAMILY% responsible for proc2 (ORAC)"
 
-if [ %DUMMYRUN% == 1 ]; then 
+if [ %DUMMYRUN% == 1 ]; then
 
     python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
 
 else
 
     if [ %SENSOR% == "AVHRR" ]
-    then 
+    then
         # filter noise of Ch3.7 data
-	lower_satellite=`exec echo %SATELLITE% | awk '{print tolower($0)}'`
-	l1_dir=%ESA_INPUTDIR%/%SENSOR%/${lower_satellite}/%START_YEAR%/%START_MONTH%/
-	length_prefix_avhrr=`expr length "ECC_GAC_sunsatangles_"`
-	prefix_filter_avhrr="S_NWC_avhrr_"
-	prefix_filter_sunsat="S_NWC_sunsatangles_"
-	length_prefix_filter_sunsat=`expr length ${prefix_filter_sunsat}`
-	n_remaining_files=0
+        lower_satellite=`exec echo %SATELLITE% | awk '{print tolower($0)}'`
+        l1_dir=%ESA_INPUTDIR%/%SENSOR%/${lower_satellite}/%START_YEAR%/%START_MONTH%/
+        length_prefix_avhrr=`expr length "ECC_GAC_sunsatangles_"`
+        prefix_filter_avhrr="S_NWC_avhrr_"
+        prefix_filter_sunsat="S_NWC_sunsatangles_"
+        length_prefix_filter_sunsat=`expr length ${prefix_filter_sunsat}`
+        n_remaining_files=0
 
-	cd ${l1_dir}
+        cd ${l1_dir}
         # run MPMD filtering job only if source link files exist
-	for f in ${l1_dir}/*/*/${prefix_filter_sunsat}*; do
-	    [ -e "$f" ] && n_filter_tasks=`exec wc -l < %EC_FILTER_TASKFILE%` &&
-	    aprun -n $n_filter_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE% &&		       
-	    remaining_files=($(ls -R ${l1_dir}/*/*/${prefix_filter_sunsat}* )) &&
-	    n_remaining_files=${#remaining_files[*]} &&
-	    [ ! -e "$f" ] && echo "Filtering not applied. No filter files exist."
-	    break
-	done
+        for f in ${l1_dir}/*/*/${prefix_filter_sunsat}*; do
+            [ -e "$f" ] && n_filter_tasks=`exec wc -l < %EC_FILTER_TASKFILE%` &&
+                aprun -n $n_filter_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE% &&
+                remaining_files=($(ls -R ${l1_dir}/*/*/${prefix_filter_sunsat}* )) &&
+                n_remaining_files=${#remaining_files[*]} &&
+                [ ! -e "$f" ] && echo "Filtering not applied. No filter files exist."
+            break
+        done
 
-	if [ $n_remaining_files -ne 0 ]; then
-	    for f in ${remaining_files}
-	    do
-		workdir=`exec dirname $f`
-		cd ${workdir}
-		link_sunsat=`exec basename ${f}`
-		length_link_sunsat=`expr length ${link_sunsat}`
-		link_avhrr=${prefix_filter_avhrr}${link_sunsat:${length_prefix_filter_sunsat}:${length_link_sunsat}}
-		filter_avhrr=${prefix_filter_avhrr}"filtered_"${link_sunsat:${length_prefix_filter_sunsat}:${length_link_sunsat}}
-		origin_avhrr="ECC_GAC_avhrr_"${link_sunsat:${length_prefix_filter_sunsat}:${length_link_sunsat}}	
-		python /perm/ms/de/sf6/gac_2014/scr/ppsGacFilter37.py --gacfile ${link_sunsat}
-		if [ -e ${filter_avhrr} ]; then 
-		    mv ${filter_avhrr} ${origin_avhrr}
-		fi
-		rm -f ${link_sunsat} ${link_avhrr}
-	    done
-	    cd ${l1_dir}
-	fi
+        if [ $n_remaining_files -ne 0 ]; then
+            for f in ${remaining_files}
+            do
+                workdir=`exec dirname $f`
+                cd ${workdir}
+                link_sunsat=`exec basename ${f}`
+                length_link_sunsat=`expr length ${link_sunsat}`
+                link_avhrr=${prefix_filter_avhrr}${link_sunsat:${length_prefix_filter_sunsat}:${length_link_sunsat}}
+                filter_avhrr=${prefix_filter_avhrr}"filtered_"${link_sunsat:${length_prefix_filter_sunsat}:${length_link_sunsat}}
+                origin_avhrr="ECC_GAC_avhrr_"${link_sunsat:${length_prefix_filter_sunsat}:${length_link_sunsat}}
+                python /perm/ms/de/sf6/gac_2014/scr/ppsGacFilter37.py --gacfile ${link_sunsat}
+                if [ -e ${filter_avhrr} ]; then
+                    mv ${filter_avhrr} ${origin_avhrr}
+                fi
+                rm -f ${link_sunsat} ${link_avhrr}
+            done
+            cd ${l1_dir}
+        fi
     fi
 
     # run retrieval
@@ -77,91 +77,91 @@ else
 
         if [ %TESTRUN% == 1 ]; then
             python %MAKE_CFG_FILE% -cf ${cfg_fil} \
-                -sy %START_YEAR% -ey %END_YEAR% \
-                -sm %START_MONTH% -em %END_MONTH% \
-                proc2 -sat %SATELLITE% -ins %SENSOR% \
-                --procday %PROCDAY% --testrun
+                   -sy %START_YEAR% -ey %END_YEAR% \
+                   -sm %START_MONTH% -em %END_MONTH% \
+                   proc2 -sat %SATELLITE% -ins %SENSOR% \
+                   --procday %PROCDAY% --testrun
         else
             python %MAKE_CFG_FILE% -cf ${cfg_fil} \
-                -sy %START_YEAR% -ey %END_YEAR% \
-                -sm %START_MONTH% -em %END_MONTH% \
-                proc2 -sat %SATELLITE% -ins %SENSOR% \
-                --procday %PROCDAY%
+                   -sy %START_YEAR% -ey %END_YEAR% \
+                   -sm %START_MONTH% -em %END_MONTH% \
+                   proc2 -sat %SATELLITE% -ins %SENSOR% \
+                   --procday %PROCDAY%
         fi
     fi
 
     # -- working directory: write core file here
     #cd %ESA_ROUTINE%
     cd %ESA_ECF_LOG_DIR%
-    
+
 
     # -- some more export statements
     OMP_STACKSIZE=256MB
     export OMP_NUM_THREADS=${EC_threads_per_task}
     export OMP_STACKSIZE=${OMP_STACKSIZE}
     export LD_LIBRARY_PATH=%LD_LIB_PATH%
-    
-    
+
+
     # -- define job name
     job_name=${PBS_JOBNAME}
     job_name=${job_name:-CL}
-    
-    
+
+
     # -- source config files
     . %CFG_PATHS_FILE%
     . %CFG_ATTRI_FILE%
     . ${cfg_fil}
-    
-    
+
+
     # -- define unix start and stop times
     unix_start=`${ESA_ROUT}/ymdhms2unix.ksh $STARTYEAR $STARTMONTH $STARTDAY`
-    
-    if [ $STOPDAY -le 0 ]; then 
-        day_stop=`cal $STOPMONTH $STOPYEAR | tr -s " " "\n" | tail -1` 
+
+    if [ $STOPDAY -le 0 ]; then
+        day_stop=`cal $STOPMONTH $STOPYEAR | tr -s " " "\n" | tail -1`
     else
         day_stop=$STOPDAY
     fi
-    
+
     unix_stop=`${ESA_ROUT}/ymdhms2unix.ksh $STOPYEAR $STOPMONTH $day_stop`
     unix_counter=$unix_start
-    
+
     # -- processing: 1 month of a year!
     ACTMONTH=$STARTMONTH
     ACTYEAR=$STARTYEAR
-    
+
     # -----------------------------------------
     # -- loop over the specified time period
     # -----------------------------------------
-    while [ $unix_counter -le $unix_stop ]; do 
-        
+    while [ $unix_counter -le $unix_stop ]; do
+
         # -- count number of days
-        ndays=`cal $ACTMONTH $ACTYEAR | tr -s " " "\n" | tail -1`    
-	
+        ndays=`cal $ACTMONTH $ACTYEAR | tr -s " " "\n" | tail -1`
+
         # -- get ID
         primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
         primary_id=${primary_id:-CL}
         jid=${job_name}_ID${primary_id}
-        
+
         # -- get (UNIX time) seconds as (additional) identifier
         sleep 3
         id=`date +%%s`
         jid=${jid}_US${id}
         echo ${jid} running
-	
+
         # -- Convert month
         ACTMONTHS=$(printf %%02d $ACTMONTH)
-	
+
         # -- write daily config
         %PROC2_ORAC_KSH% %CFG_PATHS_FILE% ${cfg_fil} %CFG_ATTRI_FILE% \
-            ${ACTYEAR} ${ACTMONTH} ${STARTDAY} ${day_stop} \
-            ${instrument} ${platform} ${jid}     
-	
-        # -- create cmd filename same as inside proc_2_process.ksh 
+                         ${ACTYEAR} ${ACTMONTH} ${STARTDAY} ${day_stop} \
+                         ${instrument} ${platform} ${jid}
+
+        # -- create cmd filename same as inside proc_2_process.ksh
         #    which creates the content of the cmd file
         logs_monthly=${LOGDIR}/processing/${ACTYEAR}${ACTMONTHS}_${instrument}_${platform}_${jid}
         cmd_file=${logs_monthly}/process_single_day_${ACTYEAR}${ACTMONTHS}_${instrument}_${platform}_${jid}.cmd
-	
-	
+
+
         # -- define logfiles
         out_file=${logs_monthly}/${PBS_JOBNAME}_${jid}.log.out
         err_file=${logs_monthly}/${PBS_JOBNAME}_${jid}.log.err
@@ -169,60 +169,60 @@ else
         # -- get ESA temp_list_l2files path
         l2_file_list_dir="%ESA_LIST_L2FILES%"
 
-	
+
         # -- put list of daily config files together
         inventory_file_daily_config=${logs_monthly}/process_single_day_${ACTYEAR}${ACTMONTHS}_${instrument}_${platform}_${jid}.cdaily.lst
         rm -rf ${inventory_file_daily_config}
-	
-	
+
+
         nfiles_conf=`find ${logs_monthly}/ -maxdepth 2 -type f -wholename "*process_single_day*.config" | wc -l`
         echo $nfiles_conf >> ${inventory_file_daily_config}
         find ${logs_monthly}/ -maxdepth 2 -type f -wholename "*process_single_day*.config"| sort  >>  ${inventory_file_daily_config}
-	
-	
+
+
         # --------------------------------------------------------------------
-        # By now all directories and environment files 
+        # By now all directories and environment files
         # (output directories, driver files, config files etc)
         # for this period/scope (=month) have been created.
-        # Thus, proceed by creating an inventory file 
+        # Thus, proceed by creating an inventory file
         # (could also be done during the previous step?)
-        # which holds the paths to all elements which are to be processed 
+        # which holds the paths to all elements which are to be processed
         # (all granules/orbits for this month)
-        # in the sense that the paths to the top level output directories 
+        # in the sense that the paths to the top level output directories
         # of all these elements are listed in this file
         # --------------------------------------------------------------------
         # start now the actual parallel processing by calling the
         # mpi wrapper and passing this inventory file to him
         # --------------------------------------------------------------------
-	
+
         aprun -N $EC_tasks_per_node \
-            -n $EC_total_tasks \
-            -d $EC_threads_per_task \
-            -j $EC_hyperthreads %WRAPPER_EXE% \
-            ${inventory_file_daily_config} \
-            ${instrument} ${platform} \
-            ${ACTMONTHS} ${ACTYEAR} \
-            ${wrapper_mode} ${jid} ${logs_monthly} \
-            ${OUTPUTDIR} ${l2_file_list_dir} \
-    	    %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
-            %SINGLE_DAY_KSH%
-	
-        
+              -n $EC_total_tasks \
+              -d $EC_threads_per_task \
+              -j $EC_hyperthreads %WRAPPER_EXE% \
+              ${inventory_file_daily_config} \
+              ${instrument} ${platform} \
+              ${ACTMONTHS} ${ACTYEAR} \
+              ${wrapper_mode} ${jid} ${logs_monthly} \
+              ${OUTPUTDIR} ${l2_file_list_dir} \
+              %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
+              %SINGLE_DAY_KSH%
+
+
         echo " *** FINISHED: retrieval for %SATELLITE%/%SENSOR% "\
              "START=%START_YEAR%/%START_MONTH% END=%END_YEAR%/%END_MONTH% "
-        
-	
+
+
         # go to next month
         (( unix_counter = unix_counter+86400*ndays ))
-	
+
         ((ACTMONTH=ACTMONTH+1))
-	
+
         # if 12 months full, go to January of the following year
         if [ ACTMONTH -gt 12 ]; then
             ACTMONTH=1
             (( ACTYEAR=ACTYEAR+1))
         fi
-	
+
     done
     # -----------------------------------------
     # END OF WHILE LOOP
