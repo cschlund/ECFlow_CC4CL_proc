@@ -45,6 +45,11 @@
      fi
      # stored in daily config file: see "write_l3_mpmd_config_files.R"
      l2info_dum=${filelist_level2_output}
+     l2info_path=$(exec dirname ${l2info_dum})
+     l2info_name=$(exec basename ${l2info_dum})
+     length=$(echo -n ${l2info_name} | wc -c)
+     l2info_secondary_name=L2_secondary_${l2info_name:3:${length}}
+     l2info_dum_secondary=${l2info_path}/${l2info_secondary_name}
  else
      gridx=${gridxl3}
      gridy=${gridyl3}
@@ -249,20 +254,22 @@ outputfile=${datum}-ESACCI-${prodtype_fn}_CLOUD-CLD_PRODUCTS-${sensor_fn}_${plat
 #files which contain the filelists the software works through then
 mkdir -p ${outputdir}
 l2info=${outputdir}/l2files_${exec_time}.tmp
+l2info_secondary=${outputdir}/l2files_${exec_time}_secondary.tmp
 
 #write file list
 if [ "${prodtype}" = l3a ] ; then
-    cp ${l2info_dum} ${l2info}
+    cp ${l2info_dum} ${l2info}    
 else
     cat ${l2info_dum} | grep output/${datum} > ${l2info}
+    cat ${l2info_dum_secondary} | grep output/${datum} > ${l2info_secondary}
 fi
 uuid_tag=$(/perm/ms/de/sf7/esa_cci_c_proc/tools_bins/ossp_uuid-1.6.2/bin/uuid -v 4)
 
 echo $(date) 'preparation of names and lists finished, execute now l2->l3 processing for' ${datum}
 echo ''
-echo ${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}"
+echo ${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${l2info_secondary}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}"
 echo ''
-${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}" "${cdm_data_type_L3}" "${naming_authority}" "${keywords_vocabulary}"
+${l3execpath}/l2tol3_script.x ${prodtype} "${sensor_fn}" "${algo}" "${l2info}" "${l2info_secondary}" "${outputdir}/${outputfile}" ${gridx} ${gridy} ${uuid_tag} "${platform_fn}" ${exec_time} "${prod_name}" ${YEAR} ${MONTH} ${DAY} "${ncdf_version}" "${cf_convention}" "${processing_inst}" "${l2processor}" "${l2proc_version}" "${l3processor}" "${l3proc_version}" "${contact_email}" "${contact_website}" "${grid_type}" "${reference}" "${history}" "${summary}" "${keywords}" "${comment}" "${project}" "${file_version}" "${source}" ${DOM} "${DUR}" "${license}" "${standard_name_voc}" "${local}" "${slon}" "${elon}" "${slat}" "${elat}" "${cdm_data_type_L3}" "${naming_authority}" "${keywords_vocabulary}"
 
 if [ "${?}" -eq 0  ] ; then
    echo 'done L2->L3 finished, results written to: ' $outputdir/$outputfile
