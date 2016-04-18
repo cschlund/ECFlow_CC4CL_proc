@@ -398,7 +398,7 @@ def add_l3s_product_tasks(family, prefamily):
             'cleanup_l3s_data': cleanup_l3s_data}
 
 
-def add_dearchiving_tasks(family, prefamily):
+def add_dearchiving_tasks(family, prefamily, counter):
     """
     Adds sat. dearchiving specific tasks to the given family.
     :rtype : dictionary
@@ -406,7 +406,10 @@ def add_dearchiving_tasks(family, prefamily):
     wrt_main_cfgs = add_task(family, 'write_main_cfg_files')
     get_sat_data = add_task(family, 'get_sat_data')
 
-    add_trigger(wrt_main_cfgs, prefamily)
+    if counter == 0:
+        add_trigger(wrt_main_cfgs, prefamily)
+    else:
+        add_trigger_dearch(wrt_main_cfgs, prefamily)
     add_trigger(get_sat_data, wrt_main_cfgs)
 
     return {'wrt_main_cfgs': wrt_main_cfgs,
@@ -830,8 +833,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         # DEARCHIVING family: add get aux/era family
         fam_aux = add_fam(fam_month_dearch, get_aux_fam)
         add_aux_tasks(fam_aux, fam_month_previous)
-
-
+        
         # PROC family: add main processing
         fam_main = add_fam(fam_month, mainproc_fam)
 
@@ -867,7 +869,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 # DEARCHIVING
                 fam_sat_dearch = add_fam(fam_avhrr_dearch, satellite)
                 fam_sat_dearch.add_variable("SATELLITE", satellite)
-                add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                add_dearchiving_tasks(fam_sat_dearch, fam_aux, counter)
                 # PROC
                 fam_sat = add_fam(fam_avhrr, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
@@ -901,13 +903,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
 
                 if avhrr_flag:
-                    add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                    add_dearchiving_tasks(fam_sat_dearch, fam_aux, counter)
                     #                  (family, prefamily (=trigger))
                     add_main_proc_tasks(fam_sat, [fam_avhrr, fam_sat_dearch], 
                                         fam_month_previous, satellite)
                     fam_avhrr = fam_sat
                 else:
-                    add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                    add_dearchiving_tasks(fam_sat_dearch, fam_aux, counter)
                     #                  (family, prefamily (=trigger))
                     add_main_proc_tasks(fam_sat, [fam_aux, fam_sat_dearch],
                                         fam_month_previous, satellite)
