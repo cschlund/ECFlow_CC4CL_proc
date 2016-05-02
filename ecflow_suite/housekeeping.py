@@ -83,16 +83,10 @@ def get_modis_avail(sat, sd, ed):
                     msd = modis_dict[sat_key][dat_key]
                 else:
                     med = modis_dict[sat_key][dat_key]
-
-            # modis lies between user start and end date
-            if sd >= msd and ed <= med:
-                return True
-            # modis lies partly between start and end date
-            elif msd < sd < med:
-                return True
-            elif msd < ed < med:
-                return True
-
+            # return true if either start or end date is within
+            # range of availability dates    
+            if msd <= sd < med or msd < ed <= med:
+                return True            
     return False
 
 
@@ -628,7 +622,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
         db_sat_list = dbfile.get_sats(start_date=sdate, end_date=edate,
                                       ignore_sats=ignore_list)
 
-        # terra/aqua at the end of list, if data avail.
+        # terra/aqua at the end of list, if data avail.        
         for item in mod_list:
             if item in all_list:
                 check = get_modis_avail(item, sdate, edate)
@@ -885,7 +879,6 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
                 medate = enddate_of_month(int(yearstr), int(monthstr))
                 mcheck = get_modis_avail(satellite, msdate, medate)
-
                 if not mcheck:
                     continue
 
