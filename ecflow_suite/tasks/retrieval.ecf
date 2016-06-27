@@ -2,6 +2,10 @@
 %include <head_retrieval.h>
 %include <export.h>
 
+module load craype-hugepages2M
+module switch grib_api/old
+module switch emos/old
+
 # -- no core file
 export ATP_ENABLED=0
 # -- core file
@@ -213,14 +217,14 @@ else
 
 
         # go to next month
-        (( unix_counter = unix_counter+86400*ndays ))
+        (( unix_counter = ${unix_counter}+86400*${ndays} ))
 
-        ((ACTMONTH=ACTMONTH+1))
+        ((ACTMONTH=${ACTMONTH}+1))
 
         # if 12 months full, go to January of the following year
-        if [ ACTMONTH -gt 12 ]; then
+        if [ ${ACTMONTH} -gt 12 ]; then
             ACTMONTH=1
-            (( ACTYEAR=ACTYEAR+1))
+            (( ACTYEAR=${ACTYEAR}+1))
         fi
 
     done
