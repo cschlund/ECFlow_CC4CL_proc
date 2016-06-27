@@ -83,16 +83,10 @@ def get_modis_avail(sat, sd, ed):
                     msd = modis_dict[sat_key][dat_key]
                 else:
                     med = modis_dict[sat_key][dat_key]
-
-            # modis lies between user start and end date
-            if sd >= msd and ed <= med:
-                return True
-            # modis lies partly between start and end date
-            elif msd < sd < med:
-                return True
-            elif msd < ed < med:
-                return True
-
+            # return true if either start or end date is within
+            # range of availability dates    
+            if msd <= sd < med or msd < ed <= med:
+                return True            
     return False
 
 
@@ -398,7 +392,7 @@ def add_l3s_product_tasks(family, prefamily):
             'cleanup_l3s_data': cleanup_l3s_data}
 
 
-def add_dearchiving_tasks(family, prefamily):
+def add_dearchiving_tasks(family, prefamily, counter):
     """
     Adds sat. dearchiving specific tasks to the given family.
     :rtype : dictionary
@@ -406,7 +400,10 @@ def add_dearchiving_tasks(family, prefamily):
     wrt_main_cfgs = add_task(family, 'write_main_cfg_files')
     get_sat_data = add_task(family, 'get_sat_data')
 
-    add_trigger(wrt_main_cfgs, prefamily)
+    if counter == 0:
+        add_trigger(wrt_main_cfgs, prefamily)
+    else:
+        add_trigger_dearch(wrt_main_cfgs, prefamily)
     add_trigger(get_sat_data, wrt_main_cfgs)
 
     return {'wrt_main_cfgs': wrt_main_cfgs,
@@ -625,7 +622,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
         db_sat_list = dbfile.get_sats(start_date=sdate, end_date=edate,
                                       ignore_sats=ignore_list)
 
-        # terra/aqua at the end of list, if data avail.
+        # terra/aqua at the end of list, if data avail.        
         for item in mod_list:
             if item in all_list:
                 check = get_modis_avail(item, sdate, edate)
@@ -830,8 +827,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         # DEARCHIVING family: add get aux/era family
         fam_aux = add_fam(fam_month_dearch, get_aux_fam)
         add_aux_tasks(fam_aux, fam_month_previous)
-
-
+        
         # PROC family: add main processing
         fam_main = add_fam(fam_month, mainproc_fam)
 
@@ -867,7 +863,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 # DEARCHIVING
                 fam_sat_dearch = add_fam(fam_avhrr_dearch, satellite)
                 fam_sat_dearch.add_variable("SATELLITE", satellite)
-                add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                add_dearchiving_tasks(fam_sat_dearch, fam_aux, counter)
                 # PROC
                 fam_sat = add_fam(fam_avhrr, satellite)
                 fam_sat.add_variable("SATELLITE", satellite)
@@ -883,7 +879,6 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
                 medate = enddate_of_month(int(yearstr), int(monthstr))
                 mcheck = get_modis_avail(satellite, msdate, medate)
-
                 if not mcheck:
                     continue
 
@@ -901,13 +896,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
 
                 if avhrr_flag:
-                    add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                    add_dearchiving_tasks(fam_sat_dearch, fam_aux, counter)
                     #                  (family, prefamily (=trigger))
                     add_main_proc_tasks(fam_sat, [fam_avhrr, fam_sat_dearch], 
                                         fam_month_previous, satellite)
                     fam_avhrr = fam_sat
                 else:
-                    add_dearchiving_tasks(fam_sat_dearch, fam_aux)
+                    add_dearchiving_tasks(fam_sat_dearch, fam_aux, counter)
                     #                  (family, prefamily (=trigger))
                     add_main_proc_tasks(fam_sat, [fam_aux, fam_sat_dearch],
                                         fam_month_previous, satellite)
