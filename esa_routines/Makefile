@@ -23,9 +23,9 @@ LFLAGS= -O noomp -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othrea
 DFLAGS= -DWRAPPER -DDEBUG
 
 #debugging
-#FFLAGS=-O noomp -eD -eC -eI -hfp_trap -rom -K trap=fp -g -ef -em
-#LFLAGS=-O noomp -eD -eC -eI -hfp_trap -rom -K trap=fp -g -ef -em
-#DFLAGS= -DWRAPPER -DDEBUG
+# FFLAGS=-O noomp -eD -eC -eI -hfp_trap -ro -K trap=fp -g -ef -em
+# LFLAGS=-O noomp -eD -eC -eI -hfp_trap -ro -K trap=fp -g -ef -em
+# DFLAGS= -DWRAPPER -DDEBUG
 
 #FFLAGS=-O noomp -eD -eC -eI -hfp_trap -rom -K trap=fp -Gfast -ef -em -DWRAPPER
 #LFLAGS=-O noomp -eD -eC -eI -hfp_trap -rom -K trap=fp -Gfast -ef -em -DWRAPPER
