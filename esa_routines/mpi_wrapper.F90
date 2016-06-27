@@ -148,7 +148,7 @@ program mpi_wrapper
 
 
 
-     !open file for stdout   
+     !open file for stdout
      logfile=trim(adjustl(trim(adjustl(log_dir))//'/'//'proc_2_logfile_'&
           &//trim(adjustl(jid))//'.log'))
      open(11,file=trim(adjustl(logfile)),status='replace')
@@ -158,7 +158,7 @@ program mpi_wrapper
           & // trim(instrument) // '_' // to_upper(trim(platform)) // '_' // &
           & trim(year) // '_' // trim(month) //'.txt'))
      open(12,file=trim(adjustl(L2_file_list)),status='replace')
-     
+
      !open file for L2 secondary output list
      L2_secondary_file_list=trim(adjustl(trim(adjustl(L2_file_list_dir))//'/'//'L2_secondary_ncfile_list_l2b_' &
           & // trim(instrument) // '_' // to_upper(trim(platform)) // '_' // &
@@ -360,7 +360,7 @@ program mpi_wrapper
 
            !write(*,*) 'slave',mytask,nfiles!,trim(adjustl(file_inventory_pre))
 
-           !do some work 
+           !do some work
            do ifile=lower_bound,upper_bound
 
               filepath1024=trim(adjustl(file_inventory_conf(ifile)))
@@ -373,7 +373,7 @@ program mpi_wrapper
 
            !if signal "stop" jump out of loop
         elseif(iexit .eq. 1 ) then
-           exit     
+           exit
         endif
 
      endif
@@ -390,7 +390,7 @@ program mpi_wrapper
   call mpi_barrier(MPI_COMM_WORLD,ierror)
 
   !master builds inventory files
-  if(mytask .eq. 0) then 
+  if(mytask .eq. 0) then
      write(11,*) 'building inventory',mytask
      call flush(11)
   endif
@@ -511,7 +511,7 @@ program mpi_wrapper
      close(18)
 
      nelements=size(file_inventory_pre)
-     write(11,*) nelements,'elements to process'   
+     write(11,*) nelements,'elements to process'
      call flush(11)
 
   endif
@@ -538,7 +538,7 @@ program mpi_wrapper
         chunk=ceiling(rchunk)
         chunk=min(chunk,1)
         lower_bound=(chunk*mytask)+1
-        upper_bound=min((mytask+1)*chunk,nfiles)     
+        upper_bound=min((mytask+1)*chunk,nfiles)
 
         !that way the last cpu has to go through more files than the others, too bad
      else
@@ -550,25 +550,6 @@ program mpi_wrapper
         if(mytask .eq. ntasks)  upper_bound=max((mytask+1)*chunk,nfiles)
 
      endif
-
-     !now each cpu has its work in terms of a loop chunk assigned
-     !start looping now
-     !do some work 
-!     do ifile=lower_bound,upper_bound
-
-        !        write(11,*) 'RUNNING PREPROC'
-        !        write(11,*) chunk,mytask,ifile,trim(adjustl(file_inventory_pre(ifile)))
-        !        call preprocessing(mytask,ntasks,lower_bound,upper_bound,adjustl(file_inventory_pre(ifile)))
-
-        !        write(11,*) 'RUNNING PROC',chunk,mytask,ifile,lower_bound,upper_bound,trim(adjustl(file_inventory_liq(ifile)))
-        !        dummyfile2048=adjustl(file_inventory_liq(ifile))
-        !write(11,*) 'dummyfile',trim(adjustl(dummyfile2048))
-        !        call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048)
-        !              
-        !        call post_process_level2
-
-
-!     enddo
 
      !use this if dynamic work assignment is desired
   else
@@ -583,14 +564,13 @@ program mpi_wrapper
      call mpi_barrier(MPI_COMM_WORLD,ierror)
 
 #ifdef DEBUG
-     if(mytask .ne. 0 ) then 
+     if(mytask .ne. 0 ) then
         Write( cmytask, '(i10)' ) mytask
         ilogfile=trim(adjustl(trim(adjustl(log_dir))//'/'//'proc_2_logfile_'//trim(adjustl(jid))//&
              & '_CPU_'//trim(adjustl(cmytask))//'.log'))
         open(300+mytask,file=trim(adjustl(ilogfile)),status='replace')
      endif
 #endif
-
 
      !set icylce: counts how many times outer loop has been run through
      icycle=0
@@ -664,7 +644,7 @@ program mpi_wrapper
                  do icpu=1,ntasks-1
                     aitask=icpu
                     call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
-                    write(11,*) 'iexit signal sent (close)',mytask,aitask,iexit            
+                    write(11,*) 'iexit signal sent (close)',mytask,aitask,iexit
                     !call mpi_abort(mpi_comm_world,rc,ierror)
                  enddo
                  exit
@@ -728,7 +708,7 @@ program mpi_wrapper
            call mpi_recv(iexit,1,mpi_integer,0,tag0,mpi_comm_world,status,ierror)
            !write(*,*) 'iexit signal received',mytask,iexit
 
-           !if signal "go"           
+           !if signal "go"
            if(iexit .eq. 0 ) then
 
               !receive work load from master
@@ -742,13 +722,13 @@ program mpi_wrapper
               write(300+mytask,*) 'Worker ',mytask,'processing: ',lower_bound,upper_bound
 #endif
 
-              !do some work 
+              !do some work
               do ifile=lower_bound,upper_bound
 
                  !set some return codes
                  rc_pre=1
                  rc_liq=1
-                 rc_ice=1 
+                 rc_ice=1
                  rc_post=1
 
                  !run preprocessing
@@ -796,12 +776,13 @@ program mpi_wrapper
 #endif
 
               enddo
+              ! endif
               !report work is done, sent at next call of loop
               free(mytask)=1
 
               !if signal "stop" jump out of loop
            elseif(iexit .eq. 1 ) then
-              exit     
+              exit
            endif
 
         endif
@@ -813,7 +794,7 @@ program mpi_wrapper
 
   endif
 
-  call mpi_barrier(MPI_COMM_WORLD,ierror)  
+  call mpi_barrier(MPI_COMM_WORLD,ierror)
 
   !close processing
   if(mytask .eq. 0) then
@@ -825,7 +806,7 @@ program mpi_wrapper
      write(11,*) '##################################################'
      call flush(11)
      close(11)
-  elseif(mytask .ne. 0 ) then 
+  elseif(mytask .ne. 0 ) then
 #ifdef DEBUG
      call flush(300+mytask)
      close(300+mytask)
