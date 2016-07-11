@@ -501,7 +501,7 @@ def split_platform_string(platform):
     """
     Splits platform string into text and number.
     """
-    r = re.compile("([a-zA-Z]+)([0-9]+)")
+    r = re.compile("^([a-zA-Z]+)([0-9]{0,2})$")
     m = r.match(platform)
     return m.group(1), m.group(2)
 
