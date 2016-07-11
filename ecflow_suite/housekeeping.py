@@ -167,12 +167,12 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA12"]["start_date"] = datetime.date(1991, 9, 17)
     avhrr_dict["NOAA14"]["start_date"] = datetime.date(1995, 1, 20)
     avhrr_dict["NOAA15"]["start_date"] = datetime.date(1998, 12, 15)
-    avhrr_dict["NOAA16"]["start_date"] = datetime.date(2001, 3, 20)
-    avhrr_dict["NOAA17"]["start_date"] = datetime.date(2002, 10, 15)
-    avhrr_dict["NOAA18"]["start_date"] = datetime.date(2005, 8, 30)
-    avhrr_dict["NOAA19"]["start_date"] = datetime.date(2009, 6, 1)
-    avhrr_dict["METOPA"]["start_date"] = datetime.date(2007, 5, 21)
-    avhrr_dict["METOPB"]["start_date"] = datetime.date(2013, 4, 24)
+    avhrr_dict["NOAA16"]["start_date"] = datetime.date(2001, 4,  1) #(2001, 3, 20)
+    avhrr_dict["NOAA17"]["start_date"] = datetime.date(2002, 11, 1) #(2002, 10, 15)
+    avhrr_dict["NOAA18"]["start_date"] = datetime.date(2005, 9,  1) #(2005, 8, 30)
+    avhrr_dict["NOAA19"]["start_date"] = datetime.date(2009, 6,  1)
+    avhrr_dict["METOPA"]["start_date"] = datetime.date(2007, 7,  1) #(2007, 5, 21)
+    avhrr_dict["METOPB"]["start_date"] = datetime.date(2020, 1,  1) #datetime.date(2013, 5,  1) #(2013, 4, 24)
     # --------------------------------------------------------------------
     avhrr_dict["NOAA7"]["end_date"]  = datetime.date(1985, 2, 1)
     avhrr_dict["NOAA9"]["end_date"]  = datetime.date(1988, 10, 31)
@@ -184,8 +184,8 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"]
     avhrr_dict["NOAA18"]["end_date"] = avhrr_dict["NOAA19"]["start_date"] - timedelta(days=1)
     avhrr_dict["NOAA19"]["end_date"] = datetime.date(2014, 12, 31)
-    avhrr_dict["METOPA"]["end_date"] = avhrr_dict["METOPB"]["start_date"]
-    avhrr_dict["METOPB"]["end_date"] = datetime.date(2014, 12, 31)
+    avhrr_dict["METOPA"]["end_date"] = datetime.date(2014, 12, 31) # avhrr_dict["METOPB"]["start_date"]
+    avhrr_dict["METOPB"]["end_date"] = datetime.date(2020, 1,  2) #datetime.date(2014, 12, 31)
     # --------------------------------------------------------------------
 
     return avhrr_dict
@@ -767,7 +767,8 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
         act_date = datetime.date(int(yearstr), int(monthstr), 1)
         ndays_of_month = calendar.monthrange(int(yearstr), 
                                              int(monthstr))[1]
-
+        YYYYMM = yearstr + monthstr
+                
         # check if month should be skipped, if given
         if ignoremonths_list:
             # if act_date in ignoremonths_list:
@@ -790,11 +791,35 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                                    month=int(monthstr))
                 if len(days) > 0:
                     avhrr_flag = True
-
+                platform = s
+                if s[0:4] == "NOAA":
+                    platform = "NOAA-" + s.split("NOAA")[1]
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
+                args = ['els'] + [ecfs_target]
+                p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+                stdout, stderr = p1.communicate()
+                if "els: File/Directory does not exist" in stderr:
+                    avhrr_flag = True
+                else:
+                    avhrr_flag = False
+                    
             if isensor == "MODIS" and modis_flag is False:
                 modsd = datetime.date(int(yearstr), int(monthstr), 1)
                 moded = enddate_of_month(int(yearstr), int(monthstr))
-                modis_flag = get_modis_avail(s, modsd, moded)
+                modis_flag = get_modis_avail(s, modsd, moded)                
+                platform = s
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
+                args = ['els'] + [ecfs_target]
+                p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+                stdout, stderr = p1.communicate()
+                if "els: File/Directory does not exist" in stderr:
+                    modis_flag = True
+                else:
+                    modis_flag = False
 
         # neither avhrr nor modis -> go to next month
         if avhrr_flag is False and modis_flag is False:
@@ -860,6 +885,19 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 if len(days) == 0:
                     continue
 
+                platform = satellite
+                if satellite[0:4] == "NOAA":
+                    platform = "NOAA-" + satellite.split("NOAA")[1]
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
+                args = ['els'] + [ecfs_target]
+                p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+                stdout, stderr = p1.communicate()
+                if "els: File/Directory does not exist" not in stderr:
+                    print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
+                    continue                
+
                 # DEARCHIVING
                 fam_sat_dearch = add_fam(fam_avhrr_dearch, satellite)
                 fam_sat_dearch.add_variable("SATELLITE", satellite)
@@ -882,6 +920,17 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 if not mcheck:
                     continue
 
+                platform = satellite
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
+                args = ['els'] + [ecfs_target]
+                p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+                stdout, stderr = p1.communicate()
+                if "els: File/Directory does not exist" not in stderr:
+                    print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
+                    continue                
+                
                 # DEARCHIVING
                 fam_sat_dearch = add_fam(fam_modis_dearch, satellite)
                 fam_sat_dearch.add_variable("SATELLITE", satellite)
