@@ -203,7 +203,7 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber, local):
 
     # -- create tarname
     tarname = create_tarname(typ, datestring, sensor, platform, local)
-    
+        
     # -- define temp. subfolder for tar creation
     if local:
         tempdir = os.path.join(inpdir, "tmp_tardir_" + datestring + "_" + sensor + "_" + platform + "_" + typ.lower() + "_Europe")
@@ -213,12 +213,12 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber, local):
 
     # -- final tarfile to be copied into ECFS
     ecfs_tarfile = os.path.join(tempdir, tarname)
-
+        
     # -- get final tarball
     logger.info("Create \'%s\'" % ecfs_tarfile)
     if typ == "L3U":
         tarfile_list = create_l3u_tarball(inpdir, idnumber,
-                                          tempdir, ecfs_tarfile, local)
+                                          tempdir, ecfs_tarfile, local, sensor)
     elif typ == "L3C":
         tarfile_list = create_l3c_tarball(inpdir, idnumber,
                                           tempdir, ecfs_tarfile)
@@ -303,11 +303,19 @@ def create_l2_tarball(inpdir, idnumber, tempdir, l2_tarfile):
     return tar_file_list
 
 
-def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local):
+def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local, sensor):
     """
     Create the final l3u tarball to be stored in ECFS.
     """
     # -- find l3 input directory via idnumber
+    if not local and sensor == "MODIS":
+        split = "." 
+        foo = l3_tarfile.split(split)
+        foo[-1] = "part1.tar"
+        l3_tarfile1 = split.join(foo)
+        foo[-1] = "part2.tar"
+        l3_tarfile2 = split.join(foo)
+        
     dirs = os.listdir(inpdir)
     daily_list = list()
     if len(dirs) > 0:
@@ -391,18 +399,36 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local):
         delete_dir(daily_tempdir)
 
     # -- make monthly tarballs containing all daily tarballs
-    tar = tarfile.open(l3_tarfile, "w:")
+    if not local and sensor == "MODIS":
+        tar1 = tarfile.open(l3_tarfile1, "w:")
+        tar2 = tarfile.open(l3_tarfile2, "w:")
+    else:
+        tar = tarfile.open(l3_tarfile, "w:")
+    half_tar_files = len(tar_files) / 2
+    file_index = 0
     for tfile in tar_files:
-        # filedir = os.path.dirname(tfile)
+        file_index = file_index + 1
         filenam = os.path.basename(tfile)
-        tar.add(tfile, arcname=filenam)
-    tar.close()
+        if not local and sensor == "MODIS":
+            if file_index <= half_tar_files:
+                tar1.add(tfile, arcname=filenam)
+            else:
+                tar2.add(tfile, arcname=filenam)
+        else:
+            # filedir = os.path.dirname(tfile)
+            tar.add(tfile, arcname=filenam)
+            
+    if not local and sensor == "MODIS":
+        tar1.close()
+        tar2.close()
+        return [l3_tarfile1, l3_tarfile2]
+    else:
+        tar.close()
+        return [l3_tarfile]
 
     # -- delete daily tarballs
     for tfile in tar_files:
         delete_file(tfile)
-
-    return [l3_tarfile]
 
 def create_l3c_tarball(inpdir, idnumber, tempdir, l3_tarfile):
     """
@@ -475,7 +501,7 @@ def split_platform_string(platform):
     """
     Splits platform string into text and number.
     """
-    r = re.compile("([a-zA-Z]+)([0-9]+)")
+    r = re.compile("^([a-zA-Z]+)([0-9]{0,2})$")
     m = r.match(platform)
     return m.group(1), m.group(2)
 
@@ -494,7 +520,6 @@ def create_tarname(ctype, datestring, sensor, platform, local):
         suffix = "fv"+filver+"_Europe.tar"
     else:
         suffix = "fv"+filver+".tar"
-
     tarname = datestring + '-' + esacci + '-' + ctype + \
               '_' + cloudp + '-' + sensor + '_' + \
               platform + '-' + suffix

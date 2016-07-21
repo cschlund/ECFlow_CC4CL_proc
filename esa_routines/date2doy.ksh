@@ -14,8 +14,8 @@ mons=${2}
 day=${3}
 
 #remove preceeding 0 from mons and day
-mmons=`exec echo ${mons} |  awk '{print $1 + 0}'`
-dday=`exec echo ${day} |  awk '{print $1 + 0}'`
+mmons=$(exec echo ${mons} |  awk '{print $1 + 0}')
+dday=$(exec echo ${day} |  awk '{print $1 + 0}')
 
 doy=0
 
@@ -33,7 +33,7 @@ while [ ${ti} -lt ${mmons} ]
   lengths="312831303130313130313031"
   cut2=$(( $ti * 2 ))
   cut1=$(( $cut2 - 1 ))
-  numday=`echo $lengths | cut -c$cut1-$cut2`
+  numday=$(echo $lengths | cut -c$cut1-$cut2)
   
 #if leap year then numday=29
   if [ $ti -eq 2 ] && [ $year -eq $ye2 ] 

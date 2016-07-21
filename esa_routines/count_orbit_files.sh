@@ -50,9 +50,10 @@ else
     
         # MODIS
         # count all files
-        numfil=$(ls $INPUTDIR/$instrument/$platform/$STARTYEAR/$month/*/*.hdf |wc -l)
+        numfil=$(ls $INPUTDIR/$instrument/$platform/$STARTYEAR/$month/*/M*D021KM*.hdf |wc -l)
         # divide by 2
-        cnt=`perl -e 'print '$numfil'/2;'`
+	cnt=$numfil
+        #cnt=`perl -e 'print '$numfil'/2;'`
     
     fi
 

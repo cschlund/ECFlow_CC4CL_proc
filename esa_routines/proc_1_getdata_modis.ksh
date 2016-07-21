@@ -51,7 +51,7 @@ get_modis()
 #     # and throw them away once everything is untared.
 #     cd ${DATADIR}
 
-#     SOURCEFILE=`exec basename ${SOURCEFILE}`
+#     SOURCEFILE=$(exec basename ${SOURCEFILE})
 #     do_it=0
 #     RANDOM=10
 
@@ -61,9 +61,9 @@ get_modis()
 
 #             echo "RANDOM CHECKING REQUESTED" 
 #             rn=${RANDOM} 
-#             rns=`expr ${rn}/32768*100 | bc -l` 
-#             rni=`exec echo $rns | cut -f 1 -d .` 
-#             rni1=`exec echo $rni | cut -c 1` 
+#             rns=$(expr ${rn}/32768*100 | bc -l) 
+#             rni=$(exec echo $rns | cut -f 1 -d .) 
+#             rni1=$(exec echo $rni | cut -c 1) 
 
 #             if [ "${rni1}" -eq 0 ]; then 
 #                 rni=0 
@@ -84,8 +84,8 @@ get_modis()
 
 #         if [ "$do_it" -eq 1 ]; then 
 
-#             #checkname=`exec ls * | grep checksums` 
-#             checkname=`exec tar -tf ${SOURCEFILE} | grep checksums` 
+#             #checkname=$(exec ls * | grep checksums) 
+#             checkname=$(exec tar -tf ${SOURCEFILE} | grep checksums) 
 #             tar xf  ${SOURCEFILE}  && rm -f ${SOURCEFILE} 
 #             file=${checkname} 
 
@@ -98,15 +98,15 @@ get_modis()
 
 #                 if [ "${iline}" -gt 4 ]; then 
 
-#                     cksumorg=`exec echo "$line" | awk '{print $1}'` 
-#                     current_file=`exec echo "$line" | awk '{print $3}'` 
-#                     cksumnew=`exec cksum ${current_file} | awk '{print $1}'` 
-#                     front=`exec echo ${current_file} | cut -c1`
+#                     cksumorg=$(exec echo "$line" | awk '{print $1}') 
+#                     current_file=$(exec echo "$line" | awk '{print $3}') 
+#                     cksumnew=$(exec cksum ${current_file} | awk '{print $1}') 
+#                     front=$(exec echo ${current_file} | cut -c1)
 
 #                     if [ "${cksumorg}" -ne "${cksumnew}" ] && [ "${front}" = "M" ]; then 
 
 #                         echo "Corrupt File:" $current_file ${cksumorg} ${cksumnew} 
-#                         basefile=`exec basename ${current_file} .hdf` 
+#                         basefile=$(exec basename ${current_file} .hdf) 
 #                         mv $current_file $basefile.corrupt 
 #                         (( ccounter=$ccounter+1 )) 
 
@@ -148,13 +148,13 @@ elif [[ ${platform} = "MOD" ]]; then
     splat=MOD
 fi
 
-unix_start=`${ESA_ROUT}/ymdhms2unix.ksh $STARTYEAR $STARTMONTH $STARTDAY`
+unix_start=$(${ESA_ROUT}/ymdhms2unix.ksh $STARTYEAR $STARTMONTH $STARTDAY)
 
 if [ $STOPDAY -eq 0 ] ; then 
-    STOPDAY=`cal $STOPMONTH $STOPYEAR | tr -s " " "\n" | tail -1` # nr days of month
+    STOPDAY=$(cal $STOPMONTH $STOPYEAR | tr -s " " "\n" | tail -1) # nr days of month
 fi
 
-unix_stop=`${ESA_ROUT}/ymdhms2unix.ksh $STOPYEAR $STOPMONTH $STOPDAY`
+unix_stop=$(${ESA_ROUT}/ymdhms2unix.ksh $STOPYEAR $STOPMONTH $STOPDAY)
 unix_counter=$unix_start
 
 while [ $unix_counter -le $unix_stop ]; do 
@@ -162,9 +162,9 @@ while [ $unix_counter -le $unix_stop ]; do
     # availability flag
     aflag=-1
 
-    YEAR=`perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');'` 
-    MONS=`perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');'` 
-    DAYS=`perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');'` 
+    YEAR=$(perl -e 'use POSIX qw(strftime); print strftime "%Y",localtime('$unix_counter');') 
+    MONS=$(perl -e 'use POSIX qw(strftime); print strftime "%m",localtime('$unix_counter');') 
+    DAYS=$(perl -e 'use POSIX qw(strftime); print strftime "%d",localtime('$unix_counter');') 
 
     DATADIR=${INPUTDIR}/MODIS/${platform}/${YEAR}/${MONS}/
 
@@ -192,7 +192,7 @@ while [ $unix_counter -le $unix_stop ]; do
         mkdir -p $DATADIR
 
         # get doy from current date
-        DOY=`exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS}`
+        DOY=$(exec ${ESA_ROUT}/date2doy.ksh ${YEAR} ${MONS} ${DAYS})
         echo ${YEAR} ${MONS} ${DAYS} "IS DOY " $DOY "OF " ${YEAR}
 
         # Build now path to MODIS files of that given doy

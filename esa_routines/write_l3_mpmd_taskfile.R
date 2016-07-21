@@ -1,12 +1,12 @@
-# write taskfile for l2tol3 prodtypes: l2b and l2b_sum
+## write taskfile for l2tol3 prodtypes: l2b and l2b_sum
 
-# individual log file for each CPU?
+## individual log file for each CPU?
 individual_logs = T
 
-# read command arguments
+## read command arguments
 args = commandArgs(trailingOnly = T)
 
-# define argument list
+## define argument list
 jobID       = args[2]
 ndays       = args[3]
 log_dir     = args[4]
@@ -24,27 +24,27 @@ global_values = read.table( global_conf, as.is=T, col.names = "values")
 local = global_values$values[pmatch("local", global_values$values)]
 local = unlist(strsplit(local, "="))[2]
 
-# create vector containing MPMD task calls
+## create vector containing MPMD task calls
 tasks = 1:ndays
 
-# create MPMD task call for each day
+## create MPMD task call for each day
 for (i in 1:ndays){
 
-   # convert single digit days to double digits
-   i_dd = as.character(i)
-   i_dd = ifelse(nchar(i_dd) == 1, paste("0", i_dd, sep=""), i_dd)
+    ## convert single digit days to double digits
+    i_dd = as.character(i)
+    i_dd = ifelse(nchar(i_dd) == 1, paste("0", i_dd, sep=""), i_dd)
 
-   # build config file name
-   config_file = paste(cfg_dir, "/", cfg_prefix, cfg_base, i_dd, ifelse(local, "_Europe", ""), cfg_suffix, sep="")
-   
-   # build log file name
-   log_file = paste(log_dir, "/log_mpmd_", cfg_base, i_dd, "_", jobID, ".txt", sep="")
+    ## build config file name
+    config_file = paste(cfg_dir, "/", cfg_prefix, cfg_base, i_dd, ifelse(local, "_Europe", ""), cfg_suffix, sep="")
 
-   # concatenate elements to build task call
-   tasks[i] = paste(ksh_script, " ", jobID, " ", cfg_attri, " ", cfg_paths, " ", config_file, sep="")
-   tasks[i] = ifelse(individual_logs, paste(tasks[i], " > ", log_file, sep=""), tasks[i])
+    ## build log file name
+    log_file = paste(log_dir, "/log_mpmd_", cfg_base, i_dd, "_", jobID, ".txt", sep="")
+
+    ## concatenate elements to build task call
+    tasks[i] = paste(ksh_script, " ", jobID, " ", cfg_attri, " ", cfg_paths, " ", config_file, sep="")
+    tasks[i] = ifelse(individual_logs, paste(tasks[i], " > ", log_file, sep=""), tasks[i])
 
 }
 
-# write tasks vector to text file
+## write tasks vector to text file
 write.table(tasks, file=out_name, quote=F, row.names=F, col.names=F)

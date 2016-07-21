@@ -1,6 +1,6 @@
-# R script for writing remapping taskfile
+## R script for writing remapping taskfile
 
-# read command arguments
+## read command arguments
 args = commandArgs( trailingOnly = T )
 
 era_dir          = args[2]
@@ -14,9 +14,9 @@ nfiles = length( files )
 tasks = 1:nfiles
 
 for ( i in 1:nfiles ){
-	call = paste(remapScript, files[i], gridInfoFile, remapWeightsFile, sep=" ")
-	tasks[i] = call
-    }
+    call = paste(remapScript, files[i], gridInfoFile, remapWeightsFile, sep=" ")
+    tasks[i] = call
+}
 
-# write tasks vector to text file
+## write tasks vector to text file
 write.table(tasks, file = taskfile, quote=F, row.names=F, col.names=F)

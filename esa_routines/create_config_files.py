@@ -260,7 +260,7 @@ def proc2(args_ret):
         f.write("ecmwf_path3='n/a'\n")
         f.write("cchunkproc=0\n")
         f.write("day_nightc=0\n")
-        f.write("cverbose='T'\n")
+        f.write("cverbose='F'\n")
         f.write("cchunk='F'\n")
         f.write("cfullpath='T'\n")
         f.write("cinclude_full_brdf='T'\n")
