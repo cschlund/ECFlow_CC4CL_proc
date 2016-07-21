@@ -726,10 +726,10 @@ program mpi_wrapper
               do ifile=lower_bound,upper_bound
 
                  !set some return codes
-                 rc_pre=1
-                 rc_liq=1
-                 rc_ice=1
-                 rc_post=1
+                 rc_pre=-999
+                 rc_liq=-999
+                 rc_ice=-999
+                 rc_post=-999
 
                  !run preprocessing
                  dummyfile1024=adjustl(file_inventory_pre(ifile))
@@ -739,22 +739,29 @@ program mpi_wrapper
 
                  call preprocessing(mytask,ntasks,lower_bound,upper_bound,dummyfile1024,rc_pre)
 
-                 !run main for water
-                 dummyfile2048=adjustl(file_inventory_liq(ifile))
-                 call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_liq)
+                 if (rc_pre .eq. 0) then
 
-                 !run main for ice
-                 dummyfile2048=adjustl(file_inventory_ice(ifile))
-                 call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_ice)
+                    !run main for water
+                    dummyfile2048=adjustl(file_inventory_liq(ifile))
+                    call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_liq)
 
-                 !run postprocessing
-                 dummyfile1024=adjustl(file_inventory_post(ifile))
-                 call post_process_level2(mytask,ntasks,lower_bound,upper_bound,dummyfile1024,rc_post)
+                    !run main for ice
+                    dummyfile2048=adjustl(file_inventory_ice(ifile))
+                    call ECP(mytask,ntasks,lower_bound,upper_bound,dummyfile2048,rc_ice)
 
-                 rc_pre=0
-                 rc_liq=0
-                 rc_ice=0
-                 rc_post=0
+                    !run postprocessing
+                    dummyfile1024=adjustl(file_inventory_post(ifile))
+                    call post_process_level2(mytask,ntasks,lower_bound,upper_bound,dummyfile1024,rc_post)
+
+                    rc_liq=0
+                    rc_ice=0
+                    rc_post=0
+
+                 else
+
+                    write(*,*) "exit status of preprocessing = ", rc_pre
+                    
+                 endif
 
                  !cleanup and rename if everything worked well
                  if(rc_pre .eq. 0 .and.&
