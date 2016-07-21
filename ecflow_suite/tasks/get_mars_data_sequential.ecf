@@ -1,0 +1,37 @@
+%include <pbs_serial_mars.h>
+%include <head.h>
+%include <export.h>
+
+echo "I am task %TASK% in family %FAMILY% responsible for remapping and converting remaining era interim data"
+
+if [ %DUMMYRUN% == 1 ]; then
+
+    python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
+
+else
+
+    date_base="%START_YEAR%_%START_MONTH%"
+
+    cfg_typ="1_getdata_era_"
+    cfg_bas="%CFG_PREFIX%${cfg_typ}${date_base}%CFG_SUFFIX%"
+    cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
+
+    era_dir="%ESA_INPUTDIR%/ERAinterim/%START_YEAR%/%START_MONTH%"
+    gridInfoFile="${era_dir}/gridinfo.txt"
+    remapWeightsFile="${era_dir}/remapweights.nc"
+    taskfile="${era_dir}/MPMD_tasks_remap_ERA_${date_base}.txt"
+
+    n_grib_files=`exec ls ${era_dir}/*.grb | wc -l`
+
+    # -- do sequential remapping of all remaining GRIB files that were not processed
+    for file in ${era_dir}/*grb; do
+        [ -e "$file" ] &&
+            echo "Not all GRIB files have been converted/remapped."
+        %REMAP_ERA_SEQUENTIAL_KSH% ${era_dir} ${gridInfoFile} ${remapWeightsFile} ||
+            echo "All GRIB files have been converted/remapped."
+        break
+    done
+
+fi
+
+%include <tail.h>

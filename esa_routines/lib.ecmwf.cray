@@ -3,13 +3,21 @@
 #this is for cray
 
 #epr lib dirs
-EPRLIBDIR = /perm/ms/de/sf7/esa_cci_c_proc/software/epr/epr_api-2.2/build/release
-EPRINCDIR = /perm/ms/de/sf7/esa_cci_c_proc/software/epr/epr_api-2.2/src
+EPRLIBDIR=/perm/ms/de/sf7/esa_cci_c_proc/software/epr/epr_api-2.2/build/release
+EPRINCDIR=/perm/ms/de/sf7/esa_cci_c_proc/software/epr/epr_api-2.2/src
 EPR=-lepr_api
 
 HDFEOSLIB=/perm/us/usc/hdfeos/2.19-d/CRAY/82/lib
 HDFEOSINC=/perm/us/usc/hdfeos/include
 HDFEOS=-lGctp -lhdfeos
+
+NETCDF4LIB=/usr/local/apps/netcdf4/4.3.0/CRAY/82/lib
+NETCDF4INC=/usr/local/apps/netcdf4/4.3.0/CRAY/82/include
+NETCDF4=-lnetcdf -lnetcdff
+
+HDF5LIB=/opt/cray/hdf5/1.8.12/CRAY/81/lib
+HDF5INC=/opt/cray/hdf5/1.8.12/CRAY/81/include
+HDF5=-lhdf5_fortran -lhdf5 -lhdf5_hl -lhdf5hl_fortran
 
 #Setup RTTOV library
 #performance serial
@@ -47,11 +55,9 @@ RTTOV=-lrttov11.2.0_emis_atlas -lrttov11.2.0_brdf_atlas -lrttov11.2.0_parallel -
 #RTTOVMODULE=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/xc30-ecmwf_debug_serial-dwd/mod
 #RTTOV=-lrttov10.2.0_emis_atlas -lrttov10.2.0_main -lrttov10.2.0_coef_io -lrttov10.2.0_other
 
-
-
 #Set up libraries and includes
-LIBS=-L$(HDFEOSLIB) $(HDFEOS)  -L$(RTTOVLIB) $(RTTOV)  -L$(EPRLIBDIR) $(EPR)
-INC=-I$(HDFEOSINC)  -I./ -I$(RTTOVINCLUDE) -J$(RTTOVMODULE) -I$(EPRINCDIR)
+LIBS=-L$(HDFEOSLIB) $(HDFEOS) -L$(RTTOVLIB) $(RTTOV) -L$(EPRLIBDIR) $(EPR) #-L$(HDF5LIB) $(HDF5) -L$(NETCDF4LIB) $(NETCDF4) 
+INC=-I$(HDFEOSINC)  -I./ -I$(RTTOVINCLUDE) -J$(RTTOVMODULE) -I$(EPRINCDIR) #-I$(HDF5INC) -I$(NETCDF4INC)
 # -I$(OBJS)
 
 CINC=-I./ -I$(EPRINCDIR)
