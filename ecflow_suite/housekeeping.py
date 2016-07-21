@@ -204,9 +204,9 @@ def get_modis_dict():
             modis_dict[sat][dt] = 0
 
     modis_dict["TERRA"]["start_date"] = datetime.date(2000, 2, 24)
-    modis_dict["TERRA"]["end_date"] = datetime.date(2012, 12, 31)
+    modis_dict["TERRA"]["end_date"] = datetime.date(2014, 12, 31)
     modis_dict["AQUA"]["start_date"] = datetime.date(2002, 7, 4)
-    modis_dict["AQUA"]["end_date"] = datetime.date(2012, 12, 31)
+    modis_dict["AQUA"]["end_date"] = datetime.date(2014, 12, 31)
 
     return modis_dict
 

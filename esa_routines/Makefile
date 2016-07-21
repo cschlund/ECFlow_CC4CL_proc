@@ -46,9 +46,13 @@ tidy:
 	rm -f *.o 
 	rm -f *.mod
 	rm -f *.i
+	rm -f *.lst
+	rm -f mpi_wrapper.x
 
 clean: 
 	rm -f *.o 
 	rm -f *.mod
 	rm -f *.i
+	rm -f *.lst
+	rm -f mpi_wrapper.x
   
