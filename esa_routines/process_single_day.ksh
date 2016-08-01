@@ -500,6 +500,7 @@ while [ $ifile -lt $nl1b ]; do
     l2_outp_main=${l2_outp}/main
 
     mkdir -p ${l2_outp_main}
+    
     if [ ${?} -ne 0 ]; then
         echo "CREATION OF PROCDIR " ${l2_outp_main} "FAILED. GOING TO NEXT ITEM" >> ${daily_log}
         echo $(exec date +%Y/%m/%d:%H:%M:%S) ${l1b_list[$ifile]} ' _F_' >> ${checkfile}
@@ -544,8 +545,8 @@ while [ $ifile -lt $nl1b ]; do
 
 
     # -- set preprocessing basename
-    preproc_base=${project}"-L2-CLOUD-CLD-"${INSTRUMENT}_${l2processor}"_"${PLATFORM}"_"${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
-    # preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
+    #preproc_base=${project}"-L2-CLOUD-CLD-"${INSTRUMENT}_${l2processor}"_"${PLATFORM}"_"${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
+    preproc_base=${INSTRUMENT}_${l2processor}"_"${PLATFORM}"_"${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
 
     # -- process first WATer phase
     phase=WAT
