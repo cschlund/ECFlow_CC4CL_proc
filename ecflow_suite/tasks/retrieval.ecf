@@ -5,6 +5,10 @@
 module load craype-hugepages2M
 module switch grib_api/old
 module switch emos/old
+module load ipm
+
+export IPM_LOGDIR=$SCRATCH/ipm-logs
+mkdir -p $IPM_LOGDIR
 
 # -- no core file
 export ATP_ENABLED=0
@@ -37,14 +41,16 @@ else
 
         cd ${l1_dir}
         # run MPMD filtering job only if source link files exist
+	unset USE_IPM
         for f in ${l1_dir}/*/*/${prefix_filter_sunsat}*; do
-            [ -e "$f" ] && n_filter_tasks=`exec wc -l < %EC_FILTER_TASKFILE%` &&
+            [ -e "$f" ] && n_filter_tasks=`exec wc -l < %EC_FILTER_TASKFILE%` &&		
                 aprun -n $n_filter_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE% &&
                 remaining_files=($(ls -R ${l1_dir}/*/*/${prefix_filter_sunsat}* )) &&
                 n_remaining_files=${#remaining_files[*]} &&
                 [ ! -e "$f" ] && echo "Filtering not applied. No filter files exist."
             break
         done
+	export USE_IPM=1
 
         if [ $n_remaining_files -ne 0 ]; then
             for f in ${remaining_files}
