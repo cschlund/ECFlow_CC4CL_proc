@@ -743,12 +743,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # original satellite list
     orig_sat_list = sat_list
 
-<<<<<<< HEAD
     # memorize previous month
     fam_month_previous = False
 
-=======
->>>>>>> 30dc0265547be62bebe73ff190aed6546d130bf7
     # memorize satellites for each month
     satellites_within_current_month = list()
 
