@@ -743,9 +743,12 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # original satellite list
     orig_sat_list = sat_list
 
+<<<<<<< HEAD
     # memorize previous month
     fam_month_previous = False
 
+=======
+>>>>>>> 30dc0265547be62bebe73ff190aed6546d130bf7
     # memorize satellites for each month
     satellites_within_current_month = list()
 
@@ -911,7 +914,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 satellites_within_current_month.append(satellite)
                 l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
                                              big_fam, yearstr, monthstr, 
-                                             isensor, satellite)
+                                             mainproc_fam, isensor, satellite)
                 l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
             else:
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)

@@ -82,6 +82,10 @@ aatsr_drift="n/a"
 ecmwf_path2="n/a"
 ecmwf_path3="n/a"
 
+aatsr_drift="n/a"
+ecmwf_path2="n/a"
+ecmwf_path3="n/a"
+
 # daily .config
 echo " 
 #

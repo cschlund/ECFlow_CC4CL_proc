@@ -59,8 +59,6 @@ subroutine clean_up_main(string)
 
 end subroutine clean_up_main
 
-
-
 subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_attributes,move_L2)
 
   character(len=1024) :: string
@@ -136,7 +134,6 @@ subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_a
 
      ! TO DO: import file version
      finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // trim(file_version) // trim(suffix_target)
-     !finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_SECONDARY_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // trim(file_version) // trim(suffix_target)
 
      if (move_L2) then
 
