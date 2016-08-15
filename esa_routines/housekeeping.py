@@ -195,31 +195,37 @@ def tar_results(ptype, inpdir, datestring, sensor, platform, idnumber, local):
         typ = ptype.upper()
     elif ptype.upper() == "L3C":
         typ = ptype.upper()
+    elif ptype.upper() == "L3S":
+        typ = ptype.upper()        
     elif ptype.upper() == "L2":
         typ = ptype.upper()
     else:
         logger.info("Wrong type name ! Options: L2, L3U, L3C")
         sys.exit(0)
 
+    print typ 
+        
     # -- create tarname
     tarname = create_tarname(typ, datestring, sensor, platform, local)
-        
+    print tarname 
+    
     # -- define temp. subfolder for tar creation
     if local:
         tempdir = os.path.join(inpdir, "tmp_tardir_" + datestring + "_" + sensor + "_" + platform + "_" + typ.lower() + "_Europe")
     else:
-        tempdir = os.path.join(inpdir, "tmp_tardir_" + datestring + "_" + sensor + "_" + platform + "_" + typ.lower())
+        tempdir = os.path.join(inpdir, "tmp_tardir_" + datestring + "_" + sensor + "_" + platform + "_" + typ.lower())        
     create_dir(tempdir)
 
     # -- final tarfile to be copied into ECFS
     ecfs_tarfile = os.path.join(tempdir, tarname)
+    print ecfs_tarfile
         
     # -- get final tarball
     logger.info("Create \'%s\'" % ecfs_tarfile)
     if typ == "L3U":
         tarfile_list = create_l3u_tarball(inpdir, idnumber,
                                           tempdir, ecfs_tarfile, local, sensor)
-    elif typ == "L3C":
+    elif typ == "L3C" or typ == "L3S":
         tarfile_list = create_l3c_tarball(inpdir, idnumber,
                                           tempdir, ecfs_tarfile)
     else:

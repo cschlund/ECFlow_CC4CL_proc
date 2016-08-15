@@ -89,6 +89,8 @@ def l3(args_l3):
 
     # -- create date string
     datestring = str(args_l3.year) + str('%02d' % args_l3.month)
+    print "_______________________________________"
+    print datestring
 
     # -- sensor and platform settings for L3U and L3C
     if args_l3.prodtype.upper() != "L3S" and args_l3.satellite:
@@ -101,6 +103,11 @@ def l3(args_l3):
             sensor = args_l3.instrument.upper()
             platform = args_l3.satellite.upper()
 
+    elif args_l3.prodtype.upper() == "L3S":
+        sensor = args_l3.instrument.upper()
+        platform = "MERGED"
+        print sensor + " " + platform
+            
     else:
         logger.info("You chose prodtype={0},"
                     "thus give me also a satellite name".
@@ -123,7 +130,7 @@ def l3(args_l3):
 
     # -- archive now: L3U or L3C (satellite AND instrument)
     if args_l3.prodtype.upper() != "L3S":
-
+        
         # -- find latest job via ID-US number
         if len(alldirs) > 0:
             getdirs = list()
@@ -175,7 +182,52 @@ def l3(args_l3):
 
     # -- archive now: L3S (sensor family, i.e. all AVHRR or MODIS)
     elif args_l3.prodtype.upper() == "L3S":
-        logger.info("L3S archiving not yet coded!")
+
+        # -- find latest job via ID-US number
+        if len(alldirs) > 0:
+            getdirs = list()
+
+            # collect right subfolders
+            for ad in alldirs:
+                if datestring in ad \
+                   and args_l3.instrument.upper() in ad \
+                   and args_l3.prodtype.upper() in ad \
+                   and prodtype_name in ad: 
+                    getdirs.append(ad)                    
+
+            # sort list
+            getdirs.sort()
+
+            print "________________________________________"
+            print getdirs
+
+            # get last element from list, should be last job
+            lastdir = getdirs.pop()            
+
+            # get ID number from the last job
+            idnumber = get_id(lastdir)
+
+            print "________________________________________"
+            print idnumber
+            print args_l3.prodtype.upper() + " " +  args_l3.inpdir + " " +  datestring + " " +  sensor + " " + platform + " " + idnumber #+ " " + args_l3.local
+            print args_l3.local 
+
+            # make tarfile
+            (tlist, tempdir) = tar_results(args_l3.prodtype.upper(), args_l3.inpdir, 
+                                           datestring, sensor, platform, idnumber, args_l3.local)
+            
+            logger.info("Copy2ECFS: {0}".format(tlist))
+            copy_into_ecfs(datestring, tlist, args_l3.ecfsdir)
+            
+            logger.info("Move files to {0}".format(tmp_data_storage))
+            create_dir(tmp_data_storage)
+            move_files(tlist, tmp_data_storage)
+
+            logger.info("Delete \'{0}\'".format(tempdir))
+            delete_dir(tempdir)
+
+        else:
+            logger.info("Check your input directory, maybe it is empty ?")
 
     else:
         logger.info("Nothing was archived for l3 parameters passed:")

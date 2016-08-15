@@ -9,7 +9,6 @@
 # b) housekeeping.py
 # c) clean_up.F90
 file_version='2.1'
-
 ncdf_version='4.1.3 (classic format)'
 cf_convention='CF-1.6,ACDD-1.3'
 processing_inst='Deutscher Wetterdienst'
