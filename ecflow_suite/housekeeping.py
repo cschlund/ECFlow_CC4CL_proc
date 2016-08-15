@@ -794,7 +794,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 platform = s
                 if s[0:4] == "NOAA":
                     platform = "NOAA-" + s.split("NOAA")[1]
-                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.1.tar"
                 ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
                 args = ['els'] + [ecfs_target]
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
@@ -810,7 +810,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 moded = enddate_of_month(int(yearstr), int(monthstr))
                 modis_flag = get_modis_avail(s, modsd, moded)                
                 platform = s
-                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.1.tar"
                 ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
                 args = ['els'] + [ecfs_target]
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
@@ -888,7 +888,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 platform = satellite
                 if satellite[0:4] == "NOAA":
                     platform = "NOAA-" + satellite.split("NOAA")[1]
-                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.1.tar"
                 ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
                 args = ['els'] + [ecfs_target]
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
@@ -911,7 +911,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 satellites_within_current_month.append(satellite)
                 l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
                                              big_fam, yearstr, monthstr, 
-                                             isensor, satellite)
+                                             mainproc_fam, isensor, satellite)
                 l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
             else:
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
@@ -921,7 +921,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                     continue
 
                 platform = satellite
-                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.1.tar"
                 ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
                 args = ['els'] + [ecfs_target]
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
