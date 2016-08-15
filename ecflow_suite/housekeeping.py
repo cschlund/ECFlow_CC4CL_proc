@@ -911,7 +911,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 satellites_within_current_month.append(satellite)
                 l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
                                              big_fam, yearstr, monthstr, 
-                                             isensor, satellite)
+                                             mainproc_fam, isensor, satellite)
                 l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
             else:
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
