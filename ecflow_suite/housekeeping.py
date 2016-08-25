@@ -675,7 +675,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
 
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 ignoremonths_list, useprimes, modisonly, 
-                procday, dummycase, testcase):
+                procday, dummycase, testcase, checkECFScase):
     """
     Build the ecflow suite.
     """
@@ -743,12 +743,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # original satellite list
     orig_sat_list = sat_list
 
-<<<<<<< HEAD
     # memorize previous month
     fam_month_previous = False
 
-=======
->>>>>>> 30dc0265547be62bebe73ff190aed6546d130bf7
     # memorize satellites for each month
     satellites_within_current_month = list()
 
@@ -805,7 +802,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 stdout, stderr = p1.communicate()
                 if "els: File/Directory does not exist" in stderr:
                     avhrr_flag = True
-                else:
+                elif checkECFScase:
                     avhrr_flag = False
                     
             if isensor == "MODIS" and modis_flag is False:
@@ -821,7 +818,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 stdout, stderr = p1.communicate()
                 if "els: File/Directory does not exist" in stderr:
                     modis_flag = True
-                else:
+                elif checkECFScase:
                     modis_flag = False
 
         # neither avhrr nor modis -> go to next month
@@ -897,7 +894,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" not in stderr:
+                if "els: File/Directory does not exist" not in stderr and checkECFScase:
                     print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
                     continue                
 
@@ -930,7 +927,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" not in stderr:
+                if "els: File/Directory does not exist" not in stderr and checkECFScase:
                     print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
                     continue                
                 
