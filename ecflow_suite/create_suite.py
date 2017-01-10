@@ -191,6 +191,6 @@ if __name__ == '__main__':
     build_suite(args.start_date, args.end_date,
                 args.satellites, args.ignore_sats, args.ignore_months,
                 args.use_avhrr_primes, args.use_modis_only,
-                args.proc_day, dummycase, testcase)
+                args.proc_day, dummycase, testcase, toacase)
 
     logger.info("SCRIPT \'{0}\' finished\n".format(os.path.basename(__file__)))
