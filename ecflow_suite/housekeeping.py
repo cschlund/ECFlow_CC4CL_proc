@@ -230,7 +230,7 @@ def get_sensor(satellite):
     return sensor
 
 
-def set_vars(suite, procday, dummycase, testcase, svn_version):
+def set_vars(suite, procday, dummycase, testcase, svn_version, toacase):
     """
     Set suite level variables
     :rtype: None
@@ -280,6 +280,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("LD_LIB_PATH", ld_lib_path)
     suite.add_variable("PROCDAY", procday)
     suite.add_variable("TESTRUN", testcase)
+    suite.add_variable("PROC_TOA", toacase)
     suite.add_variable("DUMMYRUN", dummycase)
     suite.add_variable("WRITE_MPMD_TASKFILE", write_mpmd_taskfile)
     suite.add_variable("WRITE_MPMD_CFGFILES", write_mpmd_cfgfiles)
@@ -675,7 +676,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
 
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 ignoremonths_list, useprimes, modisonly, 
-                procday, dummycase, testcase):
+                procday, dummycase, testcase, toacase):
     """
     Build the ecflow suite.
     """
@@ -694,7 +695,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     suite = defs.add_suite(mysuite)
 
     # Set suite level variables
-    set_vars(suite, procday, dummycase, testcase, svn_version)
+    set_vars(suite, procday, dummycase, testcase, svn_version, toacase)
 
     # Set default status
     suite.add_defstatus(ecflow.DState.suspended)
