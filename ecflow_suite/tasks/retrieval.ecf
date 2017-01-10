@@ -7,14 +7,15 @@ module switch grib_api/old
 module switch emos/old
 module load ipm
 
+export HDF5_DISABLE_VERSION_CHECK=1
 export IPM_LOGDIR=$SCRATCH/ipm-logs
 mkdir -p $IPM_LOGDIR
 
 # -- no core file
-export ATP_ENABLED=0
+#export ATP_ENABLED=0
 # -- core file
-#export ATP_ENABLED=1
-#ulimit -c unlimited
+export ATP_ENABLED=1
+ulimit -c unlimited
 # -- stacksize (keep it always that way)
 ulimit -s unlimited
 
