@@ -78,7 +78,6 @@ program mpi_wrapper
   character(len=1024) :: logfile,ilogfile,L2_file_list,L2_secondary_file_list,L2_sum_file_list
   !character(len=256) :: to_upper
 
-
   ! Openmp variables
   integer                                :: nompthreads
   integer                                           :: omp_get_max_threads
@@ -169,7 +168,6 @@ program mpi_wrapper
           & // trim(instrument) // '_' // to_upper(trim(platform)) // '_' // &
           & trim(year) // '_' // trim(month) //'.txt'))
      open(14,file=trim(adjustl(L2_sum_file_list)),status='replace')
-
 
      !set threadnumber to default=single-threaded
      nompthreads=1
@@ -493,7 +491,6 @@ program mpi_wrapper
         file_inventory_ice(ifile)=trim(adjustl(filepath2048))
 
         read(18,200) filepath2048
-
         file_inventory_post(ifile)=trim(adjustl(filepath2048))
 
         ! write path of L2 post-processed file to list
@@ -779,8 +776,10 @@ program mpi_wrapper
                  endif
 
 #ifdef DEBUG
-                 call flush(300+mytask)
+                    call flush(300+mytask)
 #endif
+
+                 endif
 
               enddo
               ! endif
@@ -852,3 +851,5 @@ Pure Function to_upper (str) Result (string)
   end do
 
 End Function to_upper
+
+

@@ -21,6 +21,25 @@
 #       2014-04-15 MJ migration to cca/sf7, Stage I
 #
 
+# C. Schlundt, 12.06.2015
+# function for grep path_and_file_string from 
+# returncode ofpython script pick_aux_dir.py
+grep_wanted()
+{
+    STRING=$1
+    PICK_AUX_RETURN=PICK_AUX_RETURN:
+    LEN_RETCODE=${#PICK_AUX_RETURN}
+    split_string=$(echo ${STRING} | tr " " "\n")
+    for str in ${split_string}; do 
+        if [[ ${str} == *$PICK_AUX_RETURN* ]]; then 
+            len=${#str}
+            ret=`exec echo ${str} | cut -c $((LEN_RETCODE + 1))-$len` 
+            echo "${ret}"
+            break
+        fi  
+    done 
+}
+
 set -x
 
 # -- source config path files
@@ -405,9 +424,6 @@ while [ $ifile -lt $nl1b ]; do
     echo $(exec date +%Y/%m/%d:%H:%M:%S) "PICK ECMWF FILE" >> ${daily_log}
 
     # -- pick ecmwf file
-    #. ${ESA_ROUT}/pick_ecmwf_dir.ksh
-    #path_to_ecmwf=${ecmwf_file}
-    # -- C. Schlundt, 2014-12-02
     aux_input_dir=${path_to_ecmwf}
     suffix=nc #grb
     set -A ecmwf_files $(python $pick_aux_datafile2 \

@@ -151,7 +151,6 @@ else
         id=`date +%%s`
         jid=${jid}_US${id}
         echo ${jid} running
-
         # -- Convert month
         ACTMONTHS=$(printf %%02d $ACTMONTH)
 
