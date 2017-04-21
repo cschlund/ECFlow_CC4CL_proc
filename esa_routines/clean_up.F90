@@ -59,8 +59,6 @@ subroutine clean_up_main(string)
 
 end subroutine clean_up_main
 
-
-
 subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_attributes,move_L2)
 
   character(len=1024) :: string

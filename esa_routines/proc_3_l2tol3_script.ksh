@@ -257,7 +257,7 @@ l2info=${outputdir}/l2files_${exec_time}.tmp
 l2info_secondary=${outputdir}/l2files_${exec_time}_secondary.tmp
 
 #write file list
-if [ "${prodtype}" = l3a ] ; then
+if [[ "${prodtype}" = l3a || "${prodtype}" = l3b ]] ; then
     cp ${l2info_dum} ${l2info}    
 else
     cat ${l2info_dum} | grep output/${datum} > ${l2info}

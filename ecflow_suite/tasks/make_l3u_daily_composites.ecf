@@ -26,6 +26,8 @@ else
     # -- log directory for daily jobs
     log_dir="%ESA_ECF_LOG_DIR%/%SUITE%/%FAMILY%"
 
+
+
     # -- log file of retrieval ecflow script
     log_file_retrieval="${log_dir}/retrieval.1"
 

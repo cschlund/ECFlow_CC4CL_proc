@@ -151,7 +151,6 @@ else
         id=`date +%%s`
         jid=${jid}_US${id}
         echo ${jid} running
-
         # -- Convert month
         ACTMONTHS=$(printf %%02d $ACTMONTH)
 
@@ -172,7 +171,6 @@ else
 
         # -- get ESA temp_list_l2files path
         l2_file_list_dir="%ESA_LIST_L2FILES%"
-
 
         # -- put list of daily config files together
         inventory_file_daily_config=${logs_monthly}/process_single_day_${ACTYEAR}${ACTMONTHS}_${instrument}_${platform}_${jid}.cdaily.lst
@@ -210,7 +208,6 @@ else
               ${OUTPUTDIR} ${l2_file_list_dir} \
               %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
               %SINGLE_DAY_KSH%
-
 
         echo " *** FINISHED: retrieval for %SATELLITE%/%SENSOR% "\
              "START=%START_YEAR%/%START_MONTH% END=%END_YEAR%/%END_MONTH% "

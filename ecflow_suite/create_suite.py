@@ -27,6 +27,7 @@ def help():
     logger.info("     (d)   --ignore_sats noaa18 terra metopa")
     logger.info("     (e)   --use_avhrr_primes [--ignore_sats terra aqua]")
     logger.info("     (f)   --use_modis_only")
+    logger.info("     (g)   --check_ECFS")
     logger.info(" *** TRY for more information")
     logger.info("     ./{0} --help".format(os.path.basename(__file__)))
     print "\n"
@@ -107,6 +108,9 @@ if __name__ == '__main__':
     parser.add_argument('--dummy_run', action="store_true",
                         help="Dummy run, i.e. randomsleep only")
 
+    parser.add_argument('--check_ECFS', action="store_true",
+                        help="Check in ECFS archive whether L3 data already exist.")
+
     args = parser.parse_args()
 
     # -- dummy or test run
@@ -127,6 +131,13 @@ if __name__ == '__main__':
     else:
         testcase = 0
         message = "Note: Full orbits are being processed."
+
+    if args.check_ECFS:
+        checkECFScase = True
+        ECFSmessage = "Note: Only processing months with no L3 data in ECFS."
+    else:
+        checkECFScase = False
+        ECFSmessage = "Note: Ignoring L3 data in ECFS - processing all months."        
 
     # -- either one specific day or whole month
     if args.proc_day != -1:
@@ -174,10 +185,12 @@ if __name__ == '__main__':
         logger.info("DUMMY RUN     : {0} ({1})\n".format(dummycase, dummymess))
     else: 
         logger.info("TESTCASE RUN  : {0} ({1})\n".format(testcase, message))
+    if args.check_ECFS:
+        logger.info("CHECKING ECFS : {0} ({1})\n".format(checkECFScase, ECFSmessage))
 
     build_suite(args.start_date, args.end_date,
                 args.satellites, args.ignore_sats, args.ignore_months,
                 args.use_avhrr_primes, args.use_modis_only,
-                args.proc_day, dummycase, testcase)
+                args.proc_day, dummycase, testcase, checkECFScase)
 
     logger.info("SCRIPT \'{0}\' finished\n".format(os.path.basename(__file__)))

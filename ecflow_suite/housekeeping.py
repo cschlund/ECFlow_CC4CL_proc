@@ -183,8 +183,8 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA16"]["end_date"] = avhrr_dict["NOAA18"]["start_date"]
     avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"]
     avhrr_dict["NOAA18"]["end_date"] = avhrr_dict["NOAA19"]["start_date"] - timedelta(days=1)
-    avhrr_dict["NOAA19"]["end_date"] = datetime.date(2014, 12, 31)
-    avhrr_dict["METOPA"]["end_date"] = datetime.date(2014, 12, 31) # avhrr_dict["METOPB"]["start_date"]
+    avhrr_dict["NOAA19"]["end_date"] = datetime.date(2016, 12, 31)
+    avhrr_dict["METOPA"]["end_date"] = datetime.date(2016, 12, 31) # avhrr_dict["METOPB"]["start_date"]
     avhrr_dict["METOPB"]["end_date"] = datetime.date(2020, 1,  2) #datetime.date(2014, 12, 31)
     # --------------------------------------------------------------------
 
@@ -675,7 +675,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
 
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 ignoremonths_list, useprimes, modisonly, 
-                procday, dummycase, testcase):
+                procday, dummycase, testcase, checkECFScase):
     """
     Build the ecflow suite.
     """
@@ -802,7 +802,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 stdout, stderr = p1.communicate()
                 if "els: File/Directory does not exist" in stderr:
                     avhrr_flag = True
-                else:
+                elif checkECFScase:
                     avhrr_flag = False
                     
             if isensor == "MODIS" and modis_flag is False:
@@ -818,7 +818,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 stdout, stderr = p1.communicate()
                 if "els: File/Directory does not exist" in stderr:
                     modis_flag = True
-                else:
+                elif checkECFScase:
                     modis_flag = False
 
         # neither avhrr nor modis -> go to next month
@@ -894,7 +894,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" not in stderr:
+                if "els: File/Directory does not exist" not in stderr and checkECFScase:
                     print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
                     continue                
 
@@ -911,7 +911,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 satellites_within_current_month.append(satellite)
                 l2bsum_logdir = os.path.join(esa_ecflogdir, mysuite, 
                                              big_fam, yearstr, monthstr, 
-                                             isensor, satellite)
+                                             mainproc_fam, isensor, satellite)
                 l2bsum_logdirs_within_current_month.append(l2bsum_logdir)
             else:
                 msdate = datetime.date(int(yearstr), int(monthstr), 1)
@@ -927,7 +927,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" not in stderr:
+                if "els: File/Directory does not exist" not in stderr and checkECFScase:
                     print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
                     continue                
                 
