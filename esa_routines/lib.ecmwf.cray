@@ -13,10 +13,14 @@ HDFEOS=-lGctp -lhdfeos
 
 NETCDF4LIB=/usr/local/apps/netcdf4/4.3.0/CRAY/82/lib
 NETCDF4INC=/usr/local/apps/netcdf4/4.3.0/CRAY/82/include
+#NETCDF4LIB=/usr/local/apps/netcdf4/4.3.2/CRAY/82/lib
+#NETCDF4INC=/usr/local/apps/netcdf4/4.3.2/CRAY/82/include
 NETCDF4=-lnetcdf -lnetcdff
 
 HDF5LIB=/opt/cray/hdf5/1.8.12/CRAY/81/lib
 HDF5INC=/opt/cray/hdf5/1.8.12/CRAY/81/include
+#HDF5LIB=/opt/cray/hdf5/1.8.16/CRAY/8.3/lib
+#HDF5INC=/opt/cray/hdf5/1.8.16/CRAY/8.3/include
 HDF5=-lhdf5_fortran -lhdf5 -lhdf5_hl -lhdf5hl_fortran
 
 #Setup RTTOV library

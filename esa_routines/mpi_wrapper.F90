@@ -43,7 +43,7 @@ program mpi_wrapper
   integer, parameter :: short_string=1024
   integer, parameter :: long_string=2048
 
-  integer :: rc_pre,rc_liq,rc_ice,rc_post
+  integer :: rc_pre,rc_liq,rc_ice,rc_post,rc_toa
 
   integer :: nfiles_conf
   character(len=1024), allocatable, dimension(:) :: file_inventory_conf
@@ -67,8 +67,12 @@ program mpi_wrapper
   character(len=256) :: inventory_file_pre,inventory_file_liq&
        &,inventory_file_ice,inventory_file_post
   character(len=256) :: inventory_file_config,config_paths,config_attributes
-  character(len=256) :: single_day_ksh
+  character(len=256) :: single_day_ksh, searchString,proc_toa_str
+  logical :: proc_toa
   character(len=1024) :: dummyfile1024
+  !character(len=:),allocatable :: fileTsi, filePrtm, fileAlb, filePrimary, fileToaOut, preprocFileBase, preprocDir, finalPrimaryFullPath, flxAlgorithm
+  character(len=1024) :: fileTsi, filePrtm, fileAlb, filePrimary, fileToaOut, preprocFileBase, preprocDir, finalPrimaryFullPath, flxAlgorithm
+  integer :: lengthSearchString, lengthPrimary, cut_off
   character(len=2048) :: dummyfile2048
 
   character(len=15) :: instrument,wrapper_mode,platform
@@ -105,7 +109,6 @@ program mpi_wrapper
 
   END INTERFACE
 
-
   !Initialize MPI
   call MPI_INIT(ierror)
   call MPI_COMM_SIZE(MPI_COMM_WORLD,ntasks,ierror)
@@ -119,8 +122,9 @@ program mpi_wrapper
 
      ! get number of arguments
      nargs = COMMAND_ARGUMENT_COUNT()
+     write(*,*) "nargs = ", nargs
      ! if more than one argument passed, all inputs on command line
-     if(nargs .eq. 13) then
+     if(nargs .eq. 14) then
 
         CALL GET_COMMAND_ARGUMENT(1,inventory_file_config)
         CALL GET_COMMAND_ARGUMENT(2,instrument)
@@ -135,7 +139,14 @@ program mpi_wrapper
         CALL GET_COMMAND_ARGUMENT(11,config_paths)
         CALL GET_COMMAND_ARGUMENT(12,config_attributes)
         CALL GET_COMMAND_ARGUMENT(13,single_day_ksh)
+        CALL GET_COMMAND_ARGUMENT(14,proc_toa_str)
 
+     endif
+
+     if (proc_toa_str(:1) == "1") then
+        proc_toa = .true.
+     else
+        proc_toa = .false.
      endif
 
      config_paths=trim(adjustl(config_paths))
@@ -145,12 +156,10 @@ program mpi_wrapper
      single_day_ksh=trim(adjustl(single_day_ksh))
      write(*,*) 'single_day_ksh in mpi_wrapper.F90: ', trim(adjustl(single_day_ksh))
 
-
-
      !open file for stdout
      logfile=trim(adjustl(trim(adjustl(log_dir))//'/'//'proc_2_logfile_'&
           &//trim(adjustl(jid))//'.log'))
-     open(11,file=trim(adjustl(logfile)),status='replace')
+     open(777,file=trim(adjustl(logfile)),status='replace')
 
      !open file for L2 output list
      L2_file_list=trim(adjustl(trim(adjustl(L2_file_list_dir))//'/'//'L2_ncfile_list_l2b_' &
@@ -177,21 +186,21 @@ program mpi_wrapper
      nompthreads=omp_get_max_threads()
 #endif
 
-     write(11,*) '#############################################################'
-     write(11,*) '#############################################################'
-     write(11,*) "STARTING PARALLEL PROCESSING"
-     write(11,*)  '-------------------------------------------------------------'
-     write(11,*)  '-------------------------------------------------------------'
-     write(11,*) 'CHAIN running on: ', nompthreads, 'threads'
-     write(11,*) 'NO HYPERTHREADING IF NOT EXPLICITLY TURNED-ON!!!'
-     write(11,*) 'Number of tasks assigned:', ntasks
-     write(11,*) 'A total of ', nompthreads*ntasks,' CPUs is in use'
+     write(777,*) '#############################################################'
+     write(777,*) '#############################################################'
+     write(777,*) "STARTING PARALLEL PROCESSING"
+     write(777,*)  '-------------------------------------------------------------'
+     write(777,*)  '-------------------------------------------------------------'
+     write(777,*) 'CHAIN running on: ', nompthreads, 'threads'
+     write(777,*) 'NO HYPERTHREADING IF NOT EXPLICITLY TURNED-ON!!!'
+     write(777,*) 'Number of tasks assigned:', ntasks
+     write(777,*) 'A total of ', nompthreads*ntasks,' CPUs is in use'
 
      !set mode of operation (maintain only dynamic)
      lstatic=.false.
      if(trim(adjustl(wrapper_mode)) .eq. 'stat') lstatic=.true.
      if(trim(adjustl(wrapper_mode)) .eq. 'dyn') lstatic=.false.
-     write(11,*)  'WRAPPER IN MODE ', trim(adjustl(wrapper_mode))
+     write(777,*)  'WRAPPER IN MODE ', trim(adjustl(wrapper_mode))
      lidle=.false.
 
      open(25,file=trim(adjustl(inventory_file_config)),status='old')
@@ -207,6 +216,7 @@ program mpi_wrapper
   call mpi_bcast(platform,15,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
   call mpi_bcast(year,4,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
   call mpi_bcast(month,2,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  call mpi_bcast(proc_toa,1,MPI_LOGICAL,0,MPI_COMM_WORLD,ierror)
 
   !bcast paths to cpus
   call mpi_bcast(config_paths,256,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
@@ -227,7 +237,7 @@ program mpi_wrapper
 
         read(25,100) filepath1024
         file_inventory_conf(ifile)=trim(adjustl(filepath1024))
-        write(11,*) 'master',mytask,ifile,nfiles_conf&
+        write(777,*) 'master',mytask,ifile,nfiles_conf&
              &,trim(adjustl(file_inventory_conf(ifile)))
 
      enddo
@@ -235,12 +245,13 @@ program mpi_wrapper
      close(25)
 
      !#ifdef
-     call flush(11)
+     call flush(777)
 
   endif
 
   !bcast config files to cpus
   call mpi_bcast(file_inventory_conf,nfiles_conf*1024,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+  call mpi_bcast(proc_toa,1,MPI_LOGICAL,0,MPI_COMM_WORLD,ierror)
   call mpi_barrier(MPI_COMM_WORLD,ierror)
   !set chunk to 1(assume we always have ncpus>>ndays)
   chunk=1
@@ -278,14 +289,14 @@ program mpi_wrapper
         tag3=3
         call mpi_recv(ifree,1,mpi_integer,mpi_any_source,tag3,mpi_comm_world,status,ierror)
         itask=status(mpi_source)
-        write(11,*) 'config work done from cpu',itask
+        write(777,*) 'config work done from cpu',itask
 
         free(itask)=1
 
         !if all files are processed, send to all workers the abort signal
         if(upper_bound .eq. nfiles_conf) then
            if(sum(free(0:ntasks-1)) .eq. ntasks ) then
-              write(11,*) 'config work distribution was',ccounter,'sum'&
+              write(777,*) 'config work distribution was',ccounter,'sum'&
                    &,sum(ccounter)*chunk,'nfiles',nfiles_conf,ntasks,icycle
               !sent exit signal to worker
               tag0=0
@@ -293,7 +304,7 @@ program mpi_wrapper
               do icpu=1,ntasks-1
                  aitask=icpu
                  call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
-                 write(11,*) 'iexit signal sent (close)',mytask,aitask,iexit
+                 write(777,*) 'iexit signal sent (close)',mytask,aitask,iexit
               enddo
               exit
            else
@@ -313,7 +324,7 @@ program mpi_wrapper
               tag0=0
               iexit=0
               call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
-              write(11,*) 'iexit signal sent (free)',mytask,aitask,iexit
+              write(777,*) 'iexit signal sent (free)',mytask,aitask,iexit
 
               !sent work assigment to worker
               tag1=1
@@ -324,7 +335,7 @@ program mpi_wrapper
 
               !P write(*,*) 'work assigned to cpu',aitask,lower_bound,upper_bound
               ccounter(aitask)=ccounter(aitask)+1
-              write(11,*) 'config work assigned to cpu',aitask,lower_bound,upper_bound
+              write(777,*) 'config work assigned to cpu',aitask,lower_bound,upper_bound
               !write(*,*) 'free', free
 
 
@@ -381,16 +392,14 @@ program mpi_wrapper
   deallocate(free)
   deallocate(ccounter)
 
-
-
   !write(*,*) 'task,exit',mytask,iexit
   !wait till all workers are done
   call mpi_barrier(MPI_COMM_WORLD,ierror)
 
   !master builds inventory files
   if(mytask .eq. 0) then
-     write(11,*) 'building inventory',mytask
-     call flush(11)
+     write(777,*) 'building inventory',mytask
+     call flush(777)
   endif
 
   !if(ntasks .lt. 4) then
@@ -409,7 +418,6 @@ program mpi_wrapper
 !!$  endif
   !everybody wait till master is done
   call mpi_barrier(MPI_COMM_WORLD,ierror)
-
 
   !master reads inventory in again
   if(mytask .eq. 0 ) then
@@ -431,8 +439,8 @@ program mpi_wrapper
 
      else
 
-        write(11,*) 'FAILED: # of files not equal:',nfiles_pre,nfiles_liq,nfiles_ice,nfiles_post
-        close(11)
+        write(777,*) 'FAILED: # of files not equal:',nfiles_pre,nfiles_liq,nfiles_ice,nfiles_post
+        close(777)
         call mpi_abort(mpi_comm_world,rc,ierror)
         stop
 
@@ -449,9 +457,9 @@ program mpi_wrapper
         chunk=int(nfiles/float(ntasks))
      endif
      !if more CPUs available than files
-     if((ntasks-1) .gt. nfiles) write(11,*) "ntasks-1 gt nfiles: ", ntasks-1, nfiles
+     if((ntasks-1) .gt. nfiles) write(777,*) "ntasks-1 gt nfiles: ", ntasks-1, nfiles
      chunk=max(chunk,1)
-     write(11,*) 'Chunk set statically to: ',chunk
+     write(777,*) 'Chunk set statically to: ',chunk
 
   endif
 
@@ -474,7 +482,6 @@ program mpi_wrapper
   allocate(file_inventory_post(nfiles))
   !file_inventory_post=''
 
-
   !master reads now the inventory files
   if(mytask .eq. 0 ) then
 
@@ -482,7 +489,7 @@ program mpi_wrapper
 
         read(15,100) filepath1024
         file_inventory_pre(ifile)=trim(adjustl(filepath1024))
-        write(11,*) 'master',mytask,ifile,nfiles,trim(adjustl(file_inventory_pre(ifile)))
+        write(777,*) 'master',mytask,ifile,nfiles,trim(adjustl(file_inventory_pre(ifile)))
 
         read(16,200) filepath2048
         file_inventory_liq(ifile)=trim(adjustl(filepath2048))
@@ -495,7 +502,7 @@ program mpi_wrapper
 
         ! write path of L2 post-processed file to list
         call create_L2_list_or_file(file_inventory_post(ifile), instrument, &
-             platform, year, month, config_attributes, .false.)
+             platform, year, month, config_attributes, .false., finalPrimaryFullPath)
      enddo
 
      close(12)
@@ -507,8 +514,8 @@ program mpi_wrapper
      close(18)
 
      nelements=size(file_inventory_pre)
-     write(11,*) nelements,'elements to process'
-     call flush(11)
+     write(777,*) nelements,'elements to process'
+     call flush(777)
 
   endif
 
@@ -520,6 +527,7 @@ program mpi_wrapper
      call mpi_bcast(file_inventory_liq,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
      call mpi_bcast(file_inventory_ice,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
      call mpi_bcast(file_inventory_post,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+     call mpi_bcast(proc_toa,1,MPI_LOGICAL,0,MPI_COMM_WORLD,ierror)
      call mpi_barrier(MPI_COMM_WORLD,ierror)
 
 100  format(a1024)
@@ -557,6 +565,7 @@ program mpi_wrapper
      call mpi_bcast(file_inventory_liq,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
      call mpi_bcast(file_inventory_ice,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
      call mpi_bcast(file_inventory_post,nfiles*2048,MPI_CHARACTER,0,MPI_COMM_WORLD,ierror)
+     call mpi_bcast(proc_toa,1,MPI_LOGICAL,0,MPI_COMM_WORLD,ierror)
      call mpi_barrier(MPI_COMM_WORLD,ierror)
 
 #ifdef DEBUG
@@ -611,7 +620,7 @@ program mpi_wrapper
            !              maxcpuval=valmax
            !              chunk=min(int(0.25*(nfiles-upper_bound)/float((ntasks-1))),chunk)
            !              chunk=max(chunk,1)
-           !              write(11,*) 'Chunk set dynamically to: ',chunk
+           !              write(777,*) 'Chunk set dynamically to: ',chunk
            !           endif
 
 !!$           valmin=minval(ccounter(1:ntasks-1))
@@ -628,11 +637,11 @@ program mpi_wrapper
            if(upper_bound .eq. nfiles) then
 
               cpu_counter=cpu_counter+1
-              write(11,*) 'Closing, work done from cpu',itask,cpu_counter/float((ntasks-1))*100.0,cpu_counter,ntasks-1,ntasks-1-cpu_counter
-              call flush(11)
+              write(777,*) 'Closing, work done from cpu',itask,cpu_counter/float((ntasks-1))*100.0,cpu_counter,ntasks-1,ntasks-1-cpu_counter
+              call flush(777)
 
               if(sum(free(0:ntasks-1)) .eq. ntasks ) then
-                 write(11,*) 'work distribution was',ccounter,'sum',sum(ccounter)*chunk,'nfiles',nfiles,ntasks,icycle
+                 write(777,*) 'work distribution was',ccounter,'sum',sum(ccounter)*chunk,'nfiles',nfiles,ntasks,icycle
 
                  !sent exit signal to worker
                  tag0=0
@@ -640,7 +649,7 @@ program mpi_wrapper
                  do icpu=1,ntasks-1
                     aitask=icpu
                     call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
-                    write(11,*) 'iexit signal sent (close)',mytask,aitask,iexit
+                    write(777,*) 'iexit signal sent (close)',mytask,aitask,iexit
                     !call mpi_abort(mpi_comm_world,rc,ierror)
                  enddo
                  exit
@@ -650,8 +659,8 @@ program mpi_wrapper
            else
 
               !P           write(*,*) 'work done from cpu',itask,ccounter(itask)
-              write(11,*) 'Running, work done from cpu',itask
-              call flush(11)
+              write(777,*) 'Running, work done from cpu',itask
+              call flush(777)
 
               !if worker is free give it work
               if(ifree .eq. 1 ) then
@@ -671,7 +680,7 @@ program mpi_wrapper
                  tag0=0
                  iexit=0
                  call mpi_send(iexit,1,mpi_integer,aitask,tag0,mpi_comm_world,ierror)
-                 write(11,*) 'iexit signal sent (free)',mytask,aitask,iexit
+                 write(777,*) 'iexit signal sent (free)',mytask,aitask,iexit
 
                  !sent work assigment to worker
                  tag1=1
@@ -682,7 +691,7 @@ program mpi_wrapper
 
                  !P write(*,*) 'work assigned to cpu',aitask,lower_bound,upper_bound
                  ccounter(aitask)=ccounter(aitask)+1
-                 write(11,*) 'work assigned to cpu',aitask,lower_bound,upper_bound
+                 write(777,*) 'work assigned to cpu',aitask,lower_bound,upper_bound
                  !write(*,*) 'free', free
 
 
@@ -756,7 +765,7 @@ program mpi_wrapper
                  else
 
                     write(*,*) "exit status of preprocessing = ", rc_pre
-                    
+
                  endif
 
                  !cleanup and rename if everything worked well
@@ -771,8 +780,54 @@ program mpi_wrapper
                     dummyfile1024=adjustl(file_inventory_post(ifile))
                     write(*,*) "Calling create_L2_list_or_file"
                     call create_L2_list_or_file(dummyfile1024,instrument, &
-                         platform,year,month,config_attributes,.true.)
+                         platform,year,month,config_attributes,.true.,finalPrimaryFullPath)
                  endif
+
+                 open(26,file=trim(adjustl(file_inventory_liq(ifile))),status='old')
+                 read(26,*) preprocDir
+                 read(26,*) preprocFileBase
+                 close(26)
+                 
+                 ! process TOA fluxes
+                 ! ==============================================================
+                 if (proc_toa) then
+                    write(*,*) "setting toa input paths"
+                    cut_off = index(finalPrimaryFullPath, " ")
+                    filePrimary = trim(adjustl(finalPrimaryFullPath(1:cut_off-1)))
+                    filePrtm = trim(adjustl(preprocDir)) // "/" // trim(adjustl(preprocFileBase)) // ".prtm.nc" !read file_inventory_liq(ifile) lines 1 + 2 -> merge + .prtm.nc
+                    write(*,*) "filePrtm 1 = ", filePrtm
+                    cut_off = index(filePrtm, " ")
+                    filePrtm = trim(adjustl(filePrtm(1:cut_off-1)))
+                    write(*,*) "filePrtm 2 = ", filePrtm
+                    fileAlb  = trim(adjustl(preprocDir)) // "/" // trim(adjustl(preprocFileBase)) // ".alb.nc"  !read file_inventory_liq(ifile) lines 1 + 2 -> merge + .alb.nc
+                    write(*,*) "fileAlb 1 = ", fileAlb
+                    cut_off = index(fileAlb, " ")
+                    fileAlb = trim(adjustl(fileAlb(1:cut_off-1)))
+                    write(*,*) "fileAlb 2 = ", fileAlb
+                    fileTsi = "/perm/ms/de/de0/esa_cci_c_proc/orac_repository/data/tsi_soho_sorce_1978_2015.nc"
+                    write(*,*) "fileTsi 1 = ", fileTsi
+                    cut_off = index(fileTsi, " ")
+                    fileTsi = trim(adjustl(fileTsi(1:cut_off-1)))
+                    write(*,*) "fileTsi 2 = ", fileTsi
+
+                    searchString = "L2_CLOUD-CLD_PRODUCTS"
+                    lengthSearchString = len(trim(adjustl(searchString)))
+                    lengthPrimary = len(trim(adjustl(filePrimary)))
+                    cut_off = index(filePrimary, trim(adjustl(searchString)), BACK=.true.)
+                    fileToaOut = filePrimary(1:(cut_off-1)) // "TOA" // filePrimary((cut_off+lengthSearchString):lengthPrimary)
+                    write(*,*) "fileToaOut 1 = ", fileToaOut
+                    cut_off = index(fileToaOut, " ")
+                    fileToaOut = trim(adjustl(fileToaOut(1:cut_off-1)))
+                    write(*,*) "fileToaOut 2 = ", fileToaOut
+
+                    flxAlgorithm = "1"
+                    write(*,*) "input file paths to BUGSRAD: ", trim(adjustl(filePrimary)), " ", trim(adjustl(filePrtm)), " ", trim(adjustl(fileAlb)), " ", &
+                         trim(adjustl(fileTsi)), " ", trim(adjustl(fileToaOut)), " ", trim(adjustl(flxAlgorithm)), " ", rc_toa
+                    call process_broadband_fluxes(filePrimary, filePrtm, fileAlb, fileTsi, fileToaOut, flxAlgorithm, rc_toa)
+                    rc_toa=0
+                    ! stop
+                 endif
+                 ! ==============================================================
 
 #ifdef DEBUG
                     call flush(300+mytask)
@@ -803,14 +858,14 @@ program mpi_wrapper
 
   !close processing
   if(mytask .eq. 0) then
-     write(11,*)
-     write(11,*) '##################################################'
-     write(11,*) '##################################################'
-     write(11,*) 'Closing down processing,exit',mytask,iexit
-     write(11,*) '##################################################'
-     write(11,*) '##################################################'
-     call flush(11)
-     close(11)
+     write(777,*)
+     write(777,*) '##################################################'
+     write(777,*) '##################################################'
+     write(777,*) 'Closing down processing,exit',mytask,iexit
+     write(777,*) '##################################################'
+     write(777,*) '##################################################'
+     call flush(777)
+     close(777)
   elseif(mytask .ne. 0 ) then
 #ifdef DEBUG
      call flush(300+mytask)

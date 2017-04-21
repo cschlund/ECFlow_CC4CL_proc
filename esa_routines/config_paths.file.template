@@ -30,6 +30,7 @@ LIB_common=${MAIN}/orac_repository/trunk/common
 LIB_pre=${MAIN}/orac_repository/trunk/pre_processing
 LIB_main=${MAIN}/orac_repository/trunk/src
 LIB_post=${MAIN}/orac_repository/trunk/post_processing
+LIB_TOA=${MAIN}/orac_repository/trunk/derived_products/broadband_fluxes
 
 # base paths
 REPOSITORY="ECFlow_CC4CL_proc"
