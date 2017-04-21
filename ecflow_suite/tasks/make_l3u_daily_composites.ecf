@@ -12,7 +12,7 @@ ulimit -s unlimited
 
 echo "I am task %TASK% in family %FAMILY% responsible for L3U processing, i. e. daily composites (L2b)"
 
-if [ %DUMMYRUN% == 1 ]; then 
+if [ %DUMMYRUN% == 1 ]; then
 
     python -c "import time; import numpy; time.sleep(numpy.random.randint(1, 20))"
 
@@ -26,20 +26,18 @@ else
     # -- log directory for daily jobs
     log_dir="%ESA_ECF_LOG_DIR%/%SUITE%/%FAMILY%"
 
-
-
     # -- log file of retrieval ecflow script
     log_file_retrieval="${log_dir}/retrieval.1"
 
     # -- working directory: write core file here
     cd %ESA_ECF_LOG_DIR%
-    
+
     # -- create job id number
     primary_id=`echo ${PBS_JOBID} | cut -f1 -d"."`
     id=`date +%%s`
     sleep 3
     jid=ID${primary_id}_US${id}
-    
+
     # -- create l2 output file list
     filelist_basename="L2_ncfile_list_${prodtype}_%SENSOR%_${sat_date_base}.txt"
     filelist_level2_output="%ESA_LIST_L2FILES%/${filelist_basename}"
@@ -58,6 +56,7 @@ else
             %ESA_CONFIGDIR% %CFG_PREFIX% %CFG_SUFFIX% ${cfg_base} \
             %ESA_OUTPUTDIR% \
             ${filelist_level2_output} \
+            %PROC_TOA% \
             ${l3_global_config_file}
 
     # -- write MPMD task list

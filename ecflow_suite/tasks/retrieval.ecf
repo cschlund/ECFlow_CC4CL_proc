@@ -42,16 +42,16 @@ else
 
         cd ${l1_dir}
         # run MPMD filtering job only if source link files exist
-	unset USE_IPM
+        unset USE_IPM
         for f in ${l1_dir}/*/*/${prefix_filter_sunsat}*; do
-            [ -e "$f" ] && n_filter_tasks=`exec wc -l < %EC_FILTER_TASKFILE%` &&		
+            [ -e "$f" ] && n_filter_tasks=`exec wc -l < %EC_FILTER_TASKFILE%` &&
                 aprun -n $n_filter_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE% &&
                 remaining_files=($(ls -R ${l1_dir}/*/*/${prefix_filter_sunsat}* )) &&
                 n_remaining_files=${#remaining_files[*]} &&
                 [ ! -e "$f" ] && echo "Filtering not applied. No filter files exist."
             break
         done
-	export USE_IPM=1
+        export USE_IPM=1
 
         if [ $n_remaining_files -ne 0 ]; then
             for f in ${remaining_files}
@@ -205,6 +205,22 @@ else
         # mpi wrapper and passing this inventory file to him
         # --------------------------------------------------------------------
 
+        echo "execute wrapper"
+        echo "aprun -N $EC_tasks_per_node \
+              -n $EC_total_tasks \
+              -d $EC_threads_per_task \
+              -j $EC_hyperthreads \
+              -m5000h \ # pre-allocate 5 GB per task in huge pages
+              %WRAPPER_EXE% \
+              ${inventory_file_daily_config} \
+              ${instrument} ${platform} \
+              ${ACTMONTHS} ${ACTYEAR} \
+              ${wrapper_mode} ${jid} ${logs_monthly} \
+              ${OUTPUTDIR} ${l2_file_list_dir} \
+              %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
+              %SINGLE_DAY_KSH% %PROC_TOA%"
+
+        # -m5000h: pre-allocate 5 GB per task in huge pages: -m5000h
         aprun -N $EC_tasks_per_node \
               -n $EC_total_tasks \
               -d $EC_threads_per_task \
@@ -215,11 +231,10 @@ else
               ${wrapper_mode} ${jid} ${logs_monthly} \
               ${OUTPUTDIR} ${l2_file_list_dir} \
               %CFG_PATHS_FILE% %CFG_ATTRI_FILE% \
-              %SINGLE_DAY_KSH%
+              %SINGLE_DAY_KSH% %PROC_TOA%
 
         echo " *** FINISHED: retrieval for %SATELLITE%/%SENSOR% "\
              "START=%START_YEAR%/%START_MONTH% END=%END_YEAR%/%END_MONTH% "
-
 
         # go to next month
         (( unix_counter = ${unix_counter}+86400*${ndays} ))
