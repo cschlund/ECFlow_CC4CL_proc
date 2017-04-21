@@ -463,7 +463,7 @@ while [ $ifile -lt $nl1b ]; do
     else # if not test run, use dimensions as provided by database
         # for AVHRR, or full resolution for MODIS
         if [[ ${INSTRUMENT} = "AVHRR" ]]; then
-            startx=1
+            startx=1 #200 #1
             endx=${endx_list[$ifile]}
             starty=$(expr ${starty_list[$ifile]} + 1)
             endy=$(expr ${endy_list[$ifile]} + 1)
