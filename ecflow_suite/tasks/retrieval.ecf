@@ -6,6 +6,8 @@ module load craype-hugepages2M
 module switch grib_api/old
 module switch emos/old
 
+export HDF5_DISABLE_VERSION_CHECK=1
+
 # -- no core file
 export ATP_ENABLED=0
 # -- core file

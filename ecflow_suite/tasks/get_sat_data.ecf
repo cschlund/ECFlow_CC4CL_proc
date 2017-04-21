@@ -36,6 +36,7 @@ else
 
 	# temporarily disabled for running FBL3 test year
         # -- execute ksh script
+
         %GET_MODIS_KSH% %CFG_PATHS_FILE% ${cfg_fil}
 	
 	# -- count number of tarfiles

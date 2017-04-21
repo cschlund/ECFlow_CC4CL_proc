@@ -59,11 +59,12 @@ subroutine clean_up_main(string)
 
 end subroutine clean_up_main
 
-subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_attributes,move_L2)
+subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_attributes,move_L2, finalPrimaryFullPath)
 
   character(len=1024) :: string
   character(len=15)   :: instrument,platform, file_version
   character(len=1024) :: finalprimary, finalsecondary, sourceprimary, sourcesecondary
+  character(len=1024),intent(out) :: finalPrimaryFullPath
   character(len=4)    :: year
   character(len=5)    :: month,day,hour,min
   character(len=16)   :: prefix_dummy
@@ -134,11 +135,11 @@ subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_a
 
      ! TO DO: import file version
      finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // trim(file_version) // trim(suffix_target)
-     !finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // '00-ESACCI-L2_CLOUD-CLD_SECONDARY_PRODUCTS-' // trim(instrument) // 'GAC-' // trim(platform) // trim(file_version) // trim(suffix_target)
 
      if (move_L2) then
 
         command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        finalPrimaryFullPath = trim(directory) // trim(dir) // "/" // trim(finalprimary)
         call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
         write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
 
@@ -178,17 +179,25 @@ subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_a
      cut_off=index(trim(adjustl(dri_file)),yyyymm)
      write(*,*) 'co',cut_off
 
-     day=trim(adjustl(dri_file(cut_off+6:cut_off+7)))
+     !MST day=trim(adjustl(dri_file(cut_off+6:cut_off+7)))
      write(*,*) 'day',day
-
-     hour=trim(adjustl(dri_file(cut_off+9:cut_off+10)))
+!postproc_driver_MYD021KM.A2008183.1255.006.2012069031509.bspscs_000500694516.dat
+     !MST hour=trim(adjustl(dri_file(cut_off+9:cut_off+10)))
+     hour=trim(adjustl(dri_file(cut_off+35:cut_off+36)))
      write(*,*) 'hour',hour
 
-     min=trim(adjustl(dri_file(cut_off+11:cut_off+12)))
+     min=trim(adjustl(dri_file(cut_off+37:cut_off+38)))
      write(*,*) 'min',min
 
+     !200807tYD0200-ESACCI-L2_CLOUD-CLD_PRODUCTS-MODIS-AQUA-fv2.2.nc
+     
+     !MST
+     cut_off=index(trim(adjustl(string)),'MODIS')
+     day=trim(adjustl(string(cut_off-3:cut_off-2)))
+     !     output/20080701_MODIS_AQUA_retrie
+     
      finalprimary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // &
-          '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // 'GAC-' // &
+          '00-ESACCI-L2_CLOUD-CLD_PRODUCTS-' // trim(instrument) // '-' // &
           trim(platform) // trim(file_version) // trim(suffix_target)
 
      ! finalsecondary = trim(yyyymm) // trim(day) // trim(hour) // trim(min) // &
@@ -198,6 +207,7 @@ subroutine create_L2_list_or_file(string,instrument,platform,year,month,config_a
      if (move_L2) then
 
         command_line = "mv -f " // trim(directory) // trim(dir) // "/" // trim(sourceprimary) // " " // trim(directory) // trim(dir) // "/" // trim(finalprimary)
+        finalPrimaryFullPath = trim(directory) // trim(dir) // "/" // trim(finalprimary)
         call execute_command_line(trim(adjustl(command_line)),wait=.true.,exitstat=estat,cmdstat=cstat,cmdmsg=cmsg)
         write(*,*)  "L2 output file path = ", trim(directory) // trim(dir) // "/" // trim(finalprimary)
 

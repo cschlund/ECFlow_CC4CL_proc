@@ -14,6 +14,7 @@ lcommon=-lorac_common
 lpre=-lpreproc
 lmain=-lorac
 lpost=-lpostproc
+ltoa=-lprocess_broadband_fluxes
 
 #performance
 FFLAGS= -O noomp -O3 -Oipa3 -Ovector3 -Ofp3 -Ocache3 -Oaggress -Oscalar3 -Othread0 -hmpi1 -hflex_mp=tolerant -rom -ef -em
@@ -33,7 +34,7 @@ DFLAGS= -DWRAPPER -DDEBUG
 OBJ=mpi_wrapper.o clean_up.o prepare_daily.o build_inventory.o
 
 mpi_wrapper: $(OBJ)
-	     $(F90) $(LFLAGS) $(DFLAGS) -o mpi_wrapper.x $(OBJ) -L$(LIB_pre) $(lpre) -L$(LIB_main) $(lmain) -L$(LIB_post) $(lpost) $(LIBS) -L$(LIB_common) $(lcommon)
+	     $(F90) $(LFLAGS) $(DFLAGS) -o mpi_wrapper.x $(OBJ) -L$(LIB_pre) $(lpre) -L$(LIB_main) $(lmain) -L$(LIB_post) $(lpost) -L$(LIB_common) $(lcommon) -L$(LIB_TOA) $(ltoa) $(LIBS)
  
 %.o:	%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS) $(INC)  $<
