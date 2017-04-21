@@ -496,7 +496,6 @@ program mpi_wrapper
         ! write path of L2 post-processed file to list
         call create_L2_list_or_file(file_inventory_post(ifile), instrument, &
              platform, year, month, config_attributes, .false.)
-
      enddo
 
      close(12)

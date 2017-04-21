@@ -303,7 +303,6 @@ path_and_file_to_albedo=$(python $pick_aux_datafile \
                                  --inpdir $aux_input_dir --suffix $suffix \
                                  --year $YEAR --month $MONTHS --day $DAYS)
 
-
 # -- modis brdf
 echo $(exec date +%Y/%m/%d:%H:%M:%S) "PICK BRDF" >> ${daily_log}
 aux_input_dir=${path_to_brdf}
@@ -341,7 +340,6 @@ type=em
 path_and_file_to_emissivity=$(python $pick_aux_datafile \
                                      --inpdir $aux_input_dir --suffix $suffix \
                                      --year $YEAR --month $MONTHS --day $DAYS)
-
 
 lpick=1
 
@@ -558,7 +556,6 @@ while [ $ifile -lt $nl1b ]; do
 
     fi
 
-
     # -- set preprocessing basename
     preproc_base=${project}"-L2-CLOUD-CLD-"${INSTRUMENT}_${l2processor}"_"${PLATFORM}"_"${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
     # preproc_base=${project}_${processing_inst}_${INSTRUMENT}_${l2processor}V${l2proc_version}_${PLATFORM}_${exec_time_pre}_${YEAR}${MONTHS}${DAYCUT}${HOUR}${MINUTE}_${file_version}
@@ -711,7 +708,6 @@ while [ $ifile -lt $nl1b ]; do
         fi
 
     fi
-
 
     echo  $(exec date +%Y/%m/%d:%H:%M:%S) "PROCESSING OF ITEM" ${l1b_list[$ifile]} "FINISHED" >> ${daily_log}
     echo " " >> ${daily_log}
