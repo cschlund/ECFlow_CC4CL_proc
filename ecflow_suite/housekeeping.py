@@ -178,10 +178,10 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA9"]["end_date"]  = datetime.date(1988, 10, 31)
     avhrr_dict["NOAA11"]["end_date"] = datetime.date(1994, 10, 16)
     avhrr_dict["NOAA12"]["end_date"] = avhrr_dict["NOAA15"]["start_date"]
-    avhrr_dict["NOAA14"]["end_date"] = avhrr_dict["NOAA16"]["start_date"]
-    avhrr_dict["NOAA15"]["end_date"] = avhrr_dict["NOAA17"]["start_date"]
-    avhrr_dict["NOAA16"]["end_date"] = avhrr_dict["NOAA18"]["start_date"]
-    avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"]
+    avhrr_dict["NOAA14"]["end_date"] = avhrr_dict["NOAA16"]["start_date"] - timedelta(days=1)
+    avhrr_dict["NOAA15"]["end_date"] = avhrr_dict["NOAA17"]["start_date"] - timedelta(days=1)
+    avhrr_dict["NOAA16"]["end_date"] = avhrr_dict["NOAA18"]["start_date"] - timedelta(days=1)
+    avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"] - timedelta(days=1)
     avhrr_dict["NOAA18"]["end_date"] = avhrr_dict["NOAA19"]["start_date"] - timedelta(days=1)
     avhrr_dict["NOAA19"]["end_date"] = datetime.date(2014, 12, 31)
     avhrr_dict["METOPA"]["end_date"] = datetime.date(2014, 12, 31) # avhrr_dict["METOPB"]["start_date"]
