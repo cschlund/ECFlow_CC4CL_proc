@@ -804,7 +804,7 @@ program mpi_wrapper
                     cut_off = index(fileAlb, " ")
                     fileAlb = trim(adjustl(fileAlb(1:cut_off-1)))
                     write(*,*) "fileAlb 2 = ", fileAlb
-                    fileTsi = "/perm/ms/de/de0/esa_cci_c_proc/orac_repository/data/tsi_soho_sorce_1978_2015.nc"
+                    fileTsi = "/perm/ms/de/de0/esa_cci_c_proc/orac_repository/data/tsi_soho_sorce_1978_2017.nc"
                     write(*,*) "fileTsi 1 = ", fileTsi
                     cut_off = index(fileTsi, " ")
                     fileTsi = trim(adjustl(fileTsi(1:cut_off-1)))
