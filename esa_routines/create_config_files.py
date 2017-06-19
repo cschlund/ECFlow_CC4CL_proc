@@ -271,7 +271,7 @@ def proc2(args_ret):
         f.write("types_to_process_ICE='0,1,2,3,4,5,6,7,8,9'\n")
         f.write("ntypes_to_process_WAT='10'\n")
         f.write("types_to_process_WAT='0,1,2,3,4,5,6,7,8,9'\n")
-        f.write("cloudy_only='.true.'\n")
+        f.write("cloudy_only='.false.'\n")
         f.close()
 
     except (IndexError, ValueError, RuntimeError, Exception) as err:
