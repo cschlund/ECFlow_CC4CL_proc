@@ -1,8 +1,10 @@
-%include <pbs_serial_ecfs.h>
+%include <pbs_parallel_archive_l3u.h>
 %include <head.h>
 %include <export.h>
 
 echo "I am task %TASK% in family %FAMILY% responsible for archiving L3U data"
+
+cd %ESA_LEVEL3DIR%
 
 if [ %DUMMYRUN% == 1 ]; then 
 
@@ -10,14 +12,36 @@ if [ %DUMMYRUN% == 1 ]; then
 
 else
 
-    echo "python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% " \
-         "--year %START_YEAR% --month %START_MONTH% " \
-         "l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR% "
+    # taskfile path is stored in EC_FILTER_TASKFILE; this variable name is misleading, but 
+    # was recycled because no subsequent tasks require that variable
+    echo "aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE%"
+    module unload atp
+    module swap cdo/1.6.1 cdo/1.6.4
 
-    # -- archive L3 data
+    echo "aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE%"
+    aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% %EC_FILTER_TASKFILE%
+
+    # check that all files were splitted - reprocess sequentially those that weren't
+    echo "python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR%" \
+        "--year %START_YEAR% --month %START_MONTH%" \
+        "l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR%" \
+	"--proc_toa %PROC_TOA% --check_splitting"
+
     python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
         --year %START_YEAR% --month %START_MONTH% \
-        l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR%
+        l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR% \
+	--proc_toa %PROC_TOA% --check_splitting
+    rm -f %EC_FILTER_TASKFILE%
+    
+    # -- archive L3 data
+    echo "python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR%" \
+        "--year %START_YEAR% --month %START_MONTH%" \
+        "l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR%" \
+	"--proc_toa %PROC_TOA%"
+    python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
+        --year %START_YEAR% --month %START_MONTH% \
+        l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR% \
+	--proc_toa %PROC_TOA% 
 
 fi
 

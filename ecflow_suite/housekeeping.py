@@ -183,8 +183,8 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA16"]["end_date"] = avhrr_dict["NOAA18"]["start_date"] - timedelta(days=1)
     avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"] - timedelta(days=1)
     avhrr_dict["NOAA18"]["end_date"] = avhrr_dict["NOAA19"]["start_date"] - timedelta(days=1)
-    avhrr_dict["NOAA19"]["end_date"] = datetime.date(2014, 12, 31)
-    avhrr_dict["METOPA"]["end_date"] = datetime.date(2014, 12, 31) # avhrr_dict["METOPB"]["start_date"]
+    avhrr_dict["NOAA19"]["end_date"] = datetime.date(2016, 12, 31)
+    avhrr_dict["METOPA"]["end_date"] = datetime.date(2016, 12, 31) # avhrr_dict["METOPB"]["start_date"]
     avhrr_dict["METOPB"]["end_date"] = datetime.date(2020, 1,  2) #datetime.date(2014, 12, 31)
     # --------------------------------------------------------------------
 
@@ -618,11 +618,9 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
         # noinspection PyUnusedLocal
         avh_list = all_list
         mod_list = ["AQUA", "TERRA"]
-
         # avhrr database sat list
         db_sat_list = dbfile.get_sats(start_date=sdate, end_date=edate,
                                       ignore_sats=ignore_list)
-
         # terra/aqua at the end of list, if data avail.        
         for item in mod_list:
             if item in all_list:
@@ -652,7 +650,6 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
                 if ml in sat_list:
                     idx = sat_list.index(ml)
                     del sat_list[idx]
-
 
     # -- sort satellite list, MODIS last
     sort_avhrr_list = list()
@@ -801,7 +798,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" in stderr:
+                if "els: File does not exist" in stderr:
                     avhrr_flag = True
                 else:
                     avhrr_flag = False
@@ -895,7 +892,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" not in stderr:
+                if "els: File does not exist" not in stderr:
                     print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
                     continue                
 

@@ -84,6 +84,19 @@ else
 
     aprun -n $EC_total_tasks -N $EC_tasks_per_node %MPMD_SUBMITTER% ${taskfile}
 
+    # -- write MPMD taskfile for parallelized splitting of L3U
+    python %ARCHIVE_DATA% --satellite %SATELLITE% --instrument %SENSOR% \
+        --year %START_YEAR% --month %START_MONTH% \
+        l3 --prodtype L3U --inpdir %ESA_LEVEL3DIR% --ecfsdir %ECFS_L3_DIR% \
+	--write_l3u_splitlist --proc_toa %PROC_TOA% 
+    l3u_splitting_taskfile="%ESA_LEVEL3DIR%/%SENSOR%_%SATELLITE%_${jid}_L3U_splitting_tasklist.txt"
+    # taskfile path is stored in EC_FILTER_TASKFILE; this variable name is misleading, but 
+    # recycled here because no subsequent tasks require that variable
+    ecflow_client --alter add variable 'EC_FILTER_TASKFILE' "$l3u_splitting_taskfile" '/%SUITE%/%FAMILY%'	
+    val=`exec cat ${l3u_splitting_taskfile} | wc -l`
+    ecflow_client --alter add variable 'NDAYS_SATDATA' "$val" '/%SUITE%/%BIG_FAM%/%START_YEAR%/%START_MONTH%/%MAINPROC_FAM%/%SENSOR%/%SATELLITE%'    
+
+
 fi
 
 %include <tail.h>
