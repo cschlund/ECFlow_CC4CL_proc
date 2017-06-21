@@ -604,8 +604,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
     """
 
     # ignored satellites
-    default_ignore_sats = ['']
-#['TIROSN', 'NOAA6', 'NOAA8', 'NOAA10']
+    default_ignore_sats = ['NOAA6', 'NOAA8', 'NOAA10', 'METOPB']
     if ignoresats_list:
         add_ignore_sats = ignoresats_list
         ignore_list = default_ignore_sats + add_ignore_sats
