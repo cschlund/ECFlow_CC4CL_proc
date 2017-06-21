@@ -41,7 +41,6 @@ parallel_threads_number = 4
 
 # pycmsaf software
 pycmsaf = "/perm/ms/de/sf7/cschlund/pycmsaf"
-gacdb_file = os.path.join(pycmsaf, "AVHRR_GAC_archive.sqlite3")
 
 # ecgate and cca
 repository = "ECFlow_CC4CL_proc"
