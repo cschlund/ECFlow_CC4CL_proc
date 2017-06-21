@@ -2,7 +2,7 @@
 
 #PBS -N %TASK%
 #PBS -q ns
-#PBS -M dec4@ecmwf.int
+#PBS -M dec5@ecmwf.int
 #PBS -l EC_ecfs=0
 #PBS -l EC_mars=1
 #PBS -l EC_total_tasks=1
