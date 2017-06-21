@@ -19,6 +19,7 @@ else
         cfg_fil="%ESA_CONFIGDIR%/${cfg_bas}"
 
         monthly_orbits="%ESA_LIST_L2FILES%/orbit_list_${date_sat_base}.txt"
+	echo "Rscript %COUNT_AVHRR_ORBITS% --vanilla %ESA_LIST_L2FILES% $monthly_orbits %GACDB_CLIENT% %SQL_AVHRR_GAC% %START_YEAR% %START_MONTH% %SATELLITE%"
         val=`Rscript %COUNT_AVHRR_ORBITS% --vanilla %ESA_LIST_L2FILES% $monthly_orbits %GACDB_CLIENT% %SQL_AVHRR_GAC% %START_YEAR% %START_MONTH% %SATELLITE%`
 
     else

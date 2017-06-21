@@ -178,13 +178,13 @@ def get_avhrr_prime_dict():
     avhrr_dict["NOAA9"]["end_date"]  = datetime.date(1988, 10, 31)
     avhrr_dict["NOAA11"]["end_date"] = datetime.date(1994, 10, 16)
     avhrr_dict["NOAA12"]["end_date"] = avhrr_dict["NOAA15"]["start_date"]
-    avhrr_dict["NOAA14"]["end_date"] = avhrr_dict["NOAA16"]["start_date"]
-    avhrr_dict["NOAA15"]["end_date"] = avhrr_dict["NOAA17"]["start_date"]
-    avhrr_dict["NOAA16"]["end_date"] = avhrr_dict["NOAA18"]["start_date"]
-    avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"]
+    avhrr_dict["NOAA14"]["end_date"] = avhrr_dict["NOAA16"]["start_date"] - timedelta(days=1)
+    avhrr_dict["NOAA15"]["end_date"] = avhrr_dict["NOAA17"]["start_date"] - timedelta(days=1)
+    avhrr_dict["NOAA16"]["end_date"] = avhrr_dict["NOAA18"]["start_date"] - timedelta(days=1)
+    avhrr_dict["NOAA17"]["end_date"] = avhrr_dict["METOPA"]["start_date"] - timedelta(days=1)
     avhrr_dict["NOAA18"]["end_date"] = avhrr_dict["NOAA19"]["start_date"] - timedelta(days=1)
-    avhrr_dict["NOAA19"]["end_date"] = datetime.date(2014, 12, 31)
-    avhrr_dict["METOPA"]["end_date"] = datetime.date(2014, 12, 31) # avhrr_dict["METOPB"]["start_date"]
+    avhrr_dict["NOAA19"]["end_date"] = datetime.date(2016, 12, 31)
+    avhrr_dict["METOPA"]["end_date"] = datetime.date(2016, 12, 31) # avhrr_dict["METOPB"]["start_date"]
     avhrr_dict["METOPB"]["end_date"] = datetime.date(2020, 1,  2) #datetime.date(2014, 12, 31)
     # --------------------------------------------------------------------
 
@@ -230,7 +230,7 @@ def get_sensor(satellite):
     return sensor
 
 
-def set_vars(suite, procday, dummycase, testcase, svn_version):
+def set_vars(suite, procday, dummycase, testcase, svn_version, toacase):
     """
     Set suite level variables
     :rtype: None
@@ -280,6 +280,7 @@ def set_vars(suite, procday, dummycase, testcase, svn_version):
     suite.add_variable("LD_LIB_PATH", ld_lib_path)
     suite.add_variable("PROCDAY", procday)
     suite.add_variable("TESTRUN", testcase)
+    suite.add_variable("PROC_TOA", toacase)
     suite.add_variable("DUMMYRUN", dummycase)
     suite.add_variable("WRITE_MPMD_TASKFILE", write_mpmd_taskfile)
     suite.add_variable("WRITE_MPMD_CFGFILES", write_mpmd_cfgfiles)
@@ -617,11 +618,9 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
         # noinspection PyUnusedLocal
         avh_list = all_list
         mod_list = ["AQUA", "TERRA"]
-
         # avhrr database sat list
         db_sat_list = dbfile.get_sats(start_date=sdate, end_date=edate,
                                       ignore_sats=ignore_list)
-
         # terra/aqua at the end of list, if data avail.        
         for item in mod_list:
             if item in all_list:
@@ -652,7 +651,6 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
                     idx = sat_list.index(ml)
                     del sat_list[idx]
 
-
     # -- sort satellite list, MODIS last
     sort_avhrr_list = list()
     sort_modis_list = list()
@@ -675,7 +673,7 @@ def verify_satellite_settings(dbfile, sdate, edate, satellites_list,
 
 def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 ignoremonths_list, useprimes, modisonly, 
-                procday, dummycase, testcase):
+                procday, dummycase, testcase, toacase):
     """
     Build the ecflow suite.
     """
@@ -694,7 +692,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     suite = defs.add_suite(mysuite)
 
     # Set suite level variables
-    set_vars(suite, procday, dummycase, testcase, svn_version)
+    set_vars(suite, procday, dummycase, testcase, svn_version, toacase)
 
     # Set default status
     suite.add_defstatus(ecflow.DState.suspended)
@@ -743,12 +741,9 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     # original satellite list
     orig_sat_list = sat_list
 
-<<<<<<< HEAD
     # memorize previous month
     fam_month_previous = False
 
-=======
->>>>>>> 30dc0265547be62bebe73ff190aed6546d130bf7
     # memorize satellites for each month
     satellites_within_current_month = list()
 
@@ -797,13 +792,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 platform = s
                 if s[0:4] == "NOAA":
                     platform = "NOAA-" + s.split("NOAA")[1]
-                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.1.tar"
                 ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
                 args = ['els'] + [ecfs_target]
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" in stderr:
+                if "els: File does not exist" in stderr:
                     avhrr_flag = True
                 else:
                     avhrr_flag = False
@@ -813,7 +808,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 moded = enddate_of_month(int(yearstr), int(monthstr))
                 modis_flag = get_modis_avail(s, modsd, moded)                
                 platform = s
-                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.1.tar"
                 ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
                 args = ['els'] + [ecfs_target]
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
@@ -891,13 +886,13 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 platform = satellite
                 if satellite[0:4] == "NOAA":
                     platform = "NOAA-" + satellite.split("NOAA")[1]
-                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.1.tar"
                 ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
                 args = ['els'] + [ecfs_target]
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" not in stderr:
+                if "els: File does not exist" not in stderr:
                     print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
                     continue                
 
@@ -924,7 +919,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                     continue
 
                 platform = satellite
-                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.0.tar"
+                l3_file = YYYYMM + "-ESACCI-L3C_CLOUD-CLD_PRODUCTS-" + isensor + "_" + platform + "-fv2.1.tar"
                 ecfs_target = os.path.join(ecfs_l3_dir, YYYYMM, l3_file)
                 args = ['els'] + [ecfs_target]
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,

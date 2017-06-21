@@ -56,6 +56,7 @@ else
             %ESA_CONFIGDIR% %CFG_PREFIX% %CFG_SUFFIX% ${cfg_base} \
             %ESA_OUTPUTDIR% \
             ${filelist_level2_output}\
+	    %PROC_TOA% \
             ${l3_global_config_file}
 
     # -- write MPMD task list

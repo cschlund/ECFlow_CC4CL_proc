@@ -27,6 +27,8 @@ def help():
     logger.info("     (d)   --ignore_sats noaa18 terra metopa")
     logger.info("     (e)   --use_avhrr_primes [--ignore_sats terra aqua]")
     logger.info("     (f)   --use_modis_only")
+    logger.info("     (g)   --proc_toa")
+    logger.info("     (h)   --proc_day")
     logger.info(" *** TRY for more information")
     logger.info("     ./{0} --help".format(os.path.basename(__file__)))
     print "\n"
@@ -107,6 +109,9 @@ if __name__ == '__main__':
     parser.add_argument('--dummy_run', action="store_true",
                         help="Dummy run, i.e. randomsleep only")
 
+    parser.add_argument('--proc_toa', action="store_true",
+                        help="Process L2 TOA variables and propagate into L3")
+    
     args = parser.parse_args()
 
     # -- dummy or test run
@@ -127,6 +132,13 @@ if __name__ == '__main__':
     else:
         testcase = 0
         message = "Note: Full orbits are being processed."
+
+    if args.proc_toa:
+        toacase = 1
+        toamessage = "Processing and propagating TOA fluxes"
+    else:
+        toacase = 0
+        toamessage = "TOA fluxes not processed"
 
     # -- either one specific day or whole month
     if args.proc_day != -1:
@@ -169,6 +181,7 @@ if __name__ == '__main__':
     logger.info("MODIS ONLY    : {0}".format(args.use_modis_only))
     logger.info("IGNORE SATS   : {0}".format(args.ignore_sats))
     logger.info("IGNORE MONTHS : {0}".format(args.ignore_months))
+    logger.info("PROC TOA      : {0} ({1})\n".format(args.proc_toa, toamessage))
     logger.info("PROC STATUS   : {0}".format(proc_day_message))
     if args.dummy_run: 
         logger.info("DUMMY RUN     : {0} ({1})\n".format(dummycase, dummymess))
@@ -178,6 +191,6 @@ if __name__ == '__main__':
     build_suite(args.start_date, args.end_date,
                 args.satellites, args.ignore_sats, args.ignore_months,
                 args.use_avhrr_primes, args.use_modis_only,
-                args.proc_day, dummycase, testcase)
+                args.proc_day, dummycase, testcase, toacase)
 
     logger.info("SCRIPT \'{0}\' finished\n".format(os.path.basename(__file__)))
