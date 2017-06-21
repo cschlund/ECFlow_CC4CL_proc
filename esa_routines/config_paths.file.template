@@ -17,7 +17,7 @@ MAIN="/perm/ms/de/sf7/esa_cci_c_proc"
 
 # AVHRR GAC top level directory in ecfs
 # final pygac data
-avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive
+avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive_v2
 # CMSAF feedback loop months: JAN+JUL 2008, APR 2002, JAN 1983
 #avhrr_top=ec:/sf7/data/AVHRR_GAC_L1c_archive/testdata
 
@@ -30,6 +30,7 @@ LIB_common=${MAIN}/orac_repository/trunk/common
 LIB_pre=${MAIN}/orac_repository/trunk/pre_processing
 LIB_main=${MAIN}/orac_repository/trunk/src
 LIB_post=${MAIN}/orac_repository/trunk/post_processing
+LIB_TOA=${MAIN}/orac_repository/trunk/derived_products/broadband_fluxes
 
 # base paths
 REPOSITORY="ECFlow_CC4CL_proc"
