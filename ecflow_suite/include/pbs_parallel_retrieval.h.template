@@ -5,6 +5,5 @@
 #PBS -M dec4@ecmwf.int
 #PBS -l EC_hyperthreads=1
 #PBS -l EC_threads_per_task=1
-#PBS -l EC_memory_per_task=5000mb
+#PBS -l EC_memory_per_task=12000mb
 #PBS -l EC_total_tasks=%EC_TOTAL_SLAVES%
-
