@@ -16,18 +16,11 @@ else
          "--year %START_YEAR% --month %START_MONTH% " \
          "clear_l1 --satellite %SATELLITE% --instrument %SENSOR% "
 
-    # save orbits for KGK
-    if [ %SENSOR% == "AVHRR" ]
-    then
-        satellite=`exec echo %SATELLITE% | tr '[:upper:]' '[:lower:]'`
-        /perm/ms/de/sf7/esa_cci_c_proc/routine/L2_4_KGK.R T %ESA_INPUTDIR% %START_YEAR% %START_MONTH% %SENSOR% $satellite
-    fi
-
-    # python %CLEANUP_SCRATCH%  \
-    #        --inpdir %ESA_INPUTDIR% \
-    #        --cfgdir %ESA_CONFIGDIR% \
-    #        --year %START_YEAR% --month %START_MONTH% \
-    #        clear_l1 --satellite %SATELLITE% --instrument %SENSOR%
+    python %CLEANUP_SCRATCH%  \
+           --inpdir %ESA_INPUTDIR% \
+           --cfgdir %ESA_CONFIGDIR% \
+           --year %START_YEAR% --month %START_MONTH% \
+           clear_l1 --satellite %SATELLITE% --instrument %SENSOR%
 
 fi
 
