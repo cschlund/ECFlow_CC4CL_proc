@@ -814,7 +814,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" in stderr:
+                if "els: File does not exist" in stderr:
                     modis_flag = True
                 else:
                     modis_flag = False
@@ -925,7 +925,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
                 p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
                 stdout, stderr = p1.communicate()
-                if "els: File/Directory does not exist" not in stderr:
+                if "els: File does not exist" not in stderr:
                     print "L3C file available in ECFS, so skipping " + platform + " for " + YYYYMM
                     continue                
                 
