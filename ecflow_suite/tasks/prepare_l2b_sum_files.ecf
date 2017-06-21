@@ -48,7 +48,7 @@ else
 
     l3_global_config_file="%ESA_CONFIGDIR%/${prodtype}_%SENSOR%_${sat_date_base}.txt"
 
-    python %MAKE_CFG_FILE% -cf ${l3_global_config_file} -sy %START_YEAR% -ey %END_YEAR% -sm %START_MONTH% -em %END_MONTH% l2tol3 -ins %SENSOR% -inp n/a -typ ${prodtype}
+    python %MAKE_CFG_FILE% -cf ${l3_global_config_file} -sy %START_YEAR% -ey %END_YEAR% -sm %START_MONTH% -em %END_MONTH% l2tol3 -ins %SENSOR% -inp n/a -typ ${prodtype} --proc_toa %PROC_TOA%
 
     Rscript %WRITE_MPMD_CFGFILES% --vanilla \
             %START_YEAR% %START_MONTH% ${prodtype} \
