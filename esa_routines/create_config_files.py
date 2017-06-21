@@ -352,6 +352,7 @@ def l2tol3(args_l3):
         # f.write("gridyloc=50\n")        
         f.write("# filelist containing input files for product generation\n")
         f.write("filelist_l2b_sum_output={0}\n".format(args_l3.l2bsum_filelist))
+        f.write("proc_toa={0}\n".format(args_l3.proc_toa))
         f.write("\n")
 
         f.close()
@@ -441,6 +442,8 @@ if __name__ == '__main__':
                                help="String, /path/to/filelist/of/l2bsum/files")
     l2tol3_parser.add_argument('-loc', '--local', action="store_true",
                                help="Logical, TRUE if set, otherwise FALSE")
+    l2tol3_parser.add_argument('-proc_toa', '--proc_toa', type=int, required=True,
+                               help="Process TOA fluxes if = 1")
     l2tol3_parser.set_defaults(func=l2tol3)
 
     # Parse arguments
