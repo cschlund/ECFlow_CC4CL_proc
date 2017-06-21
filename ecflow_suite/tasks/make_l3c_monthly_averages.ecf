@@ -45,19 +45,27 @@ else
     #sed -n -e "s/^.*\(${sstr}\)/\1/p" ${log_fil} | cut -f2- -d"'" | sed "s/*/\"*\"/g;s/^/\"/;s/$/\"/" > ${ofilelist}
 
     # -- create L3C config file
+
+    echo "python %MAKE_CFG_FILE% \
+        --cfile ${cfg_fil} \
+        --start_year %START_YEAR% --end_year %END_YEAR% \
+        --start_month %START_MONTH% --end_month %END_MONTH% \
+        l2tol3 --satellite %SATELLITE% --instrument %SENSOR% \
+        --inpdir %ESA_LEVEL3DIR% --prodtype ${prodtype} \
+        --l2bsum_filelist ${ofilelist} --proc_toa %PROC_TOA%"
     python %MAKE_CFG_FILE% \
         --cfile ${cfg_fil} \
         --start_year %START_YEAR% --end_year %END_YEAR% \
         --start_month %START_MONTH% --end_month %END_MONTH% \
         l2tol3 --satellite %SATELLITE% --instrument %SENSOR% \
         --inpdir %ESA_LEVEL3DIR% --prodtype ${prodtype} \
-        --l2bsum_filelist ${ofilelist}
+        --l2bsum_filelist ${ofilelist} --proc_toa %PROC_TOA%
 
     # -- execute ksh script
     %RUN_L2TOL3_KSH% $jid \
         %CFG_ATTRI_FILE% \
         %CFG_PATHS_FILE% \
-        ${cfg_fil}
+        ${cfg_fil} 
 
 fi
 
