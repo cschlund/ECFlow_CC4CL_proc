@@ -13,10 +13,14 @@ HDFEOS=-lGctp -lhdfeos
 
 NETCDF4LIB=/usr/local/apps/netcdf4/4.3.0/CRAY/82/lib
 NETCDF4INC=/usr/local/apps/netcdf4/4.3.0/CRAY/82/include
+#NETCDF4LIB=/usr/local/apps/netcdf4/4.3.2/CRAY/82/lib
+#NETCDF4INC=/usr/local/apps/netcdf4/4.3.2/CRAY/82/include
 NETCDF4=-lnetcdf -lnetcdff
 
 HDF5LIB=/opt/cray/hdf5/1.8.12/CRAY/81/lib
 HDF5INC=/opt/cray/hdf5/1.8.12/CRAY/81/include
+#HDF5LIB=/opt/cray/hdf5/1.8.16/CRAY/8.3/lib
+#HDF5INC=/opt/cray/hdf5/1.8.16/CRAY/8.3/include
 HDF5=-lhdf5_fortran -lhdf5 -lhdf5_hl -lhdf5hl_fortran
 
 #Setup RTTOV library
@@ -29,10 +33,15 @@ HDF5=-lhdf5_fortran -lhdf5 -lhdf5_hl -lhdf5hl_fortran
 
 ##parallel (OMP)
 ## ATTENTION: test version selected??? ###
-RTTOVLIB=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_performance_parallel-dwd/lib
-RTTOVINCLUDE=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_performance_parallel-dwd/include
-RTTOVMODULE=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_performance_parallel-dwd/mod
-RTTOV=-lrttov11.2.0_emis_atlas -lrttov11.2.0_brdf_atlas -lrttov11.2.0_parallel -lrttov11.2.0_main -lrttov11.2.0_coef_io -lrttov11.2.0_coef_io_789 -lrttov11.2.0_mw_scatt_coef -lrttov11.2.0_mw_scatt -lrttov11.2.0_test -lrttov11.2.0_other 
+# RTTOVLIB=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_performance_parallel-dwd/lib
+# RTTOVINCLUDE=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_performance_parallel-dwd/include
+# RTTOVMODULE=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/cray-ecmwf_performance_parallel-dwd/mod
+# RTTOV=-lrttov11.2.0_emis_atlas -lrttov11.2.0_brdf_atlas -lrttov11.2.0_parallel -lrttov11.2.0_main -lrttov11.2.0_coef_io -lrttov11.2.0_coef_io_789 -lrttov11.2.0_mw_scatt_coef -lrttov11.2.0_mw_scatt -lrttov11.2.0_test -lrttov11.2.0_other
+
+RTTOVLIB=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov12/lib
+RTTOVINCLUDE=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov12/include
+RTTOVMODULE=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov12/mod
+RTTOV=-lrttov12_wrapper -lrttov12_mw_scatt -lrttov12_brdf_atlas -lrttov12_emis_atlas -lrttov12_other -lrttov12_parallel  -lrttov12_coef_io -lrttov12_hdf -lrttov12_main -lhdf5hl_fortran -lhdf5_hl -lhdf5_fortran -lhdf5 
 
 # RTTOVLIB=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/xc30-ecmwf_performance_parallel-dwd/lib
 # RTTOVINCLUDE=/perm/ms/de/sf7/esa_cci_c_proc/software/rttov/rttov11/xc30-ecmwf_performance_parallel-dwd/include

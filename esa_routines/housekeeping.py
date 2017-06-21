@@ -314,7 +314,7 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local, sensor):
     Create the final l3u tarball to be stored in ECFS.
     """
     # -- find l3 input directory via idnumber
-    if not local and sensor == "MODIS":
+    if not local:
         split = "." 
         foo = l3_tarfile.split(split)
         foo[-1] = "part1.tar"
@@ -326,7 +326,7 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local, sensor):
     daily_list = list()
     if len(dirs) > 0:
         for idir in dirs:
-            if idnumber in idir:
+            if idnumber in idir and not "splitting_tasklist" in idir:
                 daily_list.append(os.path.join(inpdir, idir))
     else:
         logger.info("No input in {0} matching {1} ".
@@ -387,13 +387,10 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local, sensor):
                 daily_tar_files.append(target)
 
         # create daily tarfile
-        # noinspection PyUnboundLocalVariable
+        ncbase = "-".join([i for i in ncbase.split("-") if "CLD_" not in i and "RAD_" not in i])
         daily_l3_tarfile = os.path.join(tempdir, ncbase + ".tar")
-        # print (" * Create \'%s\'" % daily_l3_tarfile)
-
         tar = tarfile.open(daily_l3_tarfile, "w:")
         for tfile in daily_tar_files:
-            # filedir = os.path.dirname(tfile)
             filenam = os.path.basename(tfile)
             tar.add(tfile, arcname=filenam)
         tar.close()
@@ -405,7 +402,7 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local, sensor):
         delete_dir(daily_tempdir)
 
     # -- make monthly tarballs containing all daily tarballs
-    if not local and sensor == "MODIS":
+    if not local:
         tar1 = tarfile.open(l3_tarfile1, "w:")
         tar2 = tarfile.open(l3_tarfile2, "w:")
     else:
@@ -415,7 +412,7 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local, sensor):
     for tfile in tar_files:
         file_index = file_index + 1
         filenam = os.path.basename(tfile)
-        if not local and sensor == "MODIS":
+        if not local: 
             if file_index <= half_tar_files:
                 tar1.add(tfile, arcname=filenam)
             else:
@@ -424,7 +421,7 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local, sensor):
             # filedir = os.path.dirname(tfile)
             tar.add(tfile, arcname=filenam)
             
-    if not local and sensor == "MODIS":
+    if not local:
         tar1.close()
         tar2.close()
         return [l3_tarfile1, l3_tarfile2]
@@ -488,10 +485,8 @@ def create_l3c_tarball(inpdir, idnumber, tempdir, l3_tarfile):
             tar_files.append(target)
 
     # -- create final tarfile to be copied into ECFS
-    # print (" * Create \'%s\'" % l3_tarfile)
     tar = tarfile.open(l3_tarfile, "w:")
     for tfile in tar_files:
-        # filedir = os.path.dirname(tfile)
         filenam = os.path.basename(tfile)
         tar.add(tfile, arcname=filenam)
     tar.close()

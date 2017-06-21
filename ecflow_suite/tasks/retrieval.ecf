@@ -11,6 +11,8 @@ export HDF5_DISABLE_VERSION_CHECK=1
 export IPM_LOGDIR=$SCRATCH/ipm-logs
 mkdir -p $IPM_LOGDIR
 
+export HDF5_DISABLE_VERSION_CHECK=1
+
 # -- no core file
 export ATP_ENABLED=0
 # -- core file

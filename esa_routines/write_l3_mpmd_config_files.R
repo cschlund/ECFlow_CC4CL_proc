@@ -16,7 +16,10 @@ cfg_suffix   = args[11]
 cfg_base     = args[12]
 base_path    = args[13]
 flist_l2_out = args[14]
-global_conf  = args[15]
+proc_toa     = args[15]
+global_conf  = args[16]
+
+print(global_conf)
 
 global_values = read.table( global_conf, as.is=T, col.names = "values")
 local = global_values$values[pmatch("local", global_values$values)]
@@ -72,6 +75,7 @@ for (i in 1:ndays) {
         global_values$values[pmatch("gridyl3", global_values$values)],
         global_values$values[pmatch("gridxl2b", global_values$values)],
         global_values$values[pmatch("gridyl2b", global_values$values)],
+        paste("proc_toa=", proc_toa, sep=""),
         paste("id=", L2_id, sep="")
 
     ), fileConn)
