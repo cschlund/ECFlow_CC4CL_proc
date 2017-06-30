@@ -715,7 +715,7 @@ def build_suite(sdate, edate, satellites_list, ignoresats_list,
     fam_dearch.add_variable('ECF_JOB_CMD', serial_job_cmd)
 
     # connect to database and get_sats list
-    db = AvhrrGacDatabase(dbfile=gacdb_file)
+    db = AvhrrGacDatabase(dbfile=sql_avhrr_gac) 
 
     # verify user input and database content
     logger.info('Verify satellite settings')

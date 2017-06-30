@@ -39,9 +39,6 @@ parallel_threads_number = 4
 #   LINES BELOW SHOULD NOT BE MODIFIED BY USER
 # -------------------------------------------------------
 
-# pycmsaf software
-pycmsaf = "/perm/ms/de/sf7/cschlund/pycmsaf"
-
 # ecgate and cca
 repository = "ECFlow_CC4CL_proc"
 perm = os.path.join("/perm", basepath)
@@ -93,6 +90,7 @@ remap_era_sequential_ksh = os.path.join(esa_routine, "remap_ERA_sequential.ksh")
 wrapper_exe = os.path.join(esa_routine, "mpi_wrapper.x")
 
 # paths to be exported: $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
+pycmsaf = "/perm/ms/de/sf7/cschlund/pycmsaf"
 pycmsaf_bin = os.path.join(pycmsaf, "bin")
 python_path = "/usr/local/apps/python/current/bin/python"
 ld_lib_path = "/perm/ms/de/sf7/esa_cci_c_proc/software/" \
