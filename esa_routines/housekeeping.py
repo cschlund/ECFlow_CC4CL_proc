@@ -327,7 +327,9 @@ def create_l3u_tarball(inpdir, idnumber, tempdir, l3_tarfile, local, sensor):
     if len(dirs) > 0:
         for idir in dirs:
             if idnumber in idir and not "splitting_tasklist" in idir:
-                daily_list.append(os.path.join(inpdir, idir))
+                nfiles_nc = len( fnmatch.filter(os.listdir(idir), '*.nc'))
+                if nfiles_nc ==4:
+                    daily_list.append(os.path.join(inpdir, idir))
     else:
         logger.info("No input in {0} matching {1} ".
                 format(inpdir, idnumber))

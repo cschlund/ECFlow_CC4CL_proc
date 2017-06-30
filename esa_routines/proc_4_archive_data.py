@@ -100,7 +100,6 @@ def l3(args_l3):
     # -- create date string
     datestring = str(args_l3.year) + str('%02d' % args_l3.month)
     print "_______________________________________"
-    print datestring
 
     # -- sensor and platform settings for L3U and L3C
     if args_l3.prodtype.upper() != "L3S" and args_l3.satellite:
@@ -190,7 +189,7 @@ def l3(args_l3):
                             output = [s.strip('\n') for s in output]
 
                     cld_products =  'selname,' + ','.join([s for s in output if "ctt_" in s or "cth_" in s or "ctp_" in s or "cer_" in s or ("cot_" in s and not "cccot_" in s) or "cwp_" in s or "stemp_" in s or "cph_" in s or "qcflag_" in s or "time_" in s])
-                    cld_masktype =  'selname,' + ','.join([s for s in output if "cty_" in s or "cccot_" in s or "cmask_" in s or "cph_" in s or "time_" in s])
+                    cld_masktype =  'selname,' + ','.join([s for s in output if "cty_" in s or "cccot_" in s or "cmask_" in s or "cph_" in s or "time_" in s or "ann_phase_" in s])
                     cld_angles   =  'selname,' + ','.join([s for s in output if "illum_" in s or "satzen_" in s or "solzen_" in s or "relazi_" in s or "time_" in s])
                     rad_products =  'selname,' + ','.join([s for s in output if "toa_" in s or "boa_" in s or "cla_" in s or "cee_" in s or "time_" in s])
                     if args_l3.local:
@@ -218,22 +217,21 @@ def l3(args_l3):
                     sys.exit(0)
 
                 if args_l3.check_splitting:
-                    
                     for root, dirs, files in os.walk(args_l3.inpdir):
                         for name in files:
-                            if idnumber in name:
-                                taskfile_name = os.path.join(root, name)
+                            if idnumber in name:                                
+                                taskfile_name = os.path.join(root, name)                                
                                 with open(taskfile_name) as f:
                                     taskfile = f.readlines()
-                                    taskfile = [x.strip() for x in taskfile]                                                                
+                                    taskfile = [x.strip() for x in taskfile]
                         for name in dirs:
                             matches = []
                             if name.endswith(idnumber):
                                 dirfiles =  os.listdir(os.path.join(root, name))
                                 for filename in fnmatch.filter(dirfiles, '*.nc'):
                                     matches.append(filename)
-                                nfiles= len(matches)
-                                if (nfiles < 4 and not args_l3.local) or (nfiles < 5 and args_l3.local):
+                                nfiles = len(matches)
+                                if (nfiles < 4 and nfiles > 0 and not args_l3.local) or (nfiles < 5 and nfiles > 0 and args_l3.local):
                                     print "Not enough NetCDF output files in " + name + ", so will split sequentially"
                                     yyyymmdd = name[0:8]
                                     for line in taskfile:
