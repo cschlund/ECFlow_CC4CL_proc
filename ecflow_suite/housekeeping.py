@@ -341,15 +341,22 @@ def add_final_cleanup_task(family, prefamily):
     Adds task for final cleanup of month.
     :rtype : dictionary
     """
+    archive_l3u_data = add_task(family, 'archive_l3u_data')
+    cleanup_l3u_data = add_task(family, 'cleanup_l3u_data')
     cleanup_l2_data = add_task(family, 'cleanup_l2_data')
     cleanup_l2bsum_files = add_task(family, 'cleanup_l2bsum_files')
     cleanup_aux_data = add_task(family, 'cleanup_aux_data')
 
-    add_trigger(cleanup_l2_data, prefamily)
-    add_trigger(cleanup_l2bsum_files, prefamily)
-    add_trigger(cleanup_aux_data, prefamily)
+    # One trigger on family level is sufficient
+    # add_trigger(cleanup_l2_data, prefamily)
+    # add_trigger(cleanup_l2bsum_files, prefamily)
+    # add_trigger(cleanup_aux_data, prefamily)
+    add_trigger(family, prefamily)
+    add_trigger(cleanup_l3u_data, archive_l3u_data)
 
-    return {'cleanup_l2_data': cleanup_l2_data,
+    return {'archive_l3u_data': archive_l3u_data, 
+            'cleanup_l3u_data': cleanup_l3u_data, 
+            'cleanup_l2_data': cleanup_l2_data,
             'cleanup_l2bsum_files': cleanup_l2bsum_files,
             'cleanup_aux_data': cleanup_aux_data}
 
@@ -423,8 +430,8 @@ def add_main_proc_tasks(family, prefamily, month_trigger, satellite):
     archive_l2_data = add_task(family, 'archive_l2_data')
     prepare_l2b_sum = add_task(family, 'prepare_l2b_sum_files')
     make_l3u_data = add_task(family, 'make_l3u_daily_composites')
-    archive_l3u_data = add_task(family, 'archive_l3u_data')
-    cleanup_l3u_data = add_task(family, 'cleanup_l3u_data')
+#    archive_l3u_data = add_task(family, 'archive_l3u_data')
+#    cleanup_l3u_data = add_task(family, 'cleanup_l3u_data')
     if 'AQUA' in satellite or 'TERRA' in satellite:
         make_l3u_data_Europe = add_task(family, 'make_l3u_daily_composites_Europe')
         archive_l3u_data_Europe = add_task(family, 'archive_l3u_data_Europe')
@@ -450,8 +457,8 @@ def add_main_proc_tasks(family, prefamily, month_trigger, satellite):
     add_trigger(archive_l2_data, retrieval)
     add_trigger(prepare_l2b_sum, cleanup_l1_data)
     add_trigger(make_l3u_data, cleanup_l1_data)
-    add_trigger(archive_l3u_data, make_l3u_data)
-    add_trigger(cleanup_l3u_data, archive_l3u_data)
+#    add_trigger(archive_l3u_data, make_l3u_data)
+#    add_trigger(cleanup_l3u_data, archive_l3u_data)
     if 'AQUA' in satellite or 'TERRA' in satellite:
         add_trigger(make_l3u_data_Europe, cleanup_l1_data)
         add_trigger(archive_l3u_data_Europe, make_l3u_data_Europe)
@@ -469,9 +476,9 @@ def add_main_proc_tasks(family, prefamily, month_trigger, satellite):
                 'prepare_l2b_sum': prepare_l2b_sum,
                 'make_l3u_data': make_l3u_data,
                 'make_l3u_data_Europe': make_l3u_data_Europe,
-                'archive_l3u_data': archive_l3u_data,
+                # 'archive_l3u_data': archive_l3u_data,
                 'archive_l3u_data_Europe': archive_l3u_data_Europe,
-                'cleanup_l3u_data': cleanup_l3u_data,
+                # 'cleanup_l3u_data': cleanup_l3u_data,
                 'cleanup_l3u_data_Europe': cleanup_l3u_data_Europe,
                 'make_l3c_data': make_l3c_data,
                 'archive_l3c_data': archive_l3c_data,
@@ -484,8 +491,8 @@ def add_main_proc_tasks(family, prefamily, month_trigger, satellite):
                 'archive_l2_data': archive_l2_data,
                 'prepare_l2b_sum': prepare_l2b_sum,
                 'make_l3u_data': make_l3u_data,
-                'archive_l3u_data': archive_l3u_data,
-                'cleanup_l3u_data': cleanup_l3u_data,
+                # 'archive_l3u_data': archive_l3u_data,
+                # 'cleanup_l3u_data': cleanup_l3u_data,
                 'make_l3c_data': make_l3c_data,
                 'archive_l3c_data': archive_l3c_data,
                 'cleanup_l3c_data': cleanup_l3c_data}
